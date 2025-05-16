@@ -1,0 +1,116 @@
+/* ContactForm.module.css */
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    /* Removed align-items: center; fields are already 100% width */
+    padding: 20px; /* Default padding */
+    background-color: #ffffff; /* Slightly brighter background */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Slightly softer shadow */
+    max-width: 550px; /* Slightly increased max-width */
+    margin: 20px auto; /* Add some top/bottom margin */
+    width: 95%; /* Ensure it doesn't touch screen edges on very small screens */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Media query for smaller screens to adjust padding */
+@media (max-width: 480px) {
+    .formContainer {
+        padding: 15px;
+        margin: 15px auto;
+        width: 98%; /* Use a bit more width on very small screens */
+    }
+}
+
+
+.formField {
+    width: 100%;
+    margin-bottom: 20px; /* Increased bottom margin for better spacing */
+}
+
+.label {
+    display: block;
+    margin-bottom: 8px; /* Increased margin for label */
+    font-weight: bold;
+    color: #555; /* Slightly softer label color */
+    font-size: 0.95em; /* Slightly smaller font size */
+}
+
+.input,
+.textarea {
+    width: 100%;
+    padding: 12px; /* Increased padding */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em; /* Use relative font size */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Add transition */
+}
+
+.input:focus,
+.textarea:focus {
+    border-color: #007bff; /* Highlight border on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25); /* Add subtle shadow on focus */
+    outline: none; /* Remove default outline */
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 120px; /* Slightly increased min-height */
+}
+
+.button {
+    background-color: #28a745; /* Changed button color to green */
+    color: white;
+    padding: 12px 25px; /* Increased padding */
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1em; /* Slightly larger font size */
+    cursor: pointer;
+    transition: background-color 0.3s ease, opacity 0.3s ease; /* Add opacity transition */
+    width: 100%; /* Make button full width on small screens */
+    max-width: 200px; /* Max width for button on larger screens */
+    align-self: center; /* Center the button if its width is limited */
+}
+
+.button:hover:not(:disabled) { /* Apply hover only when not disabled */
+    background-color: #218838; /* Darker green on hover */
+}
+
+.button:disabled {
+    background-color: #cccccc; /* Grey out disabled button */
+    cursor: not-allowed;
+    opacity: 0.7; /* Slightly reduce opacity */
+}
+
+/* Style for the "Volver a Inicio" link */
+.inicio {
+    display: inline-block; /* Treat like a block for margin/padding */
+    margin: 15px auto; /* Center it and add vertical margin */
+    padding: 10px 20px;
+    background-color: #6c757d; /* Grey button color */
+    color: white;
+    text-decoration: none; /* Remove underline */
+    border-radius: 4px;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.inicio:hover {
+    background-color: #5a6268; /* Darker grey on hover */
+}
+
+
+.error {
+    color: #dc3545; /* Bootstrap danger red */
+    font-size: 0.85em; /* Slightly smaller font size */
+    margin-top: 5px;
+    display: block; /* Ensure it takes up full width below input */
+}
+
+/* Style for inputs/textareas with errors */
+.input.errorState,
+.textarea.errorState {
+    border-color: #dc3545; /* Red border for error state */
+}

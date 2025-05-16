@@ -1,0 +1,74 @@
+/* AdminPage.module.css */
+
+.container {
+  padding: var(--spacing-6);
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.heading {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: var(--spacing-4);
+  color: var(--samsung-blue);
+  text-align: center;
+}
+
+.welcome {
+  font-size: 1rem;
+  margin-bottom: var(--spacing-4);
+  color: var(--text-medium);
+  text-align: center;
+}
+
+.logoutButton {
+  background-color: var(--samsung-blue);
+  color: var(--color-white);
+  padding: var(--spacing-2) var(--spacing-4);
+  border: none;
+  border-radius: var(--border-radius-medium);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: var(--spacing-4);
+}
+
+.logoutButton:hover {
+  background-color: var(--samsung-blue-light);
+}
+
+.link {
+  color: var(--samsung-blue);
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: var(--samsung-blue-light);
+}
+
+.loading {
+  text-align: center;
+  padding: var(--spacing-4);
+  color: var(--text-light);
+}
+
+/* Responsividad */
+@media (max-width: var(--breakpoint-md)) {
+  .heading {
+    font-size: 1.5rem;
+  }
+
+  .welcome {
+    font-size: 0.9rem;
+  }
+
+  .logoutButton {
+    width: 100%;
+    padding: var(--spacing-2);
+  }
+}

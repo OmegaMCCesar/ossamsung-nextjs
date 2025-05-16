@@ -1,0 +1,128 @@
+/* pages/index.module.css */
+
+/* Estilos para el contenedor principal de la página */
+.container {
+  display: flex; /* Usamos flexbox */
+  flex-direction: column; /* Elementos apilados verticalmente */
+  align-items: center; /* Centra los elementos horizontalmente en el contenedor flex */
+  justify-content: center; /* Centra los elementos verticalmente si hay espacio */
+  text-align: center; /* Centra el texto dentro de los elementos */
+  background-color: var(--color-black); /* Fondo negro */
+  color: var(--color-white); /* Color de texto por defecto sobre fondo negro */
+
+  /* Altura mínima responsiva - Ajusta según la altura de tu header/footer */
+  /* min-height: calc(100vh - 12rem); /* Ejemplo base */
+   min-height: 100vh; /* Podrías simplificar y usar 100vh si el Layout maneja su propio espacio */
+   padding: var(--spacing-10, 2.5rem) var(--spacing-4, 1rem); /* Padding Y y X responsivo */
+}
+
+/* Media Query para ajustar la altura mínima en pantallas pequeñas si usas calc */
+/* @media (min-width: var(--breakpoint-sm, 640px)) {
+   .container {
+     min-height: calc(100vh - 10rem); /* Ejemplo para sm */
+
+
+/* Estilos para el contenedor del logo */
+.logoContainer {
+  margin-bottom: var(--spacing-8, 2rem); /* Espacio debajo del logo */
+}
+
+/* Media Query para ajustar el margen del logo en pantallas más grandes */
+@media (min-width: var(--breakpoint-md, 768px)) {
+  .logoContainer {
+    margin-bottom: var(--spacing-10, 2.5rem);
+  }
+}
+
+
+/* Estilos para la imagen del logo */
+.logo {
+  height: 12rem; /* h-14 */
+  width: auto; /* Mantiene la relación de aspecto */
+  /* Si tu logo es oscuro, podrías necesitar invertirlo o ajustarlo para el fondo negro */
+  /* filter: invert(1); /* Ejemplo si el logo es oscuro */
+}
+
+/* Ajusta el tamaño del logo responsivamente */
+@media (min-width: var(--breakpoint-sm, 640px)) {
+  .logo {
+    height: 4rem; /* sm:h-16 */
+  }
+}
+
+@media (min-width: var(--breakpoint-md, 768px)) {
+  .logo {
+    height: 5rem; /* md:h-20 */
+  }
+}
+
+
+/* Estilos para el Título Principal (h1) */
+.title {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: bold; /* font-bold */
+  color: var(--color-white); /* Color del título (blanco sobre negro) */
+  margin-bottom: var(--spacing-10, 2.5rem); /* Espacio debajo del título */
+  line-height: 1.2; /* leading-tight */
+}
+
+/* Ajusta el tamaño del título responsivamente */
+@media (min-width: var(--breakpoint-sm, 640px)) {
+  .title {
+    font-size: 2.25rem; /* sm:text-4xl */
+  }
+}
+
+@media (min-width: var(--breakpoint-md, 768px)) {
+  .title {
+    font-size: 3rem; /* md:text-5xl */
+    margin-bottom: var(--spacing-12, 3rem); /* md:mb-12 */
+  }
+}
+
+
+/* Estilos para el Botón/Link de Iniciar */
+.startButton {
+  display: inline-block; /* Permite aplicar padding y margen */
+  padding: var(--spacing-3, 0.75rem) var(--spacing-8, 2rem); /* py-3 px-8 */
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 500; /* font-medium */
+  color: var(--color-white); /* Texto blanco en el botón */
+  background-color: var(--color-samsung-blue); /* Color azul de Samsung */
+  border-radius: 0.5rem; /* rounded-lg */
+  text-decoration: none; /* Quita el subrayado por defecto del Link */
+  transition: background-color 0.15s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Transiciones */
+
+  /* Sombra básica */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+}
+
+/* Estilos del botón en hover */
+.startButton:hover {
+  background-color: var(--color-samsung-blue-dark); /* Variante oscura para hover */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* shadow-lg */
+  transform: scale(1.05); /* transform hover:scale-105 */
+}
+
+/* Estilos del botón cuando está activo (presionado) */
+.startButton:active {
+  transform: scale(1); /* active:scale-100 */
+}
+
+/* Estilos del botón en focus para accesibilidad */
+.startButton:focus {
+  outline: none; /* Elimina el outline por defecto */
+  box-shadow: 0 0 0 2px var(--color-black), 0 0 0 4px var(--color-samsung-blue); /* focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 */
+  /* Ajusta estos colores si quieres un anillo de enfoque diferente */
+}
+
+
+/* Ajustes responsivos para el botón */
+@media (min-width: var(--breakpoint-sm, 640px)) {
+  .startButton {
+    padding: var(--spacing-3-5, 0.875rem) var(--spacing-10, 2.5rem); /* sm:py-3.5 sm:px-10 */
+    font-size: 1.25rem; /* sm:text-xl */
+  }
+}
+
+/* ... puedes añadir más estilos específicos de esta página aquí ... */

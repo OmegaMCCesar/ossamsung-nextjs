@@ -1,26 +1,239 @@
-@import "tailwindcss";
+/* globals.css */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* 1. Reset básico para consistencia entre navegadores */
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* Incluye padding y border en el tamaño total */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Elimina el margen por defecto de los elementos */
+body,
+h1, h2, h3, h4, h5, h6,
+p,
+blockquote,
+figure,
+ol, ul {
+  margin: 0;
+  padding: 0; /* También elimina padding por defecto de listas */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Establece propiedades base para el cuerpo */
+body {
+  min-height: 100vh; /* Asegura que el body ocupe al menos la altura de la ventana */
+  line-height: 1.5; /* Espaciado entre líneas legible */
+  -webkit-font-smoothing: antialiased; /* Mejora la renderización de fuentes en WebKit */
+  /* font-family: 'TuFuentePreferida', sans-serif;  <-- Define tu fuente aquí */
+  /* background-color: #ffffff; <-- Color de fondo global */
+  /* color: #333333; <-- Color de texto global */
+}
+
+/* 2. Estilos base para elementos de imagen y multimedia responsiva */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block; /* Elimina espacio extra bajo la imagen */
+  max-width: 100%; /* Las imágenes no se desbordan de su contenedor */
+  height: auto; /* Mantiene la relación de aspecto */
+}
+
+/* 3. Asegura que los inputs, botones, etc., hereden las propiedades de fuente */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* 4. Previene que el texto largo se desborde */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* 5. Configuración de la fuente base responsiva (Mobile-First) */
+/* Define el tamaño de fuente base en el elemento HTML */
+/* Usar rems basados en este tamaño facilita la escalabilidad */
+html {
+  font-size: 14px; /* Tamaño base para dispositivos móviles (por defecto) */
+}
+
+/* Media Query para ajustar el tamaño de fuente base en pantallas más grandes */
+@media (min-width: 768px) { /* Ejemplo: a partir de tabletas */
+  html {
+    font-size: 15px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (min-width: 1024px) { /* Ejemplo: a partir de escritorios */
+  html {
+    font-size: 16px; /* Tamaño estándar para escritorio */
+  }
 }
+
+/* 6. Definición de variables CSS (Opcional pero útil) */
+/* Variables CSS para los colores de Samsung y breakpoints */
+:root  {
+  /* --- Breakpoints (ajusta si tus diseños usan otros valores) --- */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* --- Escala de Espaciado Común (basada en múltiplos de 4px) --- */
+  /* Usado para padding, margin, gap */
+  --spacing-0: 0;
+  --spacing-px: 1px;
+  --spacing-1: 4px;    /* 0.25rem */
+  --spacing-1-5: 6px;  /* 0.375rem */
+  --spacing-2: 8px;    /* 0.5rem */ /* Correspondía a 8px y 10px en el original */
+  --spacing-2-5: 10px; /* 0.625rem */
+  --spacing-3: 12px;   /* 0.75rem */
+  --spacing-3-5: 14px; /* 0.875rem */
+  --spacing-4: 16px;   /* 1rem */
+  --spacing-5: 20px;   /* 1.25rem */
+  --spacing-6: 24px;   /* 1.5rem */ /* Correspondía a 24px en el original */
+  --spacing-7: 28px;   /* 1.75rem */
+  --spacing-8: 32px;   /* 2rem */ /* Correspondía a 32px en el original */
+  --spacing-9: 36px;   /* 2.25rem */
+  --spacing-10: 40px;  /* 2.5rem */ /* Correspondía a 40px en el original */
+  --spacing-12: 48px;  /* 3rem */
+
+
+  /* --- Variables de Espaciado Específicas (del original House3.module.css que no encajan en la escala) --- */
+  --spacing-15px: 15px; /* Usado para gap y padding */
+  --spacing-20px: 20px; /* Usado para padding y margin */
+  /* El 24px del original (cabezal margin, padding) está cubierto por --spacing-6 */
+  /* El 30px del original (filters margin) está cerca de --spacing-8 */
+  /* El 25px del original (filters margin top, searchInput margin top) está cerca de --spacing-6 */
+
+
+  /* --- Variables de Radio de Borde --- */
+  --border-radius-small: 4px; /* Usado para botones, inputs, ítems pequeños */
+  --border-radius-medium: 8px; /* Usado para contenedores, ítems de grid, summary */
+
+
+  /* --- Variables de Colores del Tema Oscuro (con los valores CORRECTOS del House3.module.css original) --- */
+  --background-dark: #1A1A1A; /* Fondo principal */
+  --card-background-white: #fff; /* Fondo de tarjetas blancas (si las usas) */
+  --card-background-dark: hsl(0, 0%, 100%); /* Fondo de tarjetas oscuras */
+  --text-light: #E0E0E0; /* Texto claro */
+  --text-medium: #B0B0B0; /* Texto secundario (gris medio) */
+  --border-dark: #444444; /* Bordes y separadores oscuros */
+
+  /* --- Variables de Colores de Samsung Blue --- */
+  --samsung-blue: #1428A0; /* Azul principal */
+  --samsung-blue-light: #3B5998; /* Azul claro para hover */
+  --samsung-blue-dark: #0a1a70; /* Azul más oscuro para hover (precalculado) */
+
+
+  /* --- Variables de Colores de Error/Advertencia --- */
+  --error-red: #FF5252;      /* Rojo brillante (usado directamente) */
+  --warning-orange: #FFB300; /* Naranja brillante (usado directamente) */
+
+  /* --- Escala de Colores Rojos (usada en estilos de error responsivos/modo oscuro) --- */
+  --color-red-100: #fee2e2;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444; /* Rojo base común */
+  --color-red-700: #dc2626;
+  --color-red-800: #991b1b;
+  --color-red-900: #450a0a;
+
+
+  /* --- Escala de Colores Grises (si se usan fuera de las variables específicas de tema oscuro) --- */
+  /* Estos podrían ser necesarios si tu CSS usa --color-gray-XYZ directamente */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563; /* Usado en back/reset asc buttons en equips.module.css sketch */
+  --color-gray-700: #374151; /* Usado en back/reset asc buttons en equips.module.css sketch */
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827; /* Usado en Layout background dark */
+
+
+  /* --- Colores Básicos --- */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+
+  /* --- Variable para el color de hover del borde oscuro (traducido de darken()) --- */
+  --border-dark-hover: #3a3a3a; /* Gris ligeramente más oscuro que --border-dark */
+}
+
+
+/* 7. Contenedor principal responsivo */
+/* Centra el contenido y aplica un ancho máximo con padding horizontal */
+.container {
+  width: 100%; /* Ocupa el ancho completo por defecto (móvil) */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4, 16px); /* Padding horizontal base */
+  padding-right: var(--spacing-4, 16px);
+  /* max-width: 100%; ya cubierto por width: 100% y padding */
+}
+
+/* Ajusta el ancho máximo del contenedor en los breakpoints */
+@media (min-width: var(--breakpoint-sm, 640px)) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: var(--breakpoint-md, 768px)) {
+  .container {
+    max-width: 768px;
+     padding-left: var(--spacing-6, 24px); /* Puedes aumentar el padding en pantallas más grandes */
+     padding-right: var(--spacing-6, 24px);
+  }
+}
+
+@media (min-width: var(--breakpoint-lg, 1024px)) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: var(--breakpoint-xl, 1280px)) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: var(--breakpoint-2xl, 1536px)) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+/* Agrega aquí cualquier otro estilo global necesario */
+/* Por ejemplo, estilos para enlaces, estilos para focus outline, etc. */
+
+a {
+  color: inherit; /* Enlaces heredan el color del texto circundante */
+  text-decoration: none; /* Elimina el subrayado por defecto */
+}
+
+a:hover {
+  text-decoration: underline; /* Subraya al pasar el ratón */
+}
+
+/* Oculta elementos visualmente pero los mantiene accesibles para lectores de pantalla */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Otros estilos globales que necesites */

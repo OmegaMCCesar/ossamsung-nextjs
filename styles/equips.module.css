@@ -1,0 +1,438 @@
+/* pages/equips.module.css */
+
+/* Este archivo usa las variables definidas en el bloque :root de globals.css */
+
+/* --- Contenedor Principal de la Página --- */
+/* Adapta los estilos del antiguo .container */
+.equipsPageWrapper {
+  font-family: 'Arial', sans-serif; /* Fuente */
+  color: var(--text-light); /* Color principal de texto (del tema oscuro) */
+  background-color: var(--background-dark); /* Color de fondo (del tema oscuro) */
+  padding: var(--spacing-20px); /* Padding (usando variable) */
+  /* max-width y margin: auto ya vienen del .container global del Layout */
+  border-radius: var(--border-radius-medium); /* Borde redondeado */
+  box-shadow: 0 2px var(--spacing-15px) rgba(0, 0, 0, 0.5); /* Sombra */
+
+  /* No necesitas estilos de modo oscuro aquí si ya los colores por defecto son los oscuros */
+}
+
+
+/* --- Cabezal --- */
+.cabezal {
+     align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-dark);
+    gap: 15px;
+
+  /* Media Query del original (768px) - Usamos tu variable de breakpoint */
+ }
+
+.cabezalTitle {
+    width: 100%;
+  text-align: center;
+}
+
+.cabezalh1 {
+  color: var(--samsung-blue); /* Azul de Samsung */
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.cabezalh2 {
+  color: var(--text-medium); /* Gris medio */
+  font-size: 1.2em;
+  font-weight: normal;
+}
+
+
+/* --- Botones --- */
+.addButton,
+.volverButton,
+.buzonButton,
+.resetButton { /* Estos son los botones principales */
+  background-color: var(--samsung-blue); /* Azul de Samsung */
+  color: var(--text-light); /* Texto claro */
+  padding: var(--spacing-2) var(--spacing-3); /* Padding usando variables */
+  border: none;
+  border-radius: var(--border-radius-small); /* Borde redondeado */
+  cursor: pointer;
+  font-size: 1em;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: background-color 0.2s ease;
+  white-space: nowrap; /* Evita salto de línea en texto */
+}
+
+.addButton:hover,
+.volverButton:hover,
+.buzonButton:hover,
+.resetButton:hover {
+  background-color: var(--samsung-blue-light); /* Azul más claro al pasar ratón */
+}
+
+/* Botones específicos que tenían otros estilos en el original */
+/* Botón de Volver a etapa anterior */
+.backButton,
+.resetAscButton { /* Estos usaban el mismo estilo que los principales, pero podrías diferenciarlos */
+   /* Puedes dejarles el estilo de arriba o darles uno propio */
+   background-color: var(--color-gray-700); /* Un gris oscuro */
+   color: var(--text-light);
+   padding: var(--spacing-2) var(--spacing-3);
+   border: none;
+   border-radius: var(--border-radius-small);
+   cursor: pointer;
+   font-size: 1em;
+   text-decoration: none;
+   display: inline-block;
+   text-align: center;
+   transition: background-color 0.2s ease;
+   white-space: nowrap;
+}
+
+.backButton:hover,
+.resetAscButton:hover {
+   background-color: var(--color-gray-600); /* Gris un poco más claro */
+}
+
+
+/* Botón de Editar (Admin) */
+.editButton {
+  background-color: var(--border-dark); /* Gris oscuro del borde */
+  color: var(--text-light); /* Texto claro */
+  padding: var(--spacing-1) var(--spacing-2); /* Padding más pequeño */
+  border: none;
+  border-radius: var(--border-radius-small); /* Borde redondeado */
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease;
+  position: absolute; /* Posicionamiento absoluto */
+  top: var(--spacing-1); /* Arriba */
+  right: var(--spacing-1); /* Derecha */
+  z-index: 1; /* Sobre otros elementos */
+}
+
+.editButton:hover {
+  /* Usamos la variable precalculada del darken() o un valor fijo */
+  background-color: var(--border-dark-hover); /* Gris un poco más oscuro al pasar ratón */
+}
+
+
+/* --- Filtros e Inputs --- */
+.filters,
+.ascCodeInputContainer { /* Contenedores flex para filtros e input ASC */
+  display: flex;
+  gap: var(--spacing-2); /* Espacio entre elementos (10px) */
+  align-items: center;
+  flex-wrap: wrap; /* Permite que los elementos salten línea */
+  justify-content: center; /* Centrado en horizontal */
+  width: 100%; /* Ocupa todo el ancho en móvil */
+  max-width: 400px; /* Limita ancho para móvil si está apilado */
+}
+
+.filters {
+   margin: var(--spacing-6) var(--spacing-8) 0 var(--spacing-6); /* Margen específico del original (24 30 0 25) */
+   max-width: none; /* Sin límite de ancho en desktop */
+   justify-content: flex-start; /* Alinear a la izquierda en desktop */
+}
+
+.ascCodeInputContainer {
+  margin-right: 10px;
+   width: 48%;
+   margin-top: var(--spacing-4); /* Espacio arriba */
+   /* En 768px+ el filters.flex-direction: row hará que estos se pongan en fila */
+}
+
+
+.searchInput,
+.categorySelect,
+.searchInputAsc { /* Estilos para los inputs y select */
+  padding: var(--spacing-2) var(--spacing-3); /* Padding (8px 12px) */
+  border: 1px solid var(--border-dark); /* Borde oscuro */
+  border-radius: var(--border-radius-small); /* Borde redondeado */
+  font-size: 1em;
+  min-width: 150px; /* Ancho mínimo */
+  background-color: var(--background-dark); /* Fondo oscuro */
+  color: var(--text-light); /* Texto claro */
+}
+
+.categorySelect {
+  -webkit-appearance: none; /* Quita flecha por defecto */
+  -moz-appearance: none;
+  appearance: none;
+  /* Flecha personalizada - Puedes usar un SVG si el data-url da problemas */
+  /* Asegúrate que el color de la flecha sea visible en fondo oscuro */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23E0E0E0%22%20d%3D%22M287%2C114.7L159.3%2C21.L27.L21.L159.3%2C149.3L287%2C21Z%22%2F%3E%3C%2Fsvg%3E'); /* Flecha clara */
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-2) center; /* Posición flecha */
+  background-size: 12px auto;
+  padding-right: var(--spacing-8); /* Espacio para la flecha */
+}
+
+
+/* Anchos específicos del original - Revisa si son necesarios o si flex/grid ya funcionan */
+.searchInput {
+  margin-top: var(--spacing-6); /* Margen superior (25px) */
+  width: 63%; /* Ancho específico del original */
+  /* Considera cambiar a flex-grow en desktop para que ocupe espacio */
+}
+/* Ajuste responsivo para que searchInput no tenga margin-top cuando filters es row */
+
+
+
+.searchInputAsc{
+  margin-top: var(--spacing-2); /* Margen superior (8px) */
+  width: 100%; /* Ocupa todo el ancho en móvil */
+  /* padding ya definido arriba */
+}
+/* Ajuste responsivo para que searchInputAsc no tenga margin-top cuando ascCodeInputContainer es row */
+
+
+.searchInput::placeholder,
+.searchInputAsc::placeholder { /* Color de placeholder */
+  color: var(--text-medium);
+  opacity: 0.7;
+}
+
+
+.searchInput.inputInvalid,
+.searchInputAsc.inputInvalid { /* Borde y sombra para input inválido */
+  border-color: var(--error-red);
+  box-shadow: 0 0 var(--spacing-1) rgba(var(--error-red), 0.5); /* Ajusta la sombra */
+}
+
+/* --- Área de Contenido Principal --- */
+.contentArea {
+  margin-top: var(--spacing-20px); /* Margen superior (20px) */
+}
+
+/* --- Listas y Grid Layouts --- */
+.selectionList,
+.modelList {
+ margin-top: var(--spacing-20px); /* Margen superior (20px) */
+}
+
+.selectionTitle {
+ color: var(--samsung-blue);
+ font-size: 1.5em;
+ margin-bottom: var(--spacing-2); /* Margen inferior (10px) */
+ text-align: center;
+}
+
+.selectionDescription {
+ color: var(--text-medium);
+ text-align: center;
+ margin-bottom: var(--spacing-20px); /* Margen inferior (20px) */
+ font-style: italic;
+}
+
+.list { /* Lista ul */
+ list-style: none;
+ padding: 0;
+ margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2); /* Espacio entre ítems (10px) */
+}
+
+.clickableItem { /* Elementos li o div clickeables */
+ background-color: var(--samsung-blue-dark); /* Fondo oscuro de tarjeta */
+ border: 1px solid var(--border-dark); /* Borde oscuro */
+ border-radius: var(--border-radius-small); /* Borde redondeado (4px) */
+ padding: var(--spacing-15px); /* Padding (15px) */
+ margin-bottom: var(--spacing-2); /* Margen inferior (10px) */
+ cursor: pointer;
+ transition: background-color 0.2s ease, border-color 0.2s ease;
+ color: var(--text-light); /* Texto claro */
+}
+
+.clickableItem:hover {
+ background-color: var(--samsung-blue-light); /* Azul claro al pasar ratón */
+ border-color: var(--samsung-blue); /* Borde azul al pasar ratón */
+}
+
+
+/* Grid de Modelos y Bloques de Defecto */
+.gridList {
+     display: grid
+;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    justify-items: center;
+    gap: var(--spacing-20px);
+    width: 100%;
+}
+
+.modelItem,
+.blockItem { /* Ítems individuales del grid */
+ background-color: var(--card-background-dark); /* Fondo oscuro de tarjeta (original usaba white aquí?) */
+    /* Si quieres que los ítems del grid sean ligeramente diferentes, usa card-background-white o define una nueva variable */
+border: 1px solid var(--border-dark);
+border-radius: var(--border-radius-medium); /* Borde redondeado (8px) */
+padding: var(--spacing-15px); /* Padding (15px) */
+cursor: pointer;
+ transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+ text-align: center;
+ width: 100%; /* Asegura que ocupe el 100% del ancho de su celda */
+ box-sizing: border-box;
+ position: relative; /* Necesario para posicionar el botón de edición absoluto */
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ gap: var(--spacing-2); /* Espacio entre elementos internos (10px) */
+ max-height: 300px; /* Altura máxima */
+ overflow: hidden; /* Oculta si excede la altura máxima */
+}
+
+.modelItem:hover,
+.blockItem:hover {
+ transform: translateY(-5px);
+ box-shadow: 0 8px var(--spacing-20px) rgba(0, 0, 0, 0.3); /* Sombra al pasar ratón */
+ border-color: var(--samsung-blue); /* Borde azul al pasar ratón */
+}
+
+.blockTitle {
+ font-weight: bold;
+ color: var(--text-light);
+ margin: 0;
+ flex-shrink: 0; /* Previene que el título se encoja */
+    font-size: 1em; /* Ajusta si 0.9em no es necesario */
+}
+
+/* --- Imagen de Ítem --- */
+.itemImage {
+ max-width: 100%;
+ max-height: 150px; /* Altura máxima de la imagen */
+ object-fit: cover; /* Recorta si es necesario */
+  border-radius: var(--border-radius-small); /* Borde redondeado (4px) */
+ margin: 0 auto var(--spacing-2); /* Centrar imagen y espacio debajo (10px) */
+}
+
+/* --- Resumen --- */
+.summary {
+ background-color: rgba(var(--samsung-blue), 0.2); /* Tintado azul */
+ border: 1px solid var(--samsung-blue);
+ border-radius: var(--border-radius-medium); /* Borde redondeado (8px) */
+ padding: var(--spacing-20px); /* Padding (20px) */
+ margin-top: var(--spacing-20px); /* Margen superior (20px) */
+ text-align: center;
+ color: var(--text-light); /* Texto claro */
+  max-width: 600px; /* Limita ancho */
+  margin-left: auto; /* Centra si tiene max-width */
+  margin-right: auto;
+}
+
+.summaryTitle {
+ color: var(--samsung-blue);
+ font-size: 1.8em;
+ margin-bottom: var(--spacing-15px); /* Margen inferior (15px) */
+}
+
+.summaryDetails p {
+ margin-bottom: var(--spacing-2); /* Margen inferior (10px) */
+ font-size: 1.1em;
+ color: var(--text-light);
+}
+
+.summaryDetails p strong {
+ color: var(--text-light); /* Texto fuerte también claro */
+}
+
+
+/* --- Mensajes (Cargando, Error, Inicial) --- */
+.messageContainer,
+.message { /* Contenedores y mensajes generales */
+ text-align: center;
+ padding: var(--spacing-20px); /* Padding (20px) */
+ border: 1px dashed var(--border-dark); /* Borde punteado oscuro */
+ border-radius: var(--border-radius-medium); /* Borde redondeado (8px) */
+ margin-top: var(--spacing-20px); /* Margen superior (20px) */
+ color: var(--text-medium); /* Texto gris medio */
+     max-width: 500px; /* Limita ancho */
+     margin-left: auto; /* Centra */
+     margin-right: auto;
+}
+
+
+.errorMessage,
+.errorContainer { /* Mensajes y contenedores de error */
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ color: var(--error-red); /* Rojo brillante */
+ border: 1px solid var(--error-red); /* Borde rojo */
+ padding: 14px; /* Padding automático */
+ border-radius: 10px; /* Borde redondeado (10px) */
+ background-color: rgba(var(--error-red), 0.1); /* Fondo rojo claro */
+}
+.errorMessage { /* Solo el texto del mensaje de error */
+    border: none; /* El contenedor ya tiene borde */
+    padding: 0; /* El contenedor ya tiene padding */
+    margin-top: 0;
+}
+
+
+.errorMessageTitle {
+ color: var(--error-red);
+ font-size: 1.5em;
+ margin-bottom: var(--spacing-2); /* Margen inferior (10px) */
+}
+
+.errorDescription {
+ color: var(--text-light);
+ font-size: 1.1em;
+}
+
+.initialMessage {
+color: var(--text-light);
+font-size: 1.1em;
+}
+
+.noResults {
+ color: var(--text-medium); /* Gris medio */
+ font-style: italic;
+}
+
+/* --- Media Queries --- */
+
+/* A partir de 640px: Cambios para tablet en adelante */
+@media (min-width: 640px) {
+  .cabezal {
+    flex-direction: row;
+  }
+
+  .searchInput {
+    margin-top: 0;
+    width: auto;
+    flex-grow: 1;
+  }
+
+  .filters,
+  .ascCodeInputContainer {
+    max-width: none;
+    width: auto;
+  }
+
+  .searchInputAsc {
+    margin-top: 0;
+    width: auto;
+    flex-grow: 1;
+  }
+}
+
+/* A partir de 768px: Cambios para pantallas medianas en adelante */
+@media (min-width: 768px) {
+  .cabezal {
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .filters {
+    justify-content: flex-start;
+  }
+}

@@ -1,0 +1,71 @@
+/* Estilos para el contenedor principal del layout */
+.layoutWrapper {
+  min-height: 100vh; /* min-h-screen */
+  display: flex; /* flex */
+  flex-direction: column; /* flex-col */
+
+  /* Colores de fondo y texto por defecto (modo claro) */
+  background-color: var(--color-gray-50, #f9fafb); /* bg-gray-50 */
+  color: var(--color-gray-800, #1f2937); /* text-gray-800 */
+
+  /* Transiciones para los colores de fondo y texto */
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; /* transition-colors duration-300 ease-in-out */
+}
+
+/* Estilos para el modo oscuro en el contenedor principal */
+/* Asumiendo que una clase '.dark' se aplica al html o body */
+html.dark .layoutWrapper {
+  background-color: var(--color-gray-900, #111827); /* dark:bg-gray-900 */
+  color: var(--color-gray-200, #e5e7eb); /* dark:text-gray-200 */
+}
+
+
+/* Estilos para el área de contenido principal (<main>) */
+.mainContent {
+  flex-grow: 1; /* flex-grow: Permite que main ocupe el espacio restante, empujando el footer hacia abajo */
+
+  /* Padding vertical */
+  padding-top: var(--spacing-8, 2rem); /* py-8 */
+  padding-bottom: var(--spacing-8, 2rem); /* py-8 */
+
+  /* Padding horizontal responsivo (traducido de px-4 sm:px-6 lg:px-8) */
+  /* Nota: Esto se suma o reemplaza el padding que tu clase .container global pueda tener */
+  padding-left: var(--spacing-4, 1rem); /* px-4 por defecto */
+  padding-right: var(--spacing-4, 1rem); /* px-4 por defecto */
+}
+
+/* Ajustes de padding horizontal responsivos */
+@media (min-width: var(--breakpoint-sm, 640px)) {
+  .mainContent {
+    padding-left: var(--spacing-6, 1.5rem); /* sm:px-6 */
+    padding-right: var(--spacing-6, 1.5rem); /* sm:px-6 */
+  }
+}
+
+@media (min-width: var(--breakpoint-lg, 1024px)) {
+  .mainContent {
+    padding-left: var(--spacing-8, 2rem); /* lg:px-8 */
+    padding-right: var(--spacing-8, 2rem); /* lg:px-8 */
+  }
+}
+
+
+/* Estilos para el footer */
+.footer {
+  padding: var(--spacing-4, 1rem); /* p-4 */
+  text-align: center; /* text-center */
+  font-size: 0.875rem; /* text-sm */
+
+  /* Colores de fondo y texto por defecto (modo claro) */
+  background-color: var(--color-gray-100, #f3f4f6); /* bg-gray-100 */
+  color: var(--color-gray-600, #4b5563); /* text-gray-600 */
+
+  /* Transiciones para los colores */
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; /* transition-colors duration-300 ease-in-out */
+}
+
+/* Estilos para el footer en modo oscuro */
+html.dark .footer {
+  background-color: var(--color-gray-800, #1f2937); /* dark:bg-gray-800 */
+  color: var(--color-gray-400, #9ca3af); /* dark:text-gray-400 */
+}
