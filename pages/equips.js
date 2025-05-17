@@ -197,7 +197,7 @@ const EquipsPage = () => {
        // console.log(`Condiciones NO cumplidas para registrar uso: isValid=${isAscCodeValid}, showSummary=${showSummary}, ascCode=${ascCode}`);
     }
     // Dependencias del useEffect. Asegúrate que db es una dependencia estable.
-  }, [isAscCodeValid, showSummary, ascCode, db]);
+  }, [isAscCodeValid, showSummary, ascCode]);
 
 
   // --- Función Helper para Renderizar Contenido según la Etapa de Selección ---

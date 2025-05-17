@@ -1,0 +1,145 @@
+/* styles/Terminos.module.css */
+
+/*
+  Contenedor principal para el contenido de Términos y Condiciones.
+  Añade padding, centra el contenido y limita su ancho para mejorar la legibilidad,
+  especialmente en pantallas grandes.
+*/
+.terminosPageContent {
+  /* Usamos variables de espaciado para padding vertical y horizontal en móvil */
+  padding-top: var(--spacing-6); /* Equivalente a 24px */
+  padding-bottom: var(--spacing-6); /* Equivalente a 24px */
+  padding-left: var(--spacing-15px); /* Equivalente a 15px */
+  padding-right: var(--spacing-15px); /* Equivalente a 15px */
+
+  margin: 0 auto; /* Centra el bloque en la página */
+  max-width: 900px; /* Limita el ancho máximo para que las líneas no sean demasiado largas */
+  line-height: 1.8; /* Buen interlineado para facilitar la lectura de texto largo */
+  color: var(--color-gray-700); /* Color de texto base para el contenido principal */
+}
+
+/* Estilos para el encabezado principal H1 (Título del documento) */
+.terminosPageContent h1 {
+  font-size: 2.5rem; /* Tamaño de fuente base para móviles */
+  /* Espacio debajo del título principal */
+  margin-bottom: var(--spacing-8); /* Equivalente a 32px */
+  /* Color más oscuro para el título, usando variable si está disponible o color directo */
+  color: var(--color-black); /* Usa la variable para color negro */
+  text-align: center; /* Centra el texto */
+  line-height: 1.1; /* Espaciado de línea ajustado para encabezados */
+}
+
+/* Estilos para los subtítulos H2 (Títulos de las secciones) */
+.terminosPageContent h2 {
+  font-size: 1.5rem; /* Tamaño de fuente base para móviles */
+  /* Espacio antes de cada sección */
+  margin-top: var(--spacing-10); /* Equivalente a 40px */
+  /* Espacio después del subtítulo */
+  margin-bottom: var(--spacing-4); /* Equivalente a 16px */
+   /* Color ligeramente más oscuro que el texto normal, usando variable */
+  color: var(--color-gray-800);
+  line-height: 1.3;
+}
+
+/* Estilos para los párrafos */
+.terminosPageContent p {
+  font-size: 1rem; /* Tamaño de fuente base para móviles */
+  /* Espacio entre párrafos */
+  margin-bottom: var(--spacing-5); /* Equivalente a 20px */
+  /* line-height y color heredan del contenedor .terminosPageContent */
+}
+
+/* Estilos para el párrafo de la fecha de última actualización (asumiendo que es el último p) */
+.terminosPageContent p:last-child {
+    font-size: 0.9rem; /* Un poco más pequeño */
+    margin-top: var(--spacing-8); /* Espacio significativo arriba */
+    font-style: italic; /* Texto en cursiva */
+    text-align: right; /* Opcional: alinear a la derecha o dejar centrado/justificado */
+    color: var(--color-gray-600); /* Color más sutil */
+}
+
+/* Estilos para los saltos de línea (<br/>) dentro de los párrafos */
+/* Proporciona espacio entre los ítems si usas <br/> en lugar de listas <ul>/<li> */
+.terminosPageContent p br {
+    display: block; /* Asegura que <br/> actúe como un bloque para aplicar margen */
+    content: ""; /* Necesario en algunos contextos para que display: block funcione */
+    margin-bottom: var(--spacing-2); /* Espacio entre ítems (ej: 8px) */
+}
+
+
+/* --- Media Queries usando Variables de Breakpoints --- */
+
+/* Ajustes para pantallas medianas (tablets y superiores) */
+@media (min-width: var(--breakpoint-md)) { /* Utiliza la variable para 768px */
+    .terminosPageContent {
+        /* Aumentamos el padding en pantallas más grandes usando variables */
+        padding-top: var(--spacing-10); /* Equivalente a 40px */
+        padding-bottom: var(--spacing-10); /* Equivalente a 40px */
+        padding-left: var(--spacing-20px); /* Equivalente a 20px */
+        padding-right: var(--spacing-20px); /* Equivalente a 20px */
+    }
+
+    .terminosPageContent h1 {
+        font-size: 3rem; /* Aumenta tamaño H1 */
+        margin-bottom: var(--spacing-10); /* Equivalente a 40px */
+    }
+
+    .terminosPageContent h2 {
+        font-size: 1.8rem; /* Aumenta tamaño H2 */
+        margin-top: var(--spacing-12); /* Equivalente a 48px */
+        margin-bottom: var(--spacing-5); /* Equivalente a 20px */
+    }
+
+    .terminosPageContent p {
+        font-size: 1.1rem; /* Aumenta tamaño P */
+        margin-bottom: var(--spacing-6); /* Equivalente a 24px */
+    }
+     .terminosPageContent p:last-child {
+         font-size: 1rem; /* Ajusta el tamaño de la fecha */
+         margin-top: var(--spacing-10);
+     }
+      .terminosPageContent p br {
+          margin-bottom: var(--spacing-3); /* Ajusta espacio entre ítems con br */
+      }
+}
+
+/* Ajustes para pantallas grandes (escritorios y superiores) */
+@media (min-width: var(--breakpoint-lg)) { /* Utiliza la variable para 1024px */
+     .terminosPageContent {
+        /* Aumentamos aún más el padding */
+        padding-top: var(--spacing-12); /* Equivalente a 48px */
+        padding-bottom: var(--spacing-12); /* Equivalente a 48px */
+        padding-left: var(--spacing-8); /* Equivalente a 32px */
+        padding-right: var(--spacing-8); /* Equivalente a 32px */
+    }
+
+    .terminosPageContent h1 {
+        font-size: 3.8rem; /* Aumenta tamaño H1 */
+        margin-bottom: var(--spacing-12); /* Equivalente a 48px */
+    }
+
+    .terminosPageContent h2 {
+        font-size: 2rem; /* Aumenta tamaño H2 */
+        margin-top: var(--spacing-16); /* Puedes crear una variable --spacing-16 (64px) si la necesitas */
+        margin-top: calc(var(--spacing-12) + var(--spacing-4)); /* O calcularlo si no tienes la variable */
+        margin-bottom: var(--spacing-6); /* Equivalente a 24px */
+    }
+
+    .terminosPageContent p {
+        font-size: 1.2rem; /* Aumenta tamaño P */
+        margin-bottom: var(--spacing-8); /* Equivalente a 32px */
+    }
+     .terminosPageContent p:last-child {
+         font-size: 1rem; /* Mantiene el tamaño */
+         margin-top: var(--spacing-12);
+     }
+      .terminosPageContent p br {
+          margin-bottom: var(--spacing-4); /* Ajusta espacio entre ítems con br */
+      }
+}
+
+/*
+Puedes añadir ajustes para breakpoint-xl y breakpoint-2xl si lo consideras necesario.
+Ajusta los valores de espaciado (margin, padding) y tamaño de fuente (rem)
+para que se adapten mejor a tu diseño específico y la cantidad de texto.
+*/

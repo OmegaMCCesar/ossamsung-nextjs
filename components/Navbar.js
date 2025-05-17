@@ -36,6 +36,9 @@ export default function Navbar() {
           <Link href="/privacidad" className={styles.navLink}>
             Privacidad
           </Link>
+          <Link href="/aviso_legal" className={styles.navLink}>
+            Aviso Legal
+          </Link>
         </div>
 
         {/* Grupo de elementos a la derecha (Admin y ThemeSwitcher) */}

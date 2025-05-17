@@ -1,0 +1,117 @@
+/* styles/Acerca.module.css */
+
+/*
+  Estilos para el contenedor principal del contenido "Acerca de".
+  Esta clase se aplicará al div que envuelve el h1 y el p en tu componente.
+  Asume que tu Layout ya proporciona un contenedor general y centrado,
+  pero este añade padding específico para esta sección.
+*/
+.acercaPageContent {
+  /* Usamos las variables de espaciado para padding vertical y horizontal */
+  padding-top: var(--spacing-5); /* Equivalente a 20px */
+  padding-bottom: var(--spacing-5); /* Equivalente a 20px */
+  /* Usamos la variable específica para 15px que definiste */
+  padding-left: var(--spacing-15px); /* Equivalente a 15px */
+  padding-right: var(--spacing-15px); /* Equivalente a 15px */
+
+  margin: 0 auto; /* Centrar el contenido si el Layout no lo hace completamente */
+  /* Opcional: Limitar el ancho máximo del texto para mejorar legibilidad en pantallas muy grandes */
+  max-width: 800px;
+}
+
+/* Estilos para el encabezado h1 dentro de este componente */
+.acercaPageContent h1 {
+  font-size: 2rem; /* Tamaño de fuente base para móviles (usamos rem, escalable) */
+  /* Usamos variable de espaciado para el margen inferior */
+  margin-bottom: var(--spacing-4); /* Equivalente a 16px (1rem) */
+  /* Usamos variable de color - elegimos un gris oscuro similar a #333 */
+  color: var(--color-gray-700);
+  text-align: center; /* Centra el texto del encabezado */
+  line-height: 1.2; /* Espaciado de línea para el encabezado */
+}
+
+/* Estilos para el párrafo dentro de este componente */
+.acercaPageContent p {
+  font-size: 1rem; /* Tamaño de fuente base para móviles (usamos rem) */
+   /* Usamos variable de espaciado para el margen inferior */
+  margin-bottom: var(--spacing-6); /* Equivalente a 24px (1.5rem) */
+  line-height: 1.8; /* Mayor interlineado para una mejor legibilidad en párrafos largos */
+  /* Usamos variable de color - elegimos un gris medio similar a #555 */
+  color: var(--color-gray-600);
+  text-align: justify; /* Opcional: Justifica el texto del párrafo */
+}
+
+
+/* --- Media Queries usando Variables de Breakpoints --- */
+
+/* Ajustes para pantallas medianas (tablets y superiores) */
+@media (min-width: var(--breakpoint-md)) { /* Utiliza la variable para 768px */
+    .acercaPageContent {
+        /* Aumentamos el padding en pantallas más grandes usando variables */
+        padding-top: var(--spacing-8); /* Equivalente a 32px */
+        padding-bottom: var(--spacing-8); /* Equivalente a 32px */
+         /* Usamos la variable específica para 20px */
+        padding-left: var(--spacing-20px); /* Equivalente a 20px */
+        padding-right: var(--spacing-20px); /* Equivalente a 20px */
+    }
+
+    .acercaPageContent h1 {
+        font-size: 2.8rem; /* Aumenta el tamaño del h1 (usamos rem) */
+        margin-bottom: var(--spacing-6); /* Equivalente a 24px */
+    }
+
+    .acercaPageContent p {
+        font-size: 1.1rem; /* Aumenta ligeramente el tamaño del párrafo (usamos rem) */
+         /* La variable más cercana a 1.8rem (28.8px) es --spacing-7 (28px) */
+        margin-bottom: var(--spacing-7); /* Equivalente a 28px */
+    }
+}
+
+/* Ajustes para pantallas grandes (escritorios y superiores) */
+@media (min-width: var(--breakpoint-lg)) { /* Utiliza la variable para 1024px */
+     .acercaPageContent {
+        /* Aumentamos aún más el padding */
+        padding-top: var(--spacing-10); /* Equivalente a 40px */
+        padding-bottom: var(--spacing-10); /* Equivalente a 40px */
+         /* Usamos variable de espaciado para padding lateral (ej: 24px) */
+        padding-left: var(--spacing-6); /* Equivalente a 24px */
+        padding-right: var(--spacing-6); /* Equivalente a 24px */
+    }
+
+    .acercaPageContent h1 {
+        font-size: 3.5rem; /* Aumenta más el tamaño del h1 (usamos rem) */
+        margin-bottom: var(--spacing-8); /* Equivalente a 32px */
+    }
+
+    .acercaPageContent p {
+        font-size: 1.2rem; /* Aumenta más el tamaño del párrafo (usamos rem) */
+        margin-bottom: var(--spacing-8); /* Equivalente a 32px */
+    }
+}
+
+/* Ajustes opcionales para pantallas extra grandes */
+@media (min-width: var(--breakpoint-xl)) { /* Utiliza la variable para 1280px */
+     .acercaPageContent {
+        padding-top: var(--spacing-12); /* Equivalente a 48px */
+        padding-bottom: var(--spacing-12); /* Equivalente a 48px */
+         /* Puedes ajustar el padding lateral si lo deseas */
+         padding-left: var(--spacing-8); /* Equivalente a 32px */
+         padding-right: var(--spacing-8); /* Equivalente a 32px */
+    }
+
+    .acercaPageContent h1 {
+        font-size: 4rem; /* Aumenta más el tamaño del h1 */
+    }
+
+    .acercaPageContent p {
+        font-size: 1.3rem; /* Aumenta más el tamaño del párrafo */
+    }
+}
+
+/*
+Recuerda que los valores específicos de espaciado (margin, padding)
+y tamaños de fuente en las media queries son sugerencias basadas
+en la escala de variables que proporcionaste y los tamaños comunes
+de texto responsive. Es posible que quieras ajustarlos ligeramente
+para que el resultado sea perfecto en tu diseño.
+*/
