@@ -9,11 +9,8 @@ function MyApp({ Component, pageProps }) {
   // 4. Envuelve TODO con el UserProvider
   return (
     <UserProvider>
-      <Script
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4497215621533514" // <-- ¡REEMPLAZA ESTE CLIENT CON TU ID REAL!
-        crossOrigin="anonymous"
-        strategy="afterInteractive" // Carga el script después de que la página sea interactiva
-      />
+      <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4497215621533514"
+     crossorigin="anonymous"/>
       {/* 5. Renderiza el componente de la página actual que Next.js te pasa */}
       <Component {...pageProps} />
     </UserProvider>
