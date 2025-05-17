@@ -42,7 +42,7 @@ export default function PoliticaPrivacidad() {
           <br/><br/>
           c. **Cookies y Tecnologías de Seguimiento:** Utilizamos cookies y tecnologías
              de seguimiento similares para rastrear la actividad en nuestro servicio y
-             mantener cierta información. Consulta la sección "Cookies" a continuación
+             mantener cierta información. Consulta la sección Cookies a continuación
              para obtener más detalles.
         </p>
 
@@ -123,7 +123,7 @@ export default function PoliticaPrivacidad() {
 
         <h2>8. Privacidad de los Niños</h2>
         <p>
-          Nuestro servicio no se dirige a personas menores de 13 años ("Niños").
+          Nuestro servicio no se dirige a personas menores de 13 años Niños.
           No recopilamos conscientemente información de identificación personal de nadie menor de 13 años.
           Si eres padre/madre o tutor y sabes que tu hijo nos ha proporcionado Datos Personales,
           por favor, contáctanos. Si nos damos cuenta de que hemos recopilado Datos Personales

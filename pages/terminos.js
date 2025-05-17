@@ -51,7 +51,7 @@ export default function Terminos() {
 
       <h2>4. Exclusión de Garantías y Limitación de Responsabilidad</h2>
       <p>
-        a. El sitio web y los servicios se proporcionan "tal cual" y "según disponibilidad",
+        a. El sitio web y los servicios se proporcionan tal cual y según disponibilidad,
         sin garantías de ningún tipo, ya sean expresas o implícitas, incluyendo, pero no
         limitado a, garantías de comerciabilidad, idoneidad para un propósito particular
         y no infracción.<br/>
