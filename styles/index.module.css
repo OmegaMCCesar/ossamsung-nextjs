@@ -91,6 +91,7 @@
   background-color: var(--color-samsung-blue); /* Color azul de Samsung */
   border-radius: 0.5rem; /* rounded-lg */
   text-decoration: none; /* Quita el subrayado por defecto del Link */
+  border: 1px solid white;
   transition: background-color 0.15s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Transiciones */
 
   /* Sombra básica */
