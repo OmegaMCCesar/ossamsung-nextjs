@@ -164,6 +164,29 @@ html {
 
   /* --- Variable para el color de hover del borde oscuro (traducido de darken()) --- */
   --border-dark-hover: #3a3a3a; /* Gris ligeramente más oscuro que --border-dark */
+
+  /* --- Variables de Color de Fondo del Menú --- */
+  --navbar-light-bg: #ffffff;
+  --navbar-dark-bg: #1f2937;
+  --navbar-light-text: #4b5563;
+  --navbar-dark-text: #d1d5db;
+  --navbar-light-hover-bg: #f3f4f6;
+  --navbar-dark-hover-bg: #374151;
+  --navbar-padding-y-2: 0.5rem;
+  --navbar-padding-x-3: 0.75rem;
+  --navbar-rounded-md: 0.375rem;
+  --navbar-spacing-1: 0.25rem;
+  --navbar-spacing-2: 0.5rem;
+  --navbar-spacing-3: 0.75rem;
+  --navbar-spacing-4: 1rem;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --hamburger-size: 2rem;
+  --hamburger-line-height: 2px;
+  --hamburger-color: #4b5563;
+  --hamburger-dark-color: #d1d5db;
+  --menu-mobile-bg: var(--navbar-light-bg);
+  --menu-mobile-dark-bg: var(--navbar-dark-bg);
 }
 
 

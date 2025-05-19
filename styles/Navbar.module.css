@@ -1,119 +1,169 @@
 /* Estilos para el elemento <nav> principal */
 .navbar {
-  background-color: var(--navbar-light-bg, #ffffff); /* Fondo claro por defecto */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
-  position: sticky; /* sticky */
-  top: 0; /* top-0 */
-  z-index: 50; /* z-50 */
-  /* Transiciones: solo para background-color */
-  transition: background-color 0.3s ease-in-out; /* transition-colors duration-300 ease-in-out */
+  background-color: var(--navbar-light-bg);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  transition: background-color 0.3s ease-in-out;
 }
 
-/* Estilos para el modo oscuro (asumiendo que una clase '.dark' se aplica a html o body) */
 html.dark .navbar {
-  background-color: var(--navbar-dark-bg, #1f2937); /* Fondo oscuro en modo oscuro */
+  background-color: var(--navbar-dark-bg);
 }
 
-/* Estilos para el contenedor interior del flexbox principal */
-/* Este div tiene la clase 'container' global, así que solo añadimos flexbox y altura aquí */
+/* Contenedor principal de la barra de navegación */
 .navbarContent {
-  display: flex; /* flex */
-  align-items: center; /* items-center */
-  justify-content: space-between; /* justify-between */
-  height: 4rem; /* h-16 (16 * 0.25rem = 4rem, si la base es 4px por unidad) */
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Marca/botón a la izquierda, enlaces a la derecha en desktop */
+  height: 4rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Estilos para el grupo de enlaces de la izquierda */
-.navbarNavLeft {
-  display: flex; /* flex */
-  align-items: center; /* items-center */
-  flex-wrap: wrap; /* flex-wrap */
-  /* Usamos 'gap' para reemplazar 'space-x' */
-  gap: var(--navbar-spacing-1, 0.25rem); /* space-x-1 por defecto */
+/* Estilos para el área del Logo/Marca */
+.navbarBrand .navLink {
+  font-weight: bold;
+  padding: 0;
+  color: var(--navbar-light-text);
 }
 
-/* Ajustes de gap responsivos */
-@media (min-width: var(--breakpoint-sm, 640px)) {
-  .navbarNavLeft {
-    gap: var(--navbar-spacing-3, 0.75rem); /* sm:space-x-3 */
+html.dark .navbarBrand .navLink {
+  color: var(--navbar-dark-text);
+}
+
+/* Estilos para el BOTÓN HAMBURGUESA */
+.hamburgerButton {
+  display: flex; /* Visible en móvil por defecto */
+  flex-direction: column;
+  justify-content: space-around;
+  width: var(--hamburger-size);
+  height: var(--hamburger-size);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 60;
+  transition: all 0.3s ease;
+}
+
+/* Ocultar el botón hamburguesa en pantallas medianas y grandes */
+@media (min-width: var(--breakpoint-md)) {
+  .hamburgerButton {
+    display: none;
   }
 }
 
-@media (min-width: var(--breakpoint-md, 768px)) {
-  .navbarNavLeft {
-    gap: var(--navbar-spacing-4, 1rem); /* md:space-x-4 */
+/* Estilos para las líneas del icono hamburguesa */
+.hamburgerLine {
+  width: 100%;
+  height: var(--hamburger-line-height);
+  background-color: var(--hamburger-color);
+  transition: all 0.3s ease;
+}
+
+html.dark .hamburgerLine {
+  background-color: var(--hamburger-dark-color);
+}
+
+/* --- Estilos para el CONTENEDOR DE ENLACES (.navLinks) --- */
+
+/* ESTILOS POR DEFECTO (Móvil - MENÚ CERRADO) */
+.navLinks {
+  display: none; /* Oculto por defecto en móvil */
+}
+
+/* ESTILOS PARA MÓVIL - MENÚ ABIERTO */
+.navLinks.menuOpen {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 4rem;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 4rem);
+  background-color: var(--menu-mobile-bg);
+  padding: 1rem 0;
+  z-index: 55;
+  overflow-y: auto;
+  transform: translateX(0);
+}
+
+html.dark .navLinks.menuOpen {
+  background-color: var(--menu-mobile-dark-bg);
+}
+
+/* Estilos de los enlaces DENTRO del menú móvil */
+.navLinks.menuOpen .navLink,
+.navLinks.menuOpen .navLinkAdmin {
+  width: 100%;
+  padding: var(--navbar-padding-y-2) 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  color: var(--navbar-light-text);
+}
+
+html.dark .navLinks.menuOpen .navLink,
+html.dark .navLinks.menuOpen .navLinkAdmin {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  color: var(--navbar-dark-text);
+}
+
+.navLinks.menuOpen .navLink:hover,
+.navLinks.menuOpen .navLinkAdmin:hover {
+  background-color: var(--navbar-light-hover-bg);
+}
+
+html.dark .navLinks.menuOpen .navLink:hover,
+html.dark .navLinks.menuOpen .navLinkAdmin:hover {
+  background-color: var(--navbar-dark-hover-bg);
+}
+
+/* Estilo específico para el enlace Admin dentro del menú */
+.navLinks.menuOpen .navLinkAdmin {
+  color: white;
+}
+
+html.dark .navLinks.menuOpen .navLinkAdmin {
+  color: white;
+}
+
+/* --- Estilos para DESKTOP (Muestra enlaces horizontalmente) --- */
+
+@media (min-width: var(--breakpoint-md)) {
+  .navLinks {
+    display: flex; /* Mostrar como fila horizontal */
+    align-items: center;
+    gap: var(--navbar-spacing-4);
+    position: static; /* Volver al flujo normal del documento */
+    top: auto;
+    left: auto;
+    width: auto;
+    height: auto;
+    background-color: transparent;
+    padding: 0;
+    z-index: auto;
+    overflow-y: visible;
+    transform: none;
+  }
+
+  /* Ajustes de gap responsivos en desktop */
+  @media (min-width: var(--breakpoint-sm)) and (max-width: calc(var(--breakpoint-md) - 1px)) {
+    .navLinks {
+      gap: var(--navbar-spacing-3);
+    }
+  }
+
+  .navLinks .navLink,
+  .navLinks .navLinkAdmin {
+    width: auto;
+    padding: var(--navbar-padding-y-2) var(--navbar-padding-x-3);
+    text-align: left;
+    border-bottom: none;
+    border-radius: var(--navbar-rounded-md);
   }
 }
-
-/* Estilos para el grupo de elementos de la derecha */
-.navbarNavRight {
-  display: flex; /* flex */
-  align-items: center; /* items-center */
-  gap: var(--navbar-spacing-3, 0.75rem); /* space-x-3 */
-}
-
-
-/* Estilos para los enlaces individuales de navegación */
-.navLink {
-  display: inline-block; /* Para que padding/margin funcionen */
-  padding: var(--navbar-padding-y-2, 0.5rem) var(--navbar-padding-x-3, 0.75rem); /* py-2 px-3 */
-  border-radius: var(--navbar-rounded-md, 0.375rem); /* rounded-md */
-  font-size: 0.875rem; /* text-sm */
-  font-weight: 500; /* font-medium */
-  text-decoration: none; /* Quita el subrayado del Link */
-  /* Transiciones para color y background */
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out; /* transition-colors */
-
-  color: var(--navbar-light-text, #4b5563); /* Color de texto claro por defecto */
-  /* background-color: transparent; /* Fondo transparente por defecto */
-}
-
-.navLinkAdmin{
-  display: inline-block; /* Para que padding/margin funcionen */
-  padding: var(--navbar-padding-y-2, 0.5rem) var(--navbar-padding-x-3, 0.75rem); /* py-2 px-3 */
-  border-radius: var(--navbar-rounded-md, 0.375rem); /* rounded-md */
-  font-size: 0.875rem; /* text-sm */
-  font-weight: 500; /* font-medium */
-  text-decoration: none; /* Quita el subrayado del Link */
-  /* Transiciones para color y background */
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out; /* transition-colors */
-
-  color: white; /* Color de texto claro por defecto */
-  /* background-color: transparent; /* Fondo transparente por defecto */
-}
-
-.navLinkAdmin:hover{
-  background-color: #4b5563;
-}
-
-/* Estilos de enlace en hover (modo claro) */
-.navLink:hover {
-  background-color: var(--navbar-light-hover-bg, #f3f4f6);
-}
-
-/* Estilos de enlace en modo oscuro */
-html.dark .navLink {
-  color: var(--navbar-dark-text, #d1d5db); /* Color de texto oscuro */
-}
-
-/* Estilos de enlace en hover (modo oscuro) */
-html.dark .navLink:hover {
-   background-color: var(--navbar-dark-hover-bg, #374151);
-}
-
-/* Estilo para enlaces que solo se muestran a partir de un breakpoint */
-.navLinkHiddenMd {
-  display: none; /* hidden por defecto */
-}
-
-/* Media Query para mostrar el enlace en pantallas md y superiores */
-@media (min-width: var(--breakpoint-md, 768px)) {
-  .navLinkHiddenMd {
-    display: inline-block; /* md:inline-block */
-  }
-}
-
-/* Puedes añadir aquí estilos para el "Admin" link si necesita algo diferente a .navLink */
-/* .adminLink {
-  /* ... */
-/* } */
