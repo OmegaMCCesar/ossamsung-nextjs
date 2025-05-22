@@ -91,7 +91,7 @@ const AddSerialNumbersInProcess = () => {
       <div className={styles.subContainerSerialNumbers}>
         <input
           value={inputSerialNumbers}
-          onChange={(e) => setInputSerialNumbers(e.target.value)}
+          onChange={(e) => setInputSerialNumbers(e.target.value.toUpperCase())}
           placeholder="Ingrese números de serie separados por espacios"
         />
         <button onClick={() => setInputSerialNumbers("")}>Limpiar</button>
