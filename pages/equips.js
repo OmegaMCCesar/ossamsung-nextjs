@@ -15,7 +15,7 @@ import emailjs from '@emailjs/browser';
 const EquipsPage = () => {
   const router = useRouter();
   const { user } = useAuth();
-
+  
   const [category, setCategory] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const { data, loading, error } = useFetchInfFirebase(category, searchTerm);
@@ -479,10 +479,12 @@ const EquipsPage = () => {
       </div>
     );
   };
+console.log(user, 'user');
 
   return (
     <div className={styles.equipsPageWrapper}>
       <div className={styles.cabezal}>
+        {user && <button onClick={() => router.push('/sAddS')} className={styles.adminButton}>Añadir numeros de serie</button>}
         <div className={styles.cabezalTitle}>
           <h1 className={styles.cabezalh1}>INGENIERIA LINEA BLANCA</h1>
           <h2 className={styles.cabezalh2}>TECHNICAL SUPPORT SEM-S</h2>

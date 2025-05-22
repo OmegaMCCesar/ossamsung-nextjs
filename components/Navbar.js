@@ -63,7 +63,7 @@ export default function Navbar() {
           {/* El enlace de Admin también se incluye en el menú desplegable */}
           {/* Mantenemos la clase navLinkAdmin para sus estilos específicos (. invisible) */}
            <Link href="/admin" className={styles.navLinkAdmin} onClick={closeMenu}>
-            .
+            Login
           </Link>
         </div>
 

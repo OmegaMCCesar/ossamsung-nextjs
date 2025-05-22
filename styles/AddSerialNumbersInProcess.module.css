@@ -1,0 +1,91 @@
+.containerSerialNumbers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--spacing-5);
+  background-color: var(--card-background-dark);
+  width: 98%;
+  padding: var(--spacing-4);
+  border-radius: var(--border-radius-medium);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.subContainerSerialNumbers {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  margin: var(--spacing-3) 0;
+  width: 100%;
+  justify-content: center;
+}
+
+.subContainerSerialNumbers input {
+  flex: 1 1 300px;
+  background-color: var(--color-white);
+  color: var(--input-text, #000);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-medium);
+  padding: var(--spacing-2);
+  font-size: 16px;
+  font-weight: bold;
+  transition: border-color 0.2s ease;
+}
+
+.subContainerSerialNumbers input:focus {
+  outline: none;
+  border-color: var(--samsung-blue);
+}
+
+.subContainerSerialNumbers button {
+  background-color: var(--button-background, var(--samsung-blue));
+  color: var(--button-text, #fff);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-medium);
+  padding: var(--spacing-2) var(--spacing-3);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.subContainerSerialNumbers button:hover {
+  background-color: var(--samsung-blue-light);
+  color: var(--button-text-hover, #fff);
+  border-color: var(--border-dark-hover);
+}
+
+.statusMessage {
+  margin-top: var(--spacing-2);
+  font-size: 14px;
+  color: var(--text-medium);
+  text-align: center;
+}
+
+.containerSerialNumbers ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  justify-items: center;
+  gap: var(--spacing-4);
+  width: 100%;
+  padding: 0;
+  list-style: none;
+}
+
+.containerSerialNumbers ul li {
+  background-color: var(--card-background-white);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-medium);
+  padding: var(--spacing-2);
+  text-align: center;
+  width: 90%;
+  box-sizing: border-box;
+  max-height: 300px;
+  overflow: hidden;
+  user-select: none;
+  word-break: break-word;
+  font-size: 14px;
+  font-weight: 500;
+  color: gray;
+}
