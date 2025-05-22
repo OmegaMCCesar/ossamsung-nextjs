@@ -57,6 +57,9 @@ export default function Navbar() {
           <Link href="/aviso_legal" className={styles.navLink} onClick={closeMenu}>
             Aviso Legal
           </Link>
+           <Link href="/FaultSearch" className={styles.navLink} onClick={closeMenu}>
+            Diagnostico Inteligente
+          </Link>
           {/* El enlace de Admin también se incluye en el menú desplegable */}
           {/* Mantenemos la clase navLinkAdmin para sus estilos específicos (. invisible) */}
            <Link href="/admin" className={styles.navLinkAdmin} onClick={closeMenu}>
