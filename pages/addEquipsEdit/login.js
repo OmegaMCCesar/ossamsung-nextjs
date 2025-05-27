@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase/init'; // Ajusta la ruta
-import { useAuth } from '../../hooks/useAuth'; // Para verificar si ya está logueado
+import { auth } from '../../lib/firebase'; // Ajusta la ruta
+import { useAuth } from '../../context/UserContext'; // Para verificar si ya está logueado
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
