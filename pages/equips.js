@@ -510,7 +510,7 @@ const EquipsPage = () => {
           </select>
           <Link href='/ContactForm' className={styles.buzonButton}>Búzon</Link>
           <Link className={styles.volverButton} href="/">volver</Link>
-          <Link className={styles.buzonButton} href="/biblioteca">Biblioteca</Link>
+          {/* <Link className={styles.buzonButton} href="/biblioteca">Biblioteca</Link> */}
           <input
             type="text"
             className={styles.searchInput}
