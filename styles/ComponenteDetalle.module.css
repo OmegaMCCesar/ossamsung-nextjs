@@ -1,0 +1,73 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1a1a1a;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #003366;
+}
+
+.volver {
+  background-color: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  text-decoration: underline;
+}
+
+.description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #004080;
+  font-weight: 600;
+}
+
+.list {
+  list-style: disc inside;
+  padding-left: 1rem;
+}
+
+.listItem {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+/* Mensaje de error */
+.message {
+  font-style: italic;
+  margin-top: 2rem;
+  color: #666666;
+}
+
+/* Responsivo */
+@media screen and (max-width: 600px) {
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .listItem {
+    font-size: 0.95rem;
+  }
+}

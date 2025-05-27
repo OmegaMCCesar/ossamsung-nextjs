@@ -1,0 +1,62 @@
+/* styles/AdminDashboard.module.css */
+
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #1a202c;
+}
+
+.container h2 {
+  margin-top: 30px;
+  font-size: 1.5rem;
+  color: #2d3748;
+}
+
+.container p {
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+.container button {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.container button:hover {
+  background-color: #c53030;
+}
+
+.container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.container li {
+  margin: 15px 0;
+}
+
+.container a {
+  text-decoration: none;
+  color: #3182ce;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.container a:hover {
+  color: #2b6cb0;
+}

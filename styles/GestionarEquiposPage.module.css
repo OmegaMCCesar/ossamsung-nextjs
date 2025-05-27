@@ -1,0 +1,57 @@
+.container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.addLink,
+.backLink {
+  display: inline-block;
+  margin: 10px 0;
+  color: #0070f3;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hr {
+  margin: 15px 0;
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.editLink {
+  margin-left: 10px;
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.deleteButton {
+  background-color: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+}

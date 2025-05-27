@@ -187,6 +187,13 @@ html {
   --hamburger-dark-color: #d1d5db;
   --menu-mobile-bg: var(--navbar-light-bg);
   --menu-mobile-dark-bg: var(--navbar-dark-bg);
+
+  --primary-color: #1a73e8;
+  --background-color: #f9f9f9;
+  --card-color: #ffffff;
+  --text-color: #333;
+  --border-radius: 12px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 

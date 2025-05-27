@@ -2,7 +2,7 @@
 
 import { UserProvider } from '@/context/UserContext';
 import '../styles/globals.css';
-import { useRouter } from 'next/router';
+
 
 
 function MyApp({ Component, pageProps }) {

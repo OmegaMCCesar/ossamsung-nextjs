@@ -25,7 +25,8 @@ export default function AdminPage() {
       router.push('/login');
     }
   }, [loading, user, router]);
-
+ console.log('user', user);
+ 
   if (loading || !user) return <p className={styles.loading}>Cargando...</p>;
 
   return (
@@ -34,6 +35,7 @@ export default function AdminPage() {
       <h1 className={styles.heading}>Panel de administrador</h1>
       <p className={styles.welcome}>Bienvenido, {user.email}</p>
       <Link href="/" className={styles.link}>Volver a la página principal</Link>
+      {user.uid === 'PdYdDmrFMiZqZS5fhA3ztO3cpY73' &&  <Link href="/addEquipsEdit" className={styles.link}>Ir al Panel de Gestión de Equipos</Link>}
     </div>
   );
 }

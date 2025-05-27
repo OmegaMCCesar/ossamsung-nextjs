@@ -479,7 +479,6 @@ const EquipsPage = () => {
       </div>
     );
   };
-console.log(user, 'user');
 
   return (
     <div className={styles.equipsPageWrapper}>
@@ -511,6 +510,7 @@ console.log(user, 'user');
           </select>
           <Link href='/ContactForm' className={styles.buzonButton}>Búzon</Link>
           <Link className={styles.volverButton} href="/">volver</Link>
+          <Link className={styles.buzonButton} href="/biblioteca">Biblioteca</Link>
           <input
             type="text"
             className={styles.searchInput}
