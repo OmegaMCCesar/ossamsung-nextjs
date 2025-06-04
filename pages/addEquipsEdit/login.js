@@ -46,7 +46,7 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
-
+  
   if (authLoading || user) {
     // Si ya está cargando la autenticación o ya está logueado,
     // puedes mostrar un spinner o simplemente no renderizar nada mientras redirige.

@@ -1,101 +1,104 @@
-// pages/equips.js
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import useFetchInfFirebase from '../hooks/useFetchInfFirebase';
-import { useAuth } from '../context/UserContext';
+import { useAuth } from '../context/UserContext'; // Aunque no lo usemos para el email, se mantiene por si se usa en otro lugar
 import { db } from '../lib/firebase';
-import { doc, increment, runTransaction, getDoc } from 'firebase/firestore';
+import { doc, increment, runTransaction, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 import styles from '../styles/equips.module.css';
 
 import emailjs from '@emailjs/browser';
 
 const EquipsPage = () => {
-  const router = useRouter();
-  const { user } = useAuth();
-  
-  const [category, setCategory] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const { data, loading, error } = useFetchInfFirebase(category, searchTerm);
+ const router = useRouter();
+ const { user } = useAuth(); // Se mantiene por si es necesario para otras funcionalidades
 
-  const [selectedModel, setSelectedModel] = useState(null);
-  const [selectedDefectBlock, setSelectedDefectBlock] = useState(null);
-  const [selectedSymptom, setSelectedSymptom] = useState(null);
-  const [selectedSubSymptom, setSelectedSubSymptom] = useState(null);
-  const [selectedRepairCode, setSelectedRepairCode] = useState(null);
-  const [selectedSubRepairCode, setSelectedSubRepairCode] = useState(null);
+ const [category, setCategory] = useState('');
+ const [searchTerm, setSearchTerm] = useState('');
+ const { data, loading, error } = useFetchInfFirebase(category, searchTerm);
 
-  const [serialNumber, setSerialNumber] = useState('');
-  const [isSerialNumberInProcess, setIsSerialNumberInProcess] = useState(false);
-  const [serialNumberChecked, setSerialNumberChecked] = useState(false);
-  const [serialNumberError, setSerialNumberError] = useState('');
+ const [selectedModel, setSelectedModel] = useState(null);
+ const [selectedDefectBlock, setSelectedDefectBlock] = useState(null);
+ const [selectedSymptom, setSelectedSymptom] = useState(null);
+ const [selectedSubSymptom, setSelectedSubSymptom] = useState(null);
+ const [selectedRepairCode, setSelectedRepairCode] = useState(null);
+ const [selectedSubRepairCode, setSelectedSubRepairCode] = useState(null);
 
-  const [showSummary, setShowSummary] = useState(false);
+ const [serialNumber, setSerialNumber] = useState('');
+ const [isSerialNumberInProcess, setIsSerialNumberInProcess] = useState(false);
+ const [serialNumberChecked, setSerialNumberChecked] = useState(false);
+ const [serialNumberError, setSerialNumberError] = useState('');
 
-  const [ascCode, setAscCode] = useState('');
+ const [showSummary, setShowSummary] = useState(false);
 
-  const validAscCodes = useMemo(() => [
-    'Techsup', '1401501', '6283007', '4907726',
-    '1658952', '1658994', '1659040', '4301958', '1659075', '1659136', '1729840', '1729975', '1729981', '1730172', '1730213', '1730257', '3453191', '2485007', '1730369', '3329308', '3490802', '3350595', '3375393', '3188990', '3329209', '3403522', '3404483', '3441335', '2277262', '3456937', '3464868', '3465902', '3467737', '3491791', '3861676', '6420071', '3903559', '4156881', '4156884', '4156883', '4160663', '4204348', '4243700', '4254175', '4271992', '3887111', '4292179', '4366954', '4375230', '4377174', '4789474', '4789476', '4894172', '4906330', '4923659', '4923680', '4932655', '4939874', '4953466', '4953467', '4962883', '4979868', '5777171', '5777172', '5779775', '5785173', '5788233', '5791986', '5798519', '5930135', '5939508', '5944496', '5949511', '5954013', '5968133', '5978055', '6423092', '6423093', '6423094', '5981427', '5984693', '5995041', '6421187', '6420072', '5999767', '6078654', '6082798', '4220824', '6162465', '4769819', '6205424', '6216903', '3491830', '6266448', '3191645', '5283007', '3865192', '2484362', '5288709', '6288721', '6288722', '6428335', '8334950', '8381572', '8395034', '9216816', '2470144', 'Cessoss', 'Sariwis'
-  ], []);
+ const [ascCode, setAscCode] = useState('');
 
-  const isAscCodeValid = useMemo(() => validAscCodes.includes(ascCode), [ascCode, validAscCodes]);
+ const validAscCodes = useMemo(() => [
+  'Techsup', '1401501', '6283007', '4907726',
+  '1658952', '1658994', '1659040', '4301958', '1659075', '1659136', '1729840', '1729975', '1729981', '1730172', '1730213', '1730257', '3453191', '2485007', '1730369', '3329308', '3490802', '3350595', '3375393', '3188990', '3329209', '3403522', '3404483', '3441335', '2277262', '3456937', '3464868', '3465902', '3467737', '3491791', '3861676', '6420071', '3903559', '4156881', '4156884', '4156883', '4160663', '4204348', '4243700', '4254175', '4271992', '3887111', '4292179', '4366954', '4375230', '4377174', '4789474', '4789476', '4894172', '4906330', '4923659', '4923680', '4932655', '4939874', '4953466', '4953467', '4962883', '4979868', '5777171', '5777172', '5779775', '5785173', '5788233', '5791986', '5798519', '5930135', '5939508', '5944496', '5949511', '5954013', '5968133', '5978055', '6423092', '6423093', '6423094', '5981427', '5984693', '5995041', '6421187', '6420072', '5999767', '6078654', '6082798', '4220824', '6162465', '4769819', '6205424', '6216903', '3491830', '6266448', '3191645', '5283007', '3865192', '2484362', '5288709', '6288721', '6288722', '6428335', '8334950', '8381572', '8395034', '9216816', '2470144', 'Cessoss',
+ ], []);
 
-  useEffect(() => {
-    const checkSerialNumberExistence = async () => {
-      setSerialNumberChecked(false); // Reset check status
-      setSerialNumberError(''); // Clear previous errors
-      setIsSerialNumberInProcess(false); // Reset in-process status
+ const isAscCodeValid = useMemo(() => validAscCodes.includes(ascCode), [ascCode, validAscCodes]);
 
-      if (serialNumber.length === 15 && db) { // Validate length before checking existence
-        try {
-          const docRef = doc(db, "serialNumbersInProcess", serialNumber);
-          const docSnap = await getDoc(docRef);
+ useEffect(() => {
+  const checkSerialNumberExistence = async () => {
+   setSerialNumberChecked(false); // Reinicia el estado de verificación
+   setSerialNumberError(''); // Borra errores previos
+   setIsSerialNumberInProcess(false); // Reinicia el estado "en proceso"
+console.log(serialNumber.length, 'tamaño del SN:', serialNumber);
 
-          if (docSnap.exists()) {
-            console.log("Número de serie encontrado (en proceso):", docSnap.data());
-            setIsSerialNumberInProcess(true);
-            // Send email to admin without user knowing
-            if (user?.email) {
-              await emailjs.send(
-                'service_hp5g9er',
-                'template_fw5dsio', // This template should be configured to send to admin
-                {
-                  user_asc: ascCode,
-                  serial_number: serialNumber,
-                  message: 'Número de serie en proceso de SSR',
-                  user_email: user.email, // User's email to include in admin notification
-                },
-                'OimePa9MbzuM5Lahj'
-              );
-              console.log("EmailJS: Correo 'Número de serie en proceso de SSR' enviado al admin.");
-            }
-          } else {
-            console.log("Número de serie NO encontrado.");
-          }
-        } catch (e) {
-          console.error("Error al verificar el número de serie:", e);
-          // Even if there's an error checking, we don't want to block the user based on it.
-          // User can proceed, admin might manually check if something went wrong.
-        } finally {
-          setSerialNumberChecked(true); // Mark check as done
-        }
-      } else if (serialNumber.length > 0 && serialNumber.length !== 15) {
-        setSerialNumberError('El número de serie debe tener exactamente 15 caracteres.');
-        setSerialNumberChecked(true); // Mark as checked even if invalid length
-      } else {
-        setSerialNumberChecked(true); // Mark as checked if empty
-      }
-    };
+   // Solo proceder si el código ASC es válido y el SN tiene 15 caracteres
+   if (isAscCodeValid && serialNumber.length === 15 && db) {
+    console.log('Entro a funcion de mensaje ');
+    
+    try {
+     const serialNumbersRef = collection(db, "serialNumbersInProcess");
+     const q = query(serialNumbersRef, where("serialNumber", "==", serialNumber));
+     const querySnapshot = await getDocs(q);
+     console.log(querySnapshot, 'Referencia del documento para verificar SN');
+     
 
-    const debounceCheck = setTimeout(() => {
-      checkSerialNumberExistence();
-    }, 500);
 
-    return () => clearTimeout(debounceCheck);
-  }, [serialNumber, db, ascCode, user?.email]);
+     if (!querySnapshot.empty) {
+      setIsSerialNumberInProcess(true);
+      // Enviar correo al administrador si el SN está en proceso
+      await emailjs.send(
+       'service_hp5g9er',
+       'template_fw5dsio', // Esta plantilla debe configurarse para enviar al administrador
+       {
+        user_asc: ascCode,
+        serial_number: serialNumber,
+        message: `El número de serie ${serialNumber} está en proceso de cierre por SSR o REDO.`,
+        user_email: user?.email || 'N/A', // Opcional: si user.email no existe, envía 'N/A'
+       },
+       'OimePa9MbzuM5Lahj'
+      );
+      console.log("EmailJS: Correo 'Número de serie en proceso de SSR' enviado al admin.");
+     } else {
+      console.log("Número de serie NO encontrado.");
+     }
+    } catch (e) {
+     console.error("Error al verificar el número de serie o al enviar el correo:", e);
+     // Incluso si hay un error en la verificación o envío, no bloqueamos al usuario.
+    } finally {
+     setSerialNumberChecked(true); // Marca la verificación como realizada
+    }
+   } else if (serialNumber.length > 0 && serialNumber.length !== 15) {
+    setSerialNumberError('El número de serie debe tener exactamente 15 caracteres.');
+    setSerialNumberChecked(true); // Marca como verificado incluso si la longitud es inválida
+   } else {
+    setSerialNumberChecked(true); // Marca como verificado si está vacío
+   }
+  };
+
+  const debounceCheck = setTimeout(() => {
+   checkSerialNumberExistence();
+  }, 500);
+
+  return () => clearTimeout(debounceCheck);
+ }, [serialNumber, db, ascCode, isAscCodeValid, user?.email]);
 
   useEffect(() => {
     if (isAscCodeValid && showSummary && ascCode && db) {
