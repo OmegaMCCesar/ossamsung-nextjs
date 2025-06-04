@@ -25,12 +25,16 @@ export default function Home() {
         </h1>
 
         {/* Link/Botón de Iniciar */}
+        <div className={styles.buttonContainer}>
         <Link
           href={'/equips'}
           className={styles.startButton}
         >
-          Iniciar
+          Cierre de Órdenes de Servicio
         </Link>
+        {/* <Link href={'/checkIList'}
+        className={styles.startButton} >Check List de Instalacion</Link> */}
+        </div>
       </div>
     </Layout>
   );

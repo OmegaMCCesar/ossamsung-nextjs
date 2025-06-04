@@ -7,6 +7,8 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import Link from 'next/link';
 import styles from '../styles/admin.module.css'; // Asegúrate de que la ruta sea correcta
+import AgregarRequisito from '@/components/admin/usersAutorization/AgregarRequisito';
+import AgregarModelo from '@/components/admin/usersAutorization/AgregarModelo';
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
@@ -35,7 +37,17 @@ export default function AdminPage() {
       <h1 className={styles.heading}>Panel de administrador</h1>
       <p className={styles.welcome}>Bienvenido, {user.email}</p>
       <Link href="/" className={styles.link}>Volver a la página principal</Link>
-      {user.uid === 'PdYdDmrFMiZqZS5fhA3ztO3cpY73' &&  <Link href="/addEquipsEdit" className={styles.link}>Ir al Panel de Gestión de Equipos</Link>}
+      {user.uid === 'PdYdDmrFMiZqZS5fhA3ztO3cpY73' && <div>
+          <Link href="/addEquipsEdit" className={styles.link}>Ir al Panel de Gestión de Equipos</Link>
+          <Link href="/addAscInfo" className={styles.link}>Ir al Panel de Gestión de AscInfo</Link>
+          <div>
+            <AgregarRequisito />
+          </div>
+          <div>
+            <AgregarModelo />
+          </div>
+          </div>}
+
     </div>
   );
 }

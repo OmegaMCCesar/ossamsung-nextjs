@@ -45,6 +45,12 @@
   color: var(--samsung-blue);
   text-decoration: underline;
   transition: color 0.3s ease;
+  font-weight: bold;
+  margin: var(--spacing-2) 0;
+  display: inline-block;
+  font-size: 1rem;
+  text-align: center;
+  width: 100%;
 }
 
 .link:hover {

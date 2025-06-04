@@ -98,6 +98,11 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
 }
 
+.buttonContainer a{
+  text-decoration: none; /* Asegura que el enlace no tenga subrayado */
+  color: inherit; /* Hereda el color del texto del botón */
+  margin: 0 10px; /* Centra el enlace dentro del contenedor */;
+}
 /* Estilos del botón en hover */
 .startButton:hover {
   background-color: var(--color-samsung-blue-dark); /* Variante oscura para hover */
