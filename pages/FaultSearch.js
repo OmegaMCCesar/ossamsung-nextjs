@@ -40,6 +40,7 @@ const DiagnosticoScreen = () => {
     const defectMap = new Map();
 
     modelosData.forEach(modelo => {
+   
       modelo?.defectBlocks?.forEach(defect => {
         const key = defect.defectBlock;
         if (!key) return;
@@ -101,7 +102,7 @@ const DiagnosticoScreen = () => {
 
   return (
     <div className={styles.diagnosticoContainer}>
-      <h1>Proyecto First Time Complete</h1>
+      <h1>Ayuda diagnóstico</h1>
       <input
         type="text"
         placeholder="Ingrese un síntoma, código o parte defectuosa"

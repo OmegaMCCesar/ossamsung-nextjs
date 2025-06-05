@@ -8,16 +8,16 @@ const DefectDetailModal = ({ defecto, onClose }) => {
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent} onClick={onClose}>
         <h2>{defectBlockInfo?.comunName || defectBlockInfo?.defectBlock || 'Sin nombre'}</h2>
-
-        {defectBlockInfo?.fallaTipo && (
-          <span className={`${styles.badge} ${styles[defectBlockInfo.fallaTipo.toLowerCase()]}`}>
-            {defectBlockInfo.fallaTipo}
-          </span>
-        )}
-
-        <p><strong>Modelos Aplicables:</strong> {modelos?.join(', ') || 'Sin información'}</p>
-
-        <p><strong>Características:</strong> {defectBlockInfo?.caracteristicas?.join(', ') || 'Sin información'}</p>
+        <p><strong>Características:</strong></p>
+        <ul>
+          {Array.isArray(defectBlockInfo?.caracteristicas) && defectBlockInfo.caracteristicas.length > 0 ? (
+            defectBlockInfo.caracteristicas.map((caracteristica, idx) => (
+              <li key={idx}>{caracteristica || 'Sin información'}</li>
+            ))
+          ) : (
+            <li>Sin información</li>
+          )}
+        </ul>
 
         {defectBlockInfo?.defectBlockImageUrl && (
           <img

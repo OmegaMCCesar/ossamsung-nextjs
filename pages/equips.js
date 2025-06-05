@@ -47,20 +47,15 @@ const EquipsPage = () => {
    setSerialNumberChecked(false); // Reinicia el estado de verificación
    setSerialNumberError(''); // Borra errores previos
    setIsSerialNumberInProcess(false); // Reinicia el estado "en proceso"
-console.log(serialNumber.length, 'tamaño del SN:', serialNumber);
 
    // Solo proceder si el código ASC es válido y el SN tiene 15 caracteres
    if (isAscCodeValid && serialNumber.length === 15 && db) {
-    console.log('Entro a funcion de mensaje ');
     
     try {
      const serialNumbersRef = collection(db, "serialNumbersInProcess");
      const q = query(serialNumbersRef, where("serialNumber", "==", serialNumber));
      const querySnapshot = await getDocs(q);
-     console.log(querySnapshot, 'Referencia del documento para verificar SN');
      
-
-
      if (!querySnapshot.empty) {
       setIsSerialNumberInProcess(true);
       // Enviar correo al administrador si el SN está en proceso

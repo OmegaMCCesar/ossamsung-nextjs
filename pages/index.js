@@ -34,6 +34,9 @@ export default function Home() {
         </Link>
         {/* <Link href={'/checkIList'}
         className={styles.startButton} >Check List de Instalacion</Link> */}
+         <Link href="/FaultSearch" className={styles.startButton} >
+            Ayuda Pre Diagnostico
+          </Link>
         </div>
       </div>
     </Layout>
