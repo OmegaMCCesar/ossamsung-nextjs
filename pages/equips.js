@@ -505,6 +505,7 @@ const EquipsPage = () => {
             <option value="VACUM">VACUM</option>
             <option value="DW">DW</option>
             <option value="AIR DRESSER">AIR DRESSER</option>
+            <option value="NK">NK</option>
           </select>
           <Link href='/ContactForm' className={styles.buzonButton}>Búzon</Link>
           <Link className={styles.volverButton} href="/">volver</Link>
