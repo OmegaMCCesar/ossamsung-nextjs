@@ -32,8 +32,8 @@ export default function Home() {
         >
           Cierre de Órdenes de Servicio
         </Link>
-        {/* <Link href={'/checkIList'}
-        className={styles.startButton} >Check List de Instalacion</Link> */}
+        <Link href={'/checkIList'}
+        className={styles.startButton} >Check List de Instalacion</Link>
          <Link href="/FaultSearch" className={styles.startButton} >
             Ayuda Pre Diagnostico
           </Link>

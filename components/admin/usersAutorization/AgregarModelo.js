@@ -37,7 +37,7 @@ export default function AgregarModelo() {
     e.preventDefault();
     if (!nombre.trim()) return;
 
-    const q = query(collection(db, "modelos"), where("nombre", "==", nombre));
+    const q = query(collection(db, "modelosInstal"), where("nombre", "==", nombre));
     const snapshot = await getDocs(q);
 
     let modeloRef;
@@ -45,11 +45,11 @@ export default function AgregarModelo() {
 
     if (!snapshot.empty) {
       const existingDoc = snapshot.docs[0];
-      modeloRef = doc(db, "modelos", existingDoc.id);
+      modeloRef = doc(db, "modelosInstal", existingDoc.id);
       await updateDoc(modeloRef, { tipo, categoria });
       fueActualizado = true;
     } else {
-      const newDoc = await addDoc(collection(db, "modelos"), {
+      const newDoc = await addDoc(collection(db, "modelosInstal"), {
         nombre,
         tipo,
         categoria,

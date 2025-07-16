@@ -5,6 +5,7 @@ import {
   getDocs,
   query,
   where,
+  addDoc
 } from "firebase/firestore";
 import styles from "../styles/checkIList.module.css";
 
@@ -12,6 +13,7 @@ export default function InstalationRequisites() {
   const [modelos, setModelos] = useState([]);
   const [modeloSeleccionado, setModeloSeleccionado] = useState(null);
   const [requisitos, setRequisitos] = useState([]);
+  const [categoriasValidas, setCategoriasValidas] = useState([]);
   const [paso, setPaso] = useState(0);
   const [busqueda, setBusqueda] = useState("");
   const [mensajeError, setMensajeError] = useState("");
@@ -20,7 +22,7 @@ export default function InstalationRequisites() {
 
   useEffect(() => {
     const fetchModelos = async () => {
-      const snapshot = await getDocs(collection(db, "modelos"));
+      const snapshot = await getDocs(collection(db, "modelosInstal"));
       const lista = snapshot.docs.map(doc => doc.data());
       setModelos(lista);
     };
@@ -47,21 +49,25 @@ export default function InstalationRequisites() {
         };
       });
       setRequisitos(resultados);
+
+      const cats = categorias.filter(cat =>
+        resultados.some(r => r.tipo === cat)
+      );
+      setCategoriasValidas(cats);
       setPaso(0);
     };
 
     fetchRequisitos();
   }, [modeloSeleccionado]);
 
-  const requisitosPorCategoria = categorias.map(cat =>
+  const requisitosPorCategoria = categoriasValidas.map(cat =>
     requisitos.filter(r => r.tipo === cat)
   );
 
-  const categoriaActual = categorias[paso];
+  const categoriaActual = categoriasValidas[paso];
   const requisitosActuales = requisitosPorCategoria[paso] || [];
 
   const todosCumplidosCategoriaActual = requisitosActuales.every(r => r.cumplido);
-
   const todosLosRequisitosCumplidos =
     requisitos.length > 0 && requisitos.every(r => r.cumplido);
 
@@ -74,13 +80,40 @@ export default function InstalationRequisites() {
     setRequisitos(updated);
   };
 
+  const guardarModeloNoEncontrado = async (modeloNoEncontrado) => {
+    const nombreUpper = modeloNoEncontrado.toUpperCase();
+
+    try {
+      const q = query(
+        collection(db, "modelosNoEncontrados"),
+        where("nombre", "==", nombreUpper)
+      );
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        await addDoc(collection(db, "modelosNoEncontrados"), {
+          nombre: nombreUpper,
+          timestamp: new Date()
+        });
+        console.log(`✅ Modelo no encontrado guardado: ${nombreUpper}`);
+      } else {
+        console.log(`ℹ️ El modelo ${nombreUpper} ya estaba registrado como no encontrado.`);
+      }
+    } catch (error) {
+      console.error("❌ Error al guardar modelo no encontrado:", error);
+    }
+  };
+
   const buscarModelo = () => {
-    const modelo = modelos.find(m => m.nombre.toLowerCase() === busqueda.toLowerCase().trim());
+    const nombreBuscado = busqueda.trim().toUpperCase();
+    const modelo = modelos.find(m => m.nombre.toUpperCase() === nombreBuscado);
+
     if (modelo) {
       setModeloSeleccionado(modelo);
       setMensajeError("");
     } else {
-      setMensajeError("Modelo no encontrado. Verifica el nombre e intenta de nuevo.");
+      setMensajeError("Modelo no encontrado. Verifica el modelo e intenta de nuevo. Si el modelo no aparece aun después de verificar, este se agregara de 1 a 3 dias despues. Puedes intentar buscarlo nuevamente despues de este periodo.");
+      guardarModeloNoEncontrado(nombreBuscado);
     }
   };
 
@@ -90,10 +123,21 @@ export default function InstalationRequisites() {
     setMensajeError("");
     setPaso(0);
     setRequisitos([]);
+    setCategoriasValidas([]);
   };
 
+  if (modeloSeleccionado && paso >= categoriasValidas.length) {
+    return (
+      <div className={styles.container}>
+        <h2 className={styles.title}>Checklist instalación</h2>
+        <p>No hay más requisitos por mostrar.</p>
+        <button onClick={resetear} className={styles.buttonSecundary}>Reiniciar</button>
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${styles.fadeIn}`}>
       {!modeloSeleccionado ? (
         <>
           <h2 className={styles.title}>Buscar modelo a instalar</h2>
@@ -119,7 +163,10 @@ export default function InstalationRequisites() {
           </h3>
           <ul className={styles.list}>
             {requisitosActuales.map((req, idx) => (
-              <li key={req.id} className={styles.item}>
+              <li
+                key={req.id}
+                className={`${styles.item} ${req.cumplido ? styles.completed : ""}`}
+              >
                 <label>
                   <input
                     type="checkbox"
@@ -132,7 +179,7 @@ export default function InstalationRequisites() {
                 {req.imgRef.length > 0 && (
                   <div className={styles.imgContainer}>
                     {req.imgRef.map((img, i) => (
-                      <img key={i} src={img} alt={`Imagen ${i}`} />
+                      <img key={i} src={img} alt={`Imagen ${i}`} className={styles.img} />
                     ))}
                   </div>
                 )}
@@ -146,7 +193,7 @@ export default function InstalationRequisites() {
                 Anterior
               </button>
             )}
-            {paso < categorias.length - 1 && (
+            {paso < categoriasValidas.length - 1 && (
               <button
                 onClick={() => setPaso(paso + 1)}
                 className={styles.button}
@@ -155,7 +202,7 @@ export default function InstalationRequisites() {
                 Siguiente
               </button>
             )}
-            {paso === categorias.length - 1 && (
+            {paso === categoriasValidas.length - 1 && (
               <button
                 onClick={resetear}
                 className={styles.buttonSecundary}

@@ -1,30 +1,49 @@
+/* === CONTENEDOR PRINCIPAL === */
 .container {
-  max-width: 600px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 2rem 1rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.6s ease-in-out;
 }
 
+/* === ENCABEZADO PRINCIPAL === */
 .title {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 1rem;
+  text-align: center;
+  background-color: #000;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
+/* === SUBTÍTULO DE CATEGORÍA === */
 .subTitle {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
   color: #333;
+  text-transform: uppercase;
 }
 
+/* === INPUT DE BÚSQUEDA === */
 .input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.7rem;
   font-size: 1rem;
-  margin-bottom: 1rem;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+/* === RESULTADOS DE BÚSQUEDA === */
 .searchResults {
   list-style: none;
   padding: 0;
@@ -32,30 +51,62 @@
 }
 
 .searchResults .item {
-  padding: 0.5rem;
-  background-color: #f2f2f2;
-  margin-bottom: 0.3rem;
-  border-radius: 6px;
+  padding: 0.6rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
+.searchResults .item:hover {
+  background-color: #e0e0e0;
+}
+
+/* === LISTADO DE REQUISITOS === */
 .list {
   list-style: none;
   padding: 0;
+  margin-bottom: 2rem;
 }
 
 .item {
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: #fafafa;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  transition: box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
+.item:hover {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+}
+
+.item.completed {
+  background-color: #e6f4ea;
+  border-left: 6px solid #28a745;
+}
+
+/* === BOTONES PRINCIPALES === */
 .button {
+  display: inline-block;
   margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.75rem 1.5rem;
   background-color: #007bff;
   color: white;
+  font-weight: 600;
+  font-size: 1rem;
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: #0056b3;
 }
 
 .button:disabled {
@@ -63,43 +114,117 @@
   cursor: not-allowed;
 }
 
+/* === BOTÓN SECUNDARIO (Reiniciar) === */
+.buttonSecundary {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  color: #444;
+  font-weight: 500;
+  font-size: 1rem;
+  border: 2px dashed #aaa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.buttonSecundary:hover {
+  color: #000;
+}
+
+/* === ENLACE RESET TEXT === */
 .reset {
   margin-top: 1rem;
   background: transparent;
   border: none;
-  color: #666;
+  color: #555;
   cursor: pointer;
   text-decoration: underline;
 }
 
+/* === MENSAJE DE ERROR === */
 .error {
   color: red;
   margin-top: 10px;
   font-weight: bold;
+  text-align: center;
 }
 
+/* === CONTENEDOR DE IMÁGENES === */
 .imgContainer {
-  margin-top: 8px;
+  margin-top: 12px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
+  justify-content: flex-start;
 }
 
 .img {
-  max-width: 100px;
-  max-height: 100px;
-  border-radius: 8px;
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 10px;
   object-fit: cover;
+  border: 1px solid #ccc;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
 }
 
+.img:hover {
+  transform: scale(1.05);
+}
+
+/* === MENSAJE DE ÉXITO === */
 .successMessage {
-  margin-top: 20px;
+  margin-top: 30px;
   padding: 16px;
   background-color: #d4edda;
   color: #155724;
   font-weight: bold;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid #c3e6cb;
   text-align: center;
+  font-size: 1.1rem;
+}
+
+/* === ANIMACIÓN FADE IN === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeIn {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* === RESPONSIVE: PANTALLAS PEQUEÑAS === */
+@media (max-width: 640px) {
+  .title {
+    font-size: 1.5rem;
+    padding: 0.75rem;
+  }
+
+  .subTitle {
+    font-size: 1.1rem;
+  }
+
+  .img {
+    max-width: 100px;
+    max-height: 100px;
+  }
+
+  .button,
+  .buttonSecundary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .container {
+    padding: 1rem;
+  }
 }
