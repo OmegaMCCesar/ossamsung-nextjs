@@ -277,3 +277,17 @@
 .gap2 {
   gap: 8px;
 }
+
+/* Para next/image con fill */
+.imageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;   /* ajusta si quieres 1/1, 16/9, etc. */
+  background: #fff;
+}
+
+.imageContain {
+  object-fit: contain;   /* o 'cover' si prefieres recorte */
+  background: #fff;
+}
+

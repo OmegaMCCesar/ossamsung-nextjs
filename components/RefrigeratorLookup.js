@@ -1,5 +1,6 @@
 // RefrigeratorLookup.jsx
 import React, { useMemo, useState } from "react";
+import Image from "next/image";
 import { Search, Info, CheckCircle2, AlertTriangle, ClipboardCopy } from "lucide-react";
 import styles from "../styles/RefrigeratorLookup.module.css";
 
@@ -87,83 +88,46 @@ const DATA = [
 ];
 
 // =================== IMÁGENES POR MODELO ===================
-// Sustituye rutas por las reales de cada modelo/parte/estado.
-// Si un modelo no tiene "after.compressor" definido (porque no cambió o no tienes imagen),
-// quedará el placeholder de AFTER.
+// URL temporal (logo Samsung) para compresor y PCB:
+const url_compresor = "https://images.samsung.com/is/image/samsung/assets/global/about-us/brand/logo/256_144_2.png?$512_N_PNG$";
+const url_pcb       = "https://images.samsung.com/is/image/samsung/assets/global/about-us/brand/logo/256_144_2.png?$512_N_PNG$";
+
 const MODEL_PART_IMAGES = {
   "RF22A4010S9/EM": {
-    before: {
-      compressor: "/images/RF22A4010S9_before_compressor.jpg",
-      pcb: "/images/RF22A4010S9_before_pcb.jpg",
-    },
-    after: {
-      compressor: "/images/RF22A4010S9_after_compressor.jpg",
-      pcb: "/images/RF22A4010S9_after_pcb.jpg",
-    },
+    before: { compressor: url_compresor, pcb: url_pcb },
+    after:  { compressor: url_compresor, pcb: url_pcb },
   },
   "RF22A4110S9/EM": {
-    before: {
-      compressor: "/images/RF22A4110S9_before_compressor.jpg",
-      pcb: "/images/RF22A4110S9_before_pcb.jpg",
-    },
-    after: {
-      compressor: "/images/RF22A4110S9_after_compressor.jpg",
-      pcb: "/images/RF22A4110S9_after_pcb.jpg",
-    },
+    before: { compressor: url_compresor, pcb: url_pcb },
+    after:  { compressor: url_compresor, pcb: url_pcb },
   },
   "RS27T5200B1/EM": {
-    before: {
-      compressor: "/images/RS27T5200B1_before_compressor.jpg",
-      pcb: "/images/RS27T5200B1_before_pcb.jpg",
-    },
-    after: {
-      compressor: "/images/RS27T5200B1_after_compressor.jpg",
-      pcb: "/images/RS27T5200B1_after_pcb.jpg",
-    },
+    before: { compressor: url_compresor, pcb: url_pcb },
+    after:  { compressor: url_compresor, pcb: url_pcb },
   },
   "RS27T5200S9/EM": {
-    before: {
-      compressor: "/images/RS27T5200S9_before_compressor.jpg",
-      pcb: "/images/RS27T5200S9_before_pcb.jpg",
-    },
-    after: {
-      compressor: "/images/RS27T5200S9_after_compressor.jpg",
-      pcb: "/images/RS27T5200S9_after_pcb.jpg",
-    },
+    before: { compressor: url_compresor, pcb: url_pcb },
+    after:  { compressor: url_compresor, pcb: url_pcb },
   },
   "RT31DG5124S9EM": {
-    before: {
-      compressor: "/images/RT31DG5124_before_compressor.jpg",
-      pcb: "/images/RT31DG5124_before_pcb.jpg",
-    },
-    after: {
-      compressor: "/images/RT31DG5124_after_compressor.jpg",
-      pcb: "/images/RT31DG5124_after_pcb.jpg",
-    },
+    before: { compressor: url_compresor, pcb: url_pcb },
+    after:  { compressor: url_compresor, pcb: url_pcb },
   },
   "RT53DG6128S9EM": {
-    before: {
-      compressor: "/images/RT53DG6128_before_compressor.jpg",
-      pcb: "/images/RT53DG6128_before_pcb.jpg",
-    },
-    after: {
-      compressor: "/images/RT53DG6128_after_compressor.jpg",
-      pcb: "/images/RT53DG6128_after_pcb.jpg",
-    },
+    before: { compressor: url_compresor, pcb: url_pcb },
+    after:  { compressor: url_compresor, pcb: url_pcb },
   },
-  // Agrega aquí el resto de modelos que necesites...
+  "RT42DG6734B1EM": {
+    before: { compressor: url_compresor, pcb: url_pcb },
+    after:  { compressor: url_compresor, pcb: url_pcb },
+  },
+  // ...cuando tengas URLs reales, solo reemplázalas aquí.
 };
 
-// Placeholders por defecto (se usan si el modelo no tiene mapeo):
+// Placeholders por defecto → también URLs
 const DEFAULT_PART_IMAGES = {
-  before: {
-    compressor: "/images/placeholder_before_compressor.jpg",
-    pcb: "/images/placeholder_before_pcb.jpg",
-  },
-  after: {
-    compressor: "/images/placeholder_after_compressor.jpg",
-    pcb: "/images/placeholder_after_pcb.jpg",
-  },
+  before: { compressor: url_compresor, pcb: url_pcb },
+  after:  { compressor: url_compresor, pcb: url_pcb },
 };
 
 // =================== HELPERS ===================
@@ -219,6 +183,24 @@ function getImagesForModel(model = "") {
       pcb: entry?.after?.pcb || DEFAULT_PART_IMAGES.after.pcb,
     },
   };
+}
+
+// Pequeño wrapper para usar next/image con fill
+function ImgBox({ src, alt, caption }) {
+  return (
+    <figure style={{ border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden", margin: 0 }}>
+      <div className={styles.imageWrap}>
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="(max-width: 768px) 50vw, 33vw"
+          className={styles.imageContain}
+        />
+      </div>
+      <figcaption style={{ padding: "6px 10px", fontSize: 12, color: "#6b7280" }}>{caption}</figcaption>
+    </figure>
+  );
 }
 
 // =================== COMPONENTE ===================
@@ -376,7 +358,7 @@ export default function RefrigeratorLookup() {
       )}
 
       {/* Campo de Número de Serie: RF4500 o 24-ene */}
-      {chosen && requireSerial && (
+      {chosen && (isRF4500 || needs24EneSN) && (
         <div className={styles.searchRow}>
           <Search className={styles.iconMuted} />
           <input
@@ -444,16 +426,10 @@ export default function RefrigeratorLookup() {
                 </li>
               </ul>
 
-              {/* Imágenes ANTES (compresor + PCB) */}
+              {/* Imágenes ANTES */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 8 }}>
-                <figure style={{ border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden", margin: 0 }}>
-                  <img src={partImgs.before.compressor} alt={`Compresor (Antes) - ${chosen.model}`} style={{ width: "100%", height: "auto", display: "block" }} />
-                  <figcaption style={{ padding: "6px 10px", fontSize: 12, color: "#6b7280" }}>Compresor (Antes)</figcaption>
-                </figure>
-                <figure style={{ border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden", margin: 0 }}>
-                  <img src={partImgs.before.pcb} alt={`PCB (Antes) - ${chosen.model}`} style={{ width: "100%", height: "auto", display: "block" }} />
-                  <figcaption style={{ padding: "6px 10px", fontSize: 12, color: "#6b7280" }}>PCB (Antes)</figcaption>
-                </figure>
+                <ImgBox src={partImgs.before.compressor} alt={`Compresor (Antes) - ${chosen.model}`} caption="Compresor (Antes)" />
+                <ImgBox src={partImgs.before.pcb}        alt={`PCB (Antes) - ${chosen.model}`}        caption="PCB (Antes)" />
               </div>
             </div>
 
@@ -486,16 +462,10 @@ export default function RefrigeratorLookup() {
                   </li>
                 </ul>
 
-                {/* Imágenes DESPUÉS (compresor + PCB) */}
+                {/* Imágenes DESPUÉS */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 8 }}>
-                  <figure style={{ border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden", margin: 0 }}>
-                    <img src={partImgs.after.compressor} alt={`Compresor (Después) - ${chosen.model}`} style={{ width: "100%", height: "auto", display: "block" }} />
-                    <figcaption style={{ padding: "6px 10px", fontSize: 12, color: "#6b7280" }}>Compresor (Después)</figcaption>
-                  </figure>
-                  <figure style={{ border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden", margin: 0 }}>
-                    <img src={partImgs.after.pcb} alt={`PCB (Después) - ${chosen.model}`} style={{ width: "100%", height: "auto", display: "block" }} />
-                    <figcaption style={{ padding: "6px 10px", fontSize: 12, color: "#6b7280" }}>PCB (Después)</figcaption>
-                  </figure>
+                  <ImgBox src={partImgs.after.compressor} alt={`Compresor (Después) - ${chosen.model}`} caption="Compresor (Después)" />
+                  <ImgBox src={partImgs.after.pcb}        alt={`PCB (Después) - ${chosen.model}`}        caption="PCB (Después)" />
                 </div>
 
                 <div className={styles.helper} style={{ marginTop: 10 }}>
