@@ -1,14 +1,13 @@
-// RefrigeratorLookup.jsx
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { Search, Info, CheckCircle2, AlertTriangle, ClipboardCopy } from "lucide-react";
+import { Search, Info, CheckCircle2, AlertTriangle, ClipboardCopy, X } from "lucide-react";
 import styles from "../styles/RefrigeratorLookup.module.css";
 
 /**
  * Reglas:
- * - RF4500 y apply === "24-ene": exige SN (15). < feb-2025 => solo "Antes"; >= feb-2025 => "Antes" + "Después".
- * - apply termina en "W49" o "Inactive": sin SN, solo "Antes".
- * - Resto: sin SN, "Antes" + "Después".
+ * - RF4500 y apply === "24-ene": exige SN (15). < feb-2025 => solo Antes; >= feb-2025 => Antes + Después.
+ * - apply termina en W49 o Inactive: sin SN, solo Antes.
+ * - Resto: sin SN, Antes + Después.
  * Imágenes:
  * - Por modelo y por estado (Antes/Después) y por parte (compresor/PCB).
  * - Si no hay mapeo => placeholders.
@@ -88,43 +87,20 @@ const DATA = [
 ];
 
 // =================== IMÁGENES POR MODELO ===================
-// URL temporal (logo Samsung) para compresor y PCB:
+// URL temporal para compresor/PCB:
 const url_compresor = "https://images.samsung.com/is/image/samsung/assets/global/about-us/brand/logo/256_144_2.png?$512_N_PNG$";
 const url_pcb       = "https://images.samsung.com/is/image/samsung/assets/global/about-us/brand/logo/256_144_2.png?$512_N_PNG$";
 
 const MODEL_PART_IMAGES = {
-  "RF22A4010S9/EM": {
-    before: { compressor: url_compresor, pcb: url_pcb },
-    after:  { compressor: url_compresor, pcb: url_pcb },
-  },
-  "RF22A4110S9/EM": {
-    before: { compressor: url_compresor, pcb: url_pcb },
-    after:  { compressor: url_compresor, pcb: url_pcb },
-  },
-  "RS27T5200B1/EM": {
-    before: { compressor: url_compresor, pcb: url_pcb },
-    after:  { compressor: url_compresor, pcb: url_pcb },
-  },
-  "RS27T5200S9/EM": {
-    before: { compressor: url_compresor, pcb: url_pcb },
-    after:  { compressor: url_compresor, pcb: url_pcb },
-  },
-  "RT31DG5124S9EM": {
-    before: { compressor: url_compresor, pcb: url_pcb },
-    after:  { compressor: url_compresor, pcb: url_pcb },
-  },
-  "RT53DG6128S9EM": {
-    before: { compressor: url_compresor, pcb: url_pcb },
-    after:  { compressor: url_compresor, pcb: url_pcb },
-  },
-  "RT42DG6734B1EM": {
-    before: { compressor: url_compresor, pcb: url_pcb },
-    after:  { compressor: url_compresor, pcb: url_pcb },
-  },
-  // ...cuando tengas URLs reales, solo reemplázalas aquí.
+  "RF22A4010S9/EM": { before: { compressor: url_compresor, pcb: url_pcb }, after: { compressor: url_compresor, pcb: url_pcb } },
+  "RF22A4110S9/EM": { before: { compressor: url_compresor, pcb: url_pcb }, after: { compressor: url_compresor, pcb: url_pcb } },
+  "RS27T5200B1/EM": { before: { compressor: url_compresor, pcb: url_pcb }, after: { compressor: url_compresor, pcb: url_pcb } },
+  "RS27T5200S9/EM": { before: { compressor: url_compresor, pcb: url_pcb }, after: { compressor: url_compresor, pcb: url_pcb } },
+  "RT31DG5124S9EM": { before: { compressor: url_compresor, pcb: url_pcb }, after: { compressor: url_compresor, pcb: url_pcb } },
+  "RT53DG6128S9EM": { before: { compressor: url_compresor, pcb: url_pcb }, after: { compressor: url_compresor, pcb: url_pcb } },
+  "RT42DG6734B1EM": { before: { compressor: url_compresor, pcb: url_pcb }, after: { compressor: url_compresor, pcb: url_pcb } },
 };
 
-// Placeholders por defecto → también URLs
 const DEFAULT_PART_IMAGES = {
   before: { compressor: url_compresor, pcb: url_pcb },
   after:  { compressor: url_compresor, pcb: url_pcb },
@@ -136,7 +112,7 @@ function badgeClass(apply) {
   const val = String(apply).toLowerCase();
   if (val.includes("inactive")) return styles.badgeRed;
   if (val.endsWith("w49") || val.startsWith("w")) return styles.badgeBlue;
-  return styles.badgeGreen; // fecha (10-ene / 24-ene)
+  return styles.badgeGreen;
 }
 function copy(text) { if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text); }
 const normalize = (s) => (s || "").toString().trim().toLowerCase();
@@ -170,7 +146,6 @@ function isApply24Ene(apply = "") {
   return norm === "24ene";
 }
 
-// Resolver imágenes por modelo con fallback
 function getImagesForModel(model = "") {
   const entry = MODEL_PART_IMAGES[model] || {};
   return {
@@ -185,20 +160,27 @@ function getImagesForModel(model = "") {
   };
 }
 
-// Pequeño wrapper para usar next/image con fill
-function ImgBox({ src, alt, caption }) {
+// Mini-componente de imagen con click para abrir lightbox
+function ImgBox({ src, alt, caption, onOpen }) {
   return (
-    <figure style={{ border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden", margin: 0 }}>
-      <div className={styles.imageWrap}>
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes="(max-width: 768px) 50vw, 33vw"
-          className={styles.imageContain}
-        />
-      </div>
-      <figcaption style={{ padding: "6px 10px", fontSize: 12, color: "#6b7280" }}>{caption}</figcaption>
+    <figure className={styles.imgBox}>
+      <button
+        type="button"
+        className={styles.imgBtn}
+        onClick={() => onOpen?.(src, alt, caption)}
+        title="Ver en grande"
+      >
+        <div className={styles.imageWrap}>
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="(max-width: 768px) 50vw, 33vw"
+            className={styles.imageContain}
+          />
+        </div>
+      </button>
+      <figcaption className={styles.imgCaption}>{caption}</figcaption>
     </figure>
   );
 }
@@ -210,9 +192,22 @@ export default function RefrigeratorLookup() {
   const [selected, setSelected] = useState(null);
   const [serial, setSerial] = useState("");
 
+  // Lightbox state
+  const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "", caption: "" });
+  const openLightbox = useCallback((src, alt, caption) => {
+    setLightbox({ open: true, src, alt, caption });
+  }, []);
+  const closeLightbox = useCallback(() => setLightbox((p) => ({ ...p, open: false })), []);
+  // Cerrar con ESC
+  useEffect(() => {
+    if (!lightbox.open) return;
+    const onKey = (e) => { if (e.key === "Escape") closeLightbox(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox.open, closeLightbox]);
+
   const platformSet = useMemo(() => [...new Set(DATA.map((d) => d.pjt))], []);
 
-  // Búsqueda por modelo
   const results = useMemo(() => {
     const q = normalize(query);
     const pf = normalize(pjtFilter);
@@ -231,57 +226,49 @@ export default function RefrigeratorLookup() {
 
   const chosen = selected || exact || (results.length === 1 ? results[0] : null);
 
-  // Flags por modelo
   const isRF4500 = (chosen?.pjt || "").toUpperCase() === "RF4500";
   const applyStr = String(chosen?.apply || "").toUpperCase();
   const isW49 = applyStr.endsWith("W49");
   const isInactive = applyStr.includes("INACTIVE");
   const needs24EneSN = isApply24Ene(chosen?.apply);
 
-  // ¿Se pide SN?
   const requireSerial = !!chosen && (isRF4500 || needs24EneSN);
-
-  // Info SN si aplica
   const snInfo = useMemo(() => (requireSerial ? decodeSerial(serial) : null), [serial, requireSerial]);
 
-  // Mostrar sección "Después"
   const showAfterSection = useMemo(() => {
     if (!chosen) return false;
-    if (isW49 || isInactive) return false; // siempre solo "Antes"
+    if (isW49 || isInactive) return false;
     if (isRF4500 || needs24EneSN) {
       if (!snInfo?.valid) return false;
-      return !snInfo.isBeforeCutoff; // solo si >= feb-2025
+      return !snInfo.isBeforeCutoff;
     }
-    // Otros modelos → siempre ambas
     return true;
   }, [chosen, isRF4500, isW49, isInactive, needs24EneSN, snInfo]);
 
-  // ¿Qué columna va “Indicado”?
   const indicated = useMemo(() => {
     if (!chosen) return null;
     if (isW49 || isInactive) return "before";
     if ((isRF4500 || needs24EneSN) && snInfo?.valid) {
       return snInfo.isBeforeCutoff ? "before" : "after";
     }
-    return null; // otros modelos, sin SN → sin indicado explícito
+    return null;
   }, [chosen, isRF4500, isW49, isInactive, needs24EneSN, snInfo]);
 
-  // Mensaje final
   const decision = useMemo(() => {
     if (!chosen) return { text: "Selecciona un modelo para revisar si aplica al boletín.", tone: "info" };
-    if (isW49) return { text: "“Aplica W49”: seguir utilizando compresor y PCB originales (no se usa SN).", tone: "info" };
-    if (isInactive) return { text: "Estado “Inactive”: seguir utilizando compresor y PCB originales.", tone: "info" };
+    if (isW49) return { text: "Aplica W49: seguir utilizando compresor y PCB originales (no se usa SN).", tone: "info" };
+    if (isInactive) return { text: "Estado Inactive: seguir utilizando compresor y PCB originales.", tone: "info" };
 
     if (isRF4500 || needs24EneSN) {
       if (!serial) return { text: "Ingresa el número de serie (15) para validar fecha de fabricación.", tone: "info" };
       if (!snInfo?.valid) return { text: snInfo?.message || "SN inválido.", tone: "warn" };
       if (snInfo.isBeforeCutoff) {
-        return { text: `${chosen.apply}: fabricado en ${snInfo.nice} (ANTES de feb-2025) → usar compresor y PCB originales (solo “Antes”).`, tone: "warn" };
+        return { text: `${chosen.apply}: fabricado en ${snInfo.nice} (antes de feb-2025) → usar compresor y PCB originales (solo Antes).`, tone: "warn" };
       }
-      return { text: `${chosen.apply}: fabricado en ${snInfo.nice} (feb-2025 o DESPUÉS) → usar “Después” (EEPROM/PCB nuevos).`, tone: "ok" };
+      return { text: `${chosen.apply}: fabricado en ${snInfo.nice} (feb-2025 o después) → usar Después (EEPROM/PCB nuevos).`, tone: "ok" };
     }
 
-    return { text: "Este modelo no requiere validación por SN. Se muestran “Antes” y “Después”.", tone: "info" };
+    return { text: "Este modelo no requiere validación por SN. Se muestran Antes y Después.", tone: "info" };
   }, [chosen, isRF4500, needs24EneSN, isW49, isInactive, serial, snInfo]);
 
   const toneIcon = (t) =>
@@ -292,13 +279,11 @@ export default function RefrigeratorLookup() {
   const toneBadgeClass = (t) =>
     t === "ok" ? styles.badgeGreen : t === "warn" ? styles.badgeRed : styles.badgeBlue;
 
-  // Estilo inline para resaltar la sección indicada
   const indicatedStyle = (side) =>
     indicated === side
       ? { borderColor: "#10b981", boxShadow: "0 0 0 1px #10b981 inset" }
       : undefined;
 
-  // Imágenes según modelo (compresor + PCB)
   const partImgs = getImagesForModel(chosen?.model);
 
   return (
@@ -428,8 +413,8 @@ export default function RefrigeratorLookup() {
 
               {/* Imágenes ANTES */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 8 }}>
-                <ImgBox src={partImgs.before.compressor} alt={`Compresor (Antes) - ${chosen.model}`} caption="Compresor (Antes)" />
-                <ImgBox src={partImgs.before.pcb}        alt={`PCB (Antes) - ${chosen.model}`}        caption="PCB (Antes)" />
+                <ImgBox src={partImgs.before.compressor} alt={`Compresor (Antes) - ${chosen.model}`} caption="Compresor (Antes)" onOpen={openLightbox} />
+                <ImgBox src={partImgs.before.pcb}        alt={`PCB (Antes) - ${chosen.model}`}        caption="PCB (Antes)"        onOpen={openLightbox} />
               </div>
             </div>
 
@@ -464,15 +449,15 @@ export default function RefrigeratorLookup() {
 
                 {/* Imágenes DESPUÉS */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 8 }}>
-                  <ImgBox src={partImgs.after.compressor} alt={`Compresor (Después) - ${chosen.model}`} caption="Compresor (Después)" />
-                  <ImgBox src={partImgs.after.pcb}        alt={`PCB (Después) - ${chosen.model}`}        caption="PCB (Después)" />
+                  <ImgBox src={partImgs.after.compressor} alt={`Compresor (Después) - ${chosen.model}`} caption="Compresor (Después)" onOpen={openLightbox} />
+                  <ImgBox src={partImgs.after.pcb}        alt={`PCB (Después) - ${chosen.model}`}        caption="PCB (Después)"        onOpen={openLightbox} />
                 </div>
 
                 <div className={styles.helper} style={{ marginTop: 10 }}>
                   <Info className={styles.helperIcon} />
                   <p>
-                    “W##” son semanas de calendario; “10-ene / 24-ene” son fechas (día-mes).
-                    Si ves <strong>Inactive</strong>, la actualización fue retirada/no vigente.
+                    W## son semanas de calendario; 10-ene y 24-ene son fechas (día-mes).
+                    Si ves Inactive, la actualización fue retirada o no está vigente.
                   </p>
                 </div>
               </div>
@@ -499,6 +484,42 @@ export default function RefrigeratorLookup() {
         </div>
       ) : (
         <div className={styles.empty}>Empieza escribiendo un modelo y/o filtra por PJT.</div>
+      )}
+
+      {/* LIGHTBOX */}
+      {lightbox.open && (
+        <div className={styles.lbBackdrop} onClick={closeLightbox}>
+          <div
+            className={styles.lbCard}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Vista ampliada"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className={styles.lbClose}
+              onClick={closeLightbox}
+              aria-label="Cerrar"
+              title="Cerrar"
+            >
+              <X size={20} />
+            </button>
+
+            <div className={styles.lbImgWrap}>
+              <Image
+                src={lightbox.src}
+                alt={lightbox.alt || "Imagen ampliada"}
+                fill
+                sizes="100vw"
+                className={styles.imageContain}
+                priority
+              />
+            </div>
+
+            {lightbox.caption && <div className={styles.lbCaption}>{lightbox.caption}</div>}
+          </div>
+        </div>
       )}
     </div>
   );

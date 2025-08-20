@@ -3,131 +3,170 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import useFetchInfFirebase from '../hooks/useFetchInfFirebase';
-import { useAuth } from '../context/UserContext'; // Aunque no lo usemos para el email, se mantiene por si se usa en otro lugar
+import { useAuth } from '../context/UserContext';
 import { db } from '../lib/firebase';
-import { doc, increment, runTransaction, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, increment, runTransaction, collection, query, where, getDocs } from 'firebase/firestore';
 
 import styles from '../styles/equips.module.css';
-
 import emailjs from '@emailjs/browser';
 
+const LOCAL_STORAGE_ASC_KEY = 'ASC_CODE_SAVED';
+
 const EquipsPage = () => {
- const router = useRouter();
- const { user } = useAuth(); // Se mantiene por si es necesario para otras funcionalidades
+  const router = useRouter();
+  const { user } = useAuth();
 
- const [category, setCategory] = useState('');
- const [searchTerm, setSearchTerm] = useState('');
- const { data, loading, error } = useFetchInfFirebase(category, searchTerm);
+  const [category, setCategory] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const { data, loading, error } = useFetchInfFirebase(category, searchTerm);
 
- const [selectedModel, setSelectedModel] = useState(null);
- const [selectedDefectBlock, setSelectedDefectBlock] = useState(null);
- const [selectedSymptom, setSelectedSymptom] = useState(null);
- const [selectedSubSymptom, setSelectedSubSymptom] = useState(null);
- const [selectedRepairCode, setSelectedRepairCode] = useState(null);
- const [selectedSubRepairCode, setSelectedSubRepairCode] = useState(null);
+  const [selectedModel, setSelectedModel] = useState(null);
+  const [selectedDefectBlock, setSelectedDefectBlock] = useState(null);
+  const [selectedSymptom, setSelectedSymptom] = useState(null);
+  const [selectedSubSymptom, setSelectedSubSymptom] = useState(null);
+  const [selectedRepairCode, setSelectedRepairCode] = useState(null);
+  const [selectedSubRepairCode, setSelectedSubRepairCode] = useState(null);
 
- const [serialNumber, setSerialNumber] = useState('');
- const [isSerialNumberInProcess, setIsSerialNumberInProcess] = useState(false);
- const [serialNumberChecked, setSerialNumberChecked] = useState(false);
- const [serialNumberError, setSerialNumberError] = useState('');
+  const [serialNumber, setSerialNumber] = useState('');
+  const [isSerialNumberInProcess, setIsSerialNumberInProcess] = useState(false);
+  const [serialNumberChecked, setSerialNumberChecked] = useState(false);
+  const [serialNumberError, setSerialNumberError] = useState('');
 
- const [showSummary, setShowSummary] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
- const [ascCode, setAscCode] = useState('');
+  const [ascCode, setAscCode] = useState('');
 
- const validAscCodes = useMemo(() => [
-  'Techsup','6434525 ', '1401501', '6449579','6283007', '4907726',
-  '1658952', '1658994', '1659040', '4301958', '1659075', '1659136', '1729840', '1729975', '1729981', '1730172', '1730213', '1730257', '3453191', '2485007', '1730369', '3329308', '3490802', '3350595', '3375393', '3188990', '3329209', '3403522', '3404483', '3441335', '2277262', '3456937', '3464868', '3465902', '3467737', '3491791', '3861676', '6420071', '3903559', '4156881', '4156884', '4156883', '4160663', '4204348', '4243700', '4254175', '4271992', '3887111', '4292179', '4366954', '4375230', '4377174', '4789474', '4789476', '4894172', '4906330', '4923659', '4923680', '4932655', '4939874', '4953466', '4953467', '4962883', '4979868', '5777171', '5777172', '5779775', '5785173', '5788233', '5791986', '5798519', '5930135', '5939508', '5944496', '5949511', '5954013', '5968133', '5978055', '6423092', '6423093', '6423094', '5981427', '5984693', '5995041', '6421187', '6420072', '5999767', '6078654', '6082798', '4220824', '6162465', '4769819', '6205424', '6216903', '3491830', '6266448', '3191645', '5283007', '3865192', '2484362', '5288709', '6288721', '6288722', '6428335', '8334950', '8381572', '8395034', '9216816', '2470144', 'Cessoss',
- ], []);
+  // ⚠️ Ojo: había un código con espacio final '6434525 ' en tu lista original.
+  // Aun así, abajo normalizamos ambos lados (trim/uppercase) para evitar falsos negativos.
+  const validAscCodes = useMemo(
+    () => [
+      'Techsup', '6434525', '1401501', '6449579', '6283007', '4907726',
+      '1658952', '1658994', '1659040', '4301958', '1659075', '1659136', '1729840', '1729975', '1729981', '1730172', '1730213', '1730257', '3453191', '2485007', '1730369', '3329308', '3490802', '3350595', '3375393', '3188990', '3329209', '3403522', '3404483', '3441335', '2277262', '3456937', '3464868', '3465902', '3467737', '3491791', '3861676', '6420071', '3903559', '4156881', '4156884', '4156883', '4160663', '4204348', '4243700', '4254175', '4271992', '3887111', '4292179', '4366954', '4375230', '4377174', '4789474', '4789476', '4894172', '4906330', '4923659', '4923680', '4932655', '4939874', '4953466', '4953467', '4962883', '4979868', '5777171', '5777172', '5779775', '5785173', '5788233', '5791986', '5798519', '5930135', '5939508', '5944496', '5949511', '5954013', '5968133', '5978055', '6423092', '6423093', '6423094', '5981427', '5984693', '5995041', '6421187', '6420072', '5999767', '6078654', '6082798', '4220824', '6162465', '4769819', '6205424', '6216903', '3491830', '6266448', '3191645', '5283007', '3865192', '2484362', '5288709', '6288721', '6288722', '6428335', '8334950', '8381572', '8395034', '9216816', '2470144', 'Cessoss',
+    ],
+    []
+  );
 
- const isAscCodeValid = useMemo(() => validAscCodes.includes(ascCode), [ascCode, validAscCodes]);
+  const ascCodeCanonical = useMemo(() => (ascCode || '').trim(), [ascCode]);
+  const isAscCodeValid = useMemo(() => {
+    const set = new Set(validAscCodes.map(c => (c || '').trim().toUpperCase()));
+    return set.has(ascCodeCanonical.toUpperCase());
+  }, [ascCodeCanonical, validAscCodes]);
 
- useEffect(() => {
-  const checkSerialNumberExistence = async () => {
-   setSerialNumberChecked(false); // Reinicia el estado de verificación
-   setSerialNumberError(''); // Borra errores previos
-   setIsSerialNumberInProcess(false); // Reinicia el estado "en proceso"
-
-   // Solo proceder si el código ASC es válido y el SN tiene 15 caracteres
-   if (isAscCodeValid && serialNumber.length === 15 && db) {
-    
-    try {
-     const serialNumbersRef = collection(db, "serialNumbersInProcess");
-     const q = query(serialNumbersRef, where("serialNumber", "==", serialNumber));
-     const querySnapshot = await getDocs(q);
-     
-     if (!querySnapshot.empty) {
-      setIsSerialNumberInProcess(true);
-      // Enviar correo al administrador si el SN está en proceso
-      await emailjs.send(
-       'service_hp5g9er',
-       'template_fw5dsio', // Esta plantilla debe configurarse para enviar al administrador
-       {
-        user_asc: ascCode,
-        serial_number: serialNumber,
-        message: `El número de serie ${serialNumber} está en proceso de cierre por SSR o REDO.`,
-        user_email: user?.email || 'N/A', // Opcional: si user.email no existe, envía 'N/A'
-       },
-       'OimePa9MbzuM5Lahj'
-      );
-      console.log("EmailJS: Correo 'Número de serie en proceso de SSR' enviado al admin.");
-     } else {
-      console.log("Número de serie NO encontrado.");
-     }
-    } catch (e) {
-     console.error("Error al verificar el número de serie o al enviar el correo:", e);
-     // Incluso si hay un error en la verificación o envío, no bloqueamos al usuario.
-    } finally {
-     setSerialNumberChecked(true); // Marca la verificación como realizada
+  // ─────────────────────────────────────
+  // Persistencia en localStorage del ASC
+  // ─────────────────────────────────────
+  // Cargar al montar (solo cliente)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const saved = window.localStorage.getItem(LOCAL_STORAGE_ASC_KEY);
+    if (saved) {
+      setAscCode(saved);
     }
-   } else if (serialNumber.length > 0 && serialNumber.length !== 15) {
-    setSerialNumberError('El número de serie debe tener exactamente 15 caracteres.');
-    setSerialNumberChecked(true); // Marca como verificado incluso si la longitud es inválida
-   } else {
-    setSerialNumberChecked(true); // Marca como verificado si está vacío
-   }
+  }, []);
+
+  // Guardar/limpiar cuando cambia y es válido/no válido
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (isAscCodeValid) {
+      window.localStorage.setItem(LOCAL_STORAGE_ASC_KEY, ascCodeCanonical);
+    } else {
+      // Si el usuario cambió a un valor inválido, no persistimos ese valor
+      // (pero solo borramos si el almacenado es distinto del válido actual).
+      const current = window.localStorage.getItem(LOCAL_STORAGE_ASC_KEY);
+      if (current && current !== ascCodeCanonical) {
+        window.localStorage.removeItem(LOCAL_STORAGE_ASC_KEY);
+      }
+    }
+  }, [ascCodeCanonical, isAscCodeValid]);
+
+  // Botón "Reiniciar Código" también borra storage
+  const resetAsc = () => {
+    setAscCode('');
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(LOCAL_STORAGE_ASC_KEY);
+    }
   };
 
-  const debounceCheck = setTimeout(() => {
-   checkSerialNumberExistence();
-  }, 500);
-
-  return () => clearTimeout(debounceCheck);
- }, [serialNumber, db, ascCode, isAscCodeValid, user?.email]);
-
+  // ─────────────────────────────────────
+  // Verificación de SN (igual que antes)
+  // ─────────────────────────────────────
   useEffect(() => {
-    if (isAscCodeValid && showSummary && ascCode && db) {
-      console.log(`Condiciones cumplidas para registrar uso: Código ASC=${ascCode}`);
+    const checkSerialNumberExistence = async () => {
+      setSerialNumberChecked(false);
+      setSerialNumberError('');
+      setIsSerialNumberInProcess(false);
 
-      const ascCodeRef = doc(db, "ascCodeUsage", ascCode);
+      if (isAscCodeValid && serialNumber.length === 15 && db) {
+        try {
+          const serialNumbersRef = collection(db, 'serialNumbersInProcess');
+          const q = query(serialNumbersRef, where('serialNumber', '==', serialNumber));
+          const querySnapshot = await getDocs(q);
 
+          if (!querySnapshot.empty) {
+            setIsSerialNumberInProcess(true);
+            await emailjs.send(
+              'service_hp5g9er',
+              'template_fw5dsio',
+              {
+                user_asc: ascCodeCanonical,
+                serial_number: serialNumber,
+                message: `El número de serie ${serialNumber} está en proceso de cierre por SSR o REDO.`,
+                user_email: user?.email || 'N/A',
+              },
+              'OimePa9MbzuM5Lahj'
+            );
+            console.log('EmailJS: Correo "Número de serie en proceso de SSR" enviado al admin.');
+          } else {
+            console.log('Número de serie NO encontrado.');
+          }
+        } catch (e) {
+          console.error('Error al verificar el número de serie o al enviar el correo:', e);
+        } finally {
+          setSerialNumberChecked(true);
+        }
+      } else if (serialNumber.length > 0 && serialNumber.length !== 15) {
+        setSerialNumberError('El número de serie debe tener exactamente 15 caracteres.');
+        setSerialNumberChecked(true);
+      } else {
+        setSerialNumberChecked(true);
+      }
+    };
+
+    const debounceCheck = setTimeout(() => {
+      checkSerialNumberExistence();
+    }, 500);
+
+    return () => clearTimeout(debounceCheck);
+  }, [serialNumber, db, ascCodeCanonical, isAscCodeValid, user?.email]);
+
+  // Registrar uso del ASC al mostrar resumen
+  useEffect(() => {
+    if (isAscCodeValid && showSummary && ascCodeCanonical && db) {
+      const ascCodeRef = doc(db, 'ascCodeUsage', ascCodeCanonical);
       const updateUsage = async () => {
         try {
           await runTransaction(db, async (transaction) => {
             const ascDoc = await transaction.get(ascCodeRef);
             if (!ascDoc.exists()) {
               transaction.set(ascCodeRef, {
-                code: ascCode,
+                code: ascCodeCanonical,
                 usageCount: 1,
-                lastUsed: new Date()
+                lastUsed: new Date(),
               });
-              console.log(`Firebase: Nuevo código ASC ${ascCode} registrado con usageCount 1.`);
             } else {
               transaction.update(ascCodeRef, {
                 usageCount: increment(1),
-                lastUsed: new Date()
+                lastUsed: new Date(),
               });
-              console.log(`Firebase: Código ASC ${ascCode} actualizado. Nuevo usageCount: ${ascDoc.data().usageCount + 1}`);
             }
           });
         } catch (e) {
-          console.error("Firebase: Error actualizando uso de código ASC: ", e);
+          console.error('Firebase: Error actualizando uso de código ASC: ', e);
         }
       };
       updateUsage();
     }
-  }, [isAscCodeValid, showSummary, ascCode, db]);
-
+  }, [isAscCodeValid, showSummary, ascCodeCanonical, db]);
 
   const handleModelClick = (model) => {
     setSelectedModel(model);
@@ -182,9 +221,6 @@ const EquipsPage = () => {
     setSelectedRepairCode(null);
     setSelectedSubRepairCode(null);
     setShowSummary(false);
-    // Optionally reset serial number and ASC code if you want a full fresh start
-    // setSerialNumber('');
-    // setAscCode('');
   };
 
   const handleBack = (step) => {
@@ -232,12 +268,12 @@ const EquipsPage = () => {
       return <div className={`${styles.message} ${styles.errorMessage}`}>Error: {error.message}</div>;
     }
 
-    // --- Require Serial Number and ASC Code first ---
-    if (!ascCode) {
+    // Requerir ASC
+    if (!ascCodeCanonical) {
       return (
         <div className={styles.messageContainer}>
           <p className={styles.initialMessage}>
-            Primero, ingresa el **código de tu centro de servicio** para comenzar a usar la plataforma.
+            Primero, ingresa el código de tu centro de servicio para comenzar a usar la plataforma.
           </p>
         </div>
       );
@@ -252,14 +288,12 @@ const EquipsPage = () => {
       );
     }
 
-    // Show SN validation error if it exists
+    // Errores de SN
     if (serialNumberError) {
       return (
         <div className={styles.errorContainer}>
           <h2 className={styles.errorMessageTitle}>Error en Número de Serie</h2>
-          <p className={styles.errorDescription}>
-            {serialNumberError}
-          </p>
+          <p className={styles.errorDescription}>{serialNumberError}</p>
           <button onClick={() => setSerialNumber('')} className={styles.resetButton}>
             Ingresar otro Número de Serie
           </button>
@@ -270,10 +304,7 @@ const EquipsPage = () => {
     if (!serialNumber || serialNumber.length !== 15 || !serialNumberChecked) {
       return (
         <div className={styles.messageContainer}>
-          <p className={styles.initialMessage}>
-            Ahora, ingresa el **Número de Serie (SN)** del producto para continuar.
-          </p>
-          {/* Show loading for SN check only when a serial number is entered and not yet checked */}
+          <p className={styles.initialMessage}>Ahora, ingresa el Número de Serie (SN) del producto para continuar.</p>
           {serialNumber.length > 0 && !serialNumberChecked && (
             <div className={styles.message}>Verificando número de serie...</div>
           )}
@@ -281,17 +312,13 @@ const EquipsPage = () => {
       );
     }
 
-    // If we reach here, ascCode is valid, serialNumber is 15 chars and has been checked.
-    // The user can now proceed, even if the SN was found to be "in process" (admin got the email).
-
     if (showSummary) {
       return (
         <div className={styles.summary}>
           <h2 className={styles.summaryTitle}>Resumen de Selección</h2>
           <div className={styles.summaryDetails}>
-            <p><strong>Código ASC:</strong> {ascCode}</p>
+            <p><strong>Código ASC:</strong> {ascCodeCanonical}</p>
             <p><strong>Número de Serie:</strong> {serialNumber}</p>
-            {/* Removed the inProcessMessage from here to ensure the user doesn't see it */}
             <p><strong>Modelo:</strong> {selectedModel?.productName}</p>
             <p><strong>Bloque de defecto:</strong> {selectedDefectBlock?.defectBlock}</p>
             <p><strong>Síntoma:</strong> {selectedSymptom?.symptomCode}</p>
@@ -299,9 +326,7 @@ const EquipsPage = () => {
             <p><strong>Código de reparación:</strong> {selectedRepairCode?.repairCode}</p>
             <p><strong>Sub-Código de reparación:</strong> {selectedSubRepairCode}</p>
           </div>
-          <button onClick={handleReset} className={styles.resetButton}>
-            Reiniciar Selección
-          </button>
+          <button onClick={handleReset} className={styles.resetButton}>Reiniciar Selección</button>
         </div>
       );
     }
@@ -313,14 +338,10 @@ const EquipsPage = () => {
             Volver a códigos de reparación
           </button>
           <h2 className={styles.selectionTitle}>Sub-Códigos de reparación para {selectedRepairCode.repairCode}</h2>
-          {selectedRepairCode.subRepairCodes && selectedRepairCode.subRepairCodes.length > 0 ? (
+          {selectedRepairCode.subRepairCodes?.length ? (
             <ul className={styles.list}>
               {selectedRepairCode.subRepairCodes.map((subRep, subRepIndex) => (
-                <li
-                  key={subRepIndex}
-                  onClick={() => handleSubRepairCodeClick(subRep)}
-                  className={styles.clickableItem}
-                >
+                <li key={subRepIndex} onClick={() => handleSubRepairCodeClick(subRep)} className={styles.clickableItem}>
                   {subRep}
                 </li>
               ))}
@@ -339,14 +360,10 @@ const EquipsPage = () => {
             Volver a sub-síntomas
           </button>
           <h2 className={styles.selectionTitle}>Códigos de reparación para {selectedSubSymptom.subSymptomCode}</h2>
-          {selectedSubSymptom.repairCodes && selectedSubSymptom.repairCodes.length > 0 ? (
+          {selectedSubSymptom.repairCodes?.length ? (
             <ul className={styles.list}>
               {selectedSubSymptom.repairCodes.map((repair, repIndex) => (
-                <li
-                  key={repIndex}
-                  onClick={() => handleRepairCodeClick(repair)}
-                  className={styles.clickableItem}
-                >
+                <li key={repIndex} onClick={() => handleRepairCodeClick(repair)} className={styles.clickableItem}>
                   <strong>Reparación:</strong> {repair.repairCode}
                 </li>
               ))}
@@ -365,14 +382,10 @@ const EquipsPage = () => {
             Volver a síntomas
           </button>
           <h2 className={styles.selectionTitle}>Sub-Síntomas para {selectedSymptom.symptomCode}</h2>
-          {selectedSymptom.subSymptoms && selectedSymptom.subSymptoms.length > 0 ? (
+          {selectedSymptom.subSymptoms?.length ? (
             <ul className={styles.list}>
               {selectedSymptom.subSymptoms.map((sub, subIndex) => (
-                <li
-                  key={subIndex}
-                  onClick={() => handleSubSymptomClick(sub)}
-                  className={styles.clickableItem}
-                >
+                <li key={subIndex} onClick={() => handleSubSymptomClick(sub)} className={styles.clickableItem}>
                   <strong>Sub-Síntoma:</strong> {sub.subSymptomCode}
                 </li>
               ))}
@@ -393,13 +406,9 @@ const EquipsPage = () => {
           <h2 className={styles.selectionTitle}>Bloques de defecto para {selectedModel.productName}</h2>
           <p className={styles.selectionDescription}>Seleccione la parte reemplazada por el técnico. Si se sustituyeron varias, elija la de mayor importancia.</p>
           <div className={styles.gridList}>
-            {selectedDefectBlock.symptoms && selectedDefectBlock.symptoms.length > 0 ? (
+            {selectedDefectBlock.symptoms?.length ? (
               selectedDefectBlock.symptoms.map((symptom, symIndex) => (
-                <div
-                  key={symIndex}
-                  onClick={() => handleSymptomClick(symptom)}
-                  className={styles.clickableItem}
-                >
+                <div key={symIndex} onClick={() => handleSymptomClick(symptom)} className={styles.clickableItem}>
                   <strong>Síntoma:</strong> {symptom.symptomCode}
                 </div>
               ))
@@ -420,20 +429,12 @@ const EquipsPage = () => {
           <h2 className={styles.selectionTitle}>Bloques de defecto para {selectedModel.productName}</h2>
           <p className={styles.selectionDescription}>Seleccione la parte reemplazada por el técnico. Si se sustituyeron varias, elija la de mayor importancia.</p>
           <div className={styles.gridList}>
-            {selectedModel.defectBlocks && selectedModel.defectBlocks.length > 0 ? (
+            {selectedModel.defectBlocks?.length ? (
               selectedModel.defectBlocks.map((block, index) => (
-                <div
-                  key={index}
-                  className={styles.blockItem}
-                  onClick={() => handleDefectBlockClick(block)}
-                >
+                <div key={index} className={styles.blockItem} onClick={() => handleDefectBlockClick(block)}>
                   <p className={styles.blockTitle}><strong>Defecto:</strong> {block.defectBlock}</p>
                   {block.defectBlockImageUrl && (
-                    <img
-                      className={styles.itemImage}
-                      src={block.defectBlockImageUrl}
-                      alt={block.defectBlock}
-                    />
+                    <img className={styles.itemImage} src={block.defectBlockImageUrl} alt={block.defectBlock} />
                   )}
                 </div>
               ))
@@ -445,7 +446,6 @@ const EquipsPage = () => {
       );
     }
 
-    // Allow interaction with models if ASC code is valid, SN is 15 chars, and SN check is done
     const isReadyToSelectModel = isAscCodeValid && serialNumber.length === 15 && serialNumberChecked;
 
     return (
@@ -453,20 +453,16 @@ const EquipsPage = () => {
         {Array.isArray(data) && data.length > 0 ? (
           <div className={styles.gridList}>
             {data.map((item) => (
-              item.imagenes?.modelo && <div
-                key={item.id}
-                className={styles.modelItem}
-                onClick={isReadyToSelectModel ? () => handleModelClick(item) : undefined}
-                style={{ cursor: isReadyToSelectModel ? 'pointer' : 'not-allowed', opacity: isReadyToSelectModel ? 1 : 0.5 }}
-              >
-                {item.imagenes?.modelo && (
-                  <img
-                    className={styles.itemImage}
-                    src={item.imagenes.modelo}
-                    alt={item.productModel}
-                  />
-                )}
-              </div>
+              item.imagenes?.modelo && (
+                <div
+                  key={item.id}
+                  className={styles.modelItem}
+                  onClick={isReadyToSelectModel ? () => handleModelClick(item) : undefined}
+                  style={{ cursor: isReadyToSelectModel ? 'pointer' : 'not-allowed', opacity: isReadyToSelectModel ? 1 : 0.5 }}
+                >
+                  <img className={styles.itemImage} src={item.imagenes.modelo} alt={item.productModel} />
+                </div>
+              )
             ))}
           </div>
         ) : (
@@ -491,7 +487,6 @@ const EquipsPage = () => {
             onChange={(e) => setCategory(e.target.value)}
             value={category}
             className={styles.categorySelect}
-            // Disable until ASC and SN are provided and valid
             disabled={!isAscCodeValid || serialNumber.length !== 15 || !serialNumberChecked || serialNumberError}
           >
             <option value="">Todas las categorías</option>
@@ -510,50 +505,56 @@ const EquipsPage = () => {
           <Link href='/ContactForm' className={styles.buzonButton}>Búzon</Link>
           <Link className={styles.volverButton} href="/">volver</Link>
           <Link className={styles.volverButton} href="esCom">Estandarizacion Compresores</Link>
-          {/* <Link className={styles.buzonButton} href="/biblioteca">Biblioteca</Link> */}
           <input
             type="text"
             className={styles.searchInput}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar modelo"
-            // Disable until ASC and SN are provided and valid
             disabled={!isAscCodeValid || serialNumber.length !== 15 || !serialNumberChecked || serialNumberError}
           />
         </div>
 
         <div className={styles.ascCodeInputContainer}>
           <input
-            className={`${styles.searchInputAsc} ${!isAscCodeValid && ascCode ? styles.inputInvalid : ''}`}
+            className={`${styles.searchInputAsc} ${!isAscCodeValid && ascCodeCanonical ? styles.inputInvalid : ''}`}
             placeholder="Ingresa código de ASC aqui"
             type="text"
             value={ascCode}
             onChange={(e) => setAscCode(e.target.value)}
-            disabled={isAscCodeValid}
+            disabled={isAscCodeValid} // se deshabilita si ya es válido (y queda guardado)
           />
           {ascCode && (
-            <button onClick={() => setAscCode('')} className={styles.resetAscButton}>
+            <button onClick={resetAsc} className={styles.resetAscButton}>
               Reiniciar Código
             </button>
           )}
         </div>
+
         <div className={styles.serialNumberInputContainer}>
           <input
-            className={`${styles.searchInputSN} ${serialNumberError ? styles.inputInvalid : ''}`} // Apply invalid style
+            className={`${styles.searchInputSN} ${serialNumberError ? styles.inputInvalid : ''}`}
             placeholder="Ingresa Número de Serie (SN)"
             type="text"
             value={serialNumber}
             onChange={(e) => {
               setSerialNumber(e.target.value);
-              setSerialNumberChecked(false); // Reset check status when input changes
-              setSerialNumberError(''); // Clear error on change
+              setSerialNumberChecked(false);
+              setSerialNumberError('');
             }}
-            // Disable only if ASC code is not valid, or if SN is valid and checked and no error (no need to re-enter)
             disabled={!isAscCodeValid || (serialNumber.length === 15 && serialNumberChecked && !serialNumberError && !isSerialNumberInProcess)}
-            maxLength={15} // Enforce max length of 15 characters
+            maxLength={15}
           />
           {serialNumber && (
-            <button onClick={() => { setSerialNumber(''); setIsSerialNumberInProcess(false); setSerialNumberChecked(false); setSerialNumberError(''); }} className={styles.resetSNButton}>
+            <button
+              onClick={() => {
+                setSerialNumber('');
+                setIsSerialNumberInProcess(false);
+                setSerialNumberChecked(false);
+                setSerialNumberError('');
+              }}
+              className={styles.resetSNButton}
+            >
               Reiniciar SN
             </button>
           )}
@@ -561,10 +562,7 @@ const EquipsPage = () => {
         </div>
       </div>
 
-      <div className={styles.contentArea}>
-        {renderContent()}
-      </div>
-
+      <div className={styles.contentArea}>{renderContent()}</div>
     </div>
   );
 };

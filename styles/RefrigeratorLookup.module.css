@@ -266,11 +266,14 @@
   border-radius: 9999px; /* pill */
   background: #fff;
   cursor: pointer;
-  transition: background 120ms ease, transform 80ms ease, box-shadow 160ms ease;
+  transition: background 120ms ease, transform 80ms ease, box-shadow 160ms ease, border-color 120ms ease;
 }
 .filterBtn:hover {
   background: #f9fafb;
   box-shadow: 0 4px 12px rgba(17, 24, 39, 0.06);
+}
+.filterBtn[aria-pressed="true"] {
+  border-color: #3b82f6;
 }
 
 /* Utilidades */
@@ -278,16 +281,93 @@
   gap: 8px;
 }
 
-/* Para next/image con fill */
+/* ======== Imagen miniatura (next/image con fill) ======== */
+/* (Unificadas: evita duplicados y comportamientos inconsistentes) */
 .imageWrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;   /* ajusta si quieres 1/1, 16/9, etc. */
+  aspect-ratio: 1 / 1; /* cuadrado para grilla; ajusta si quieres 4/3 o 16/9 */
   background: #fff;
 }
-
 .imageContain {
   object-fit: contain;   /* o 'cover' si prefieres recorte */
   background: #fff;
 }
 
+/* Figure compacto con botón */
+.imgBox {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0;
+  background: #fff;
+}
+.imgBtn {
+  all: unset;
+  display: block;
+  width: 100%;
+  cursor: zoom-in;
+}
+.imgBtn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.45); /* azul focus */
+  outline-offset: 2px;
+}
+
+/* Caption pequeño */
+.imgCaption {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ======== LIGHTBOX ======== */
+.lbBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.lbCard {
+  position: relative;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  max-width: 96vw;
+  width: auto;
+  padding: 12px 12px 8px;
+}
+
+.lbClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+}
+.lbClose:hover {
+  background: #e2e8f0;
+}
+
+.lbImgWrap {
+  position: relative;
+  width: min(92vw, 900px);
+  height: min(75vh, 900px);
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.lbCaption {
+  font-size: 12px;
+  color: #6b7280;
+  padding: 8px 4px 2px;
+  text-align: center;
+}
