@@ -37,6 +37,9 @@ export default function Home() {
          <Link href="/FaultSearch" className={styles.startButton} >
             Ayuda Pre Diagnostico
           </Link>
+          <Link href="/esCom" className={styles.startButton} >
+            Estandarizacion de compresores
+          </Link>
         </div>
       </div>
     </Layout>

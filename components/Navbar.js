@@ -60,6 +60,9 @@ export default function Navbar() {
            <Link href="/FaultSearch" className={styles.navLink} onClick={closeMenu}>
             Pre Diagnostico
           </Link>
+          <Link href="/DecisionTree" className={styles.navLink} onClick={closeMenu}>
+            Árbol de Decisiones
+          </Link>
           {/* El enlace de Admin también se incluye en el menú desplegable */}
           {/* Mantenemos la clase navLinkAdmin para sus estilos específicos (. invisible) */}
            <Link href="/admin" className={styles.navLinkAdmin} onClick={closeMenu}>
