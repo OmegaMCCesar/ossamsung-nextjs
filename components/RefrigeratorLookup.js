@@ -120,7 +120,7 @@ const normalize = (s) => (s || "").toString().trim().toLowerCase();
 function normalizeSerial(snRaw = "") {
   return (snRaw || "").toUpperCase().replace(/Υ/g, "Y").replace(/[^A-Z0-9]/g, "");
 }
-const YEAR_MAP = { W: 2023, X: 2024, Y: 2025 };
+const YEAR_MAP = { H: 2016, J: 2017, K: 2018, M: 2019, N: 2020, R:2021, T: 2022, W: 2023, X: 2024, Y: 2025 };
 const MONTH_MAP = { "1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9, A:10, B:11, C:12 };
 const MONTH_NAMES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const CUTOFF = new Date(2025, 1, 1); // 01-feb-2025
