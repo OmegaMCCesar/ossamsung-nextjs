@@ -4,18 +4,18 @@ import { Search, Info, CheckCircle2, AlertTriangle, ClipboardCopy, X } from "luc
 import styles from "../styles/RefrigeratorLookup.module.css";
 
 /**
- * Reglas:
- * - RF4500 y apply === "24-ene": exige SN (15). < feb-2025 => solo Antes; >= feb-2025 => Antes + Después.
- * - apply termina en W49 o Inactive: sin SN, solo Antes.
- * - Resto: sin SN, Antes + Después.
- * Imágenes:
- * - Por modelo y por estado (Antes/Después) y por parte (compresor/PCB).
- * - Si no hay mapeo => placeholders.
+ * Flujo:
+ * 1) Primero SN (15). Cuando es válido → aparece input de Modelo.
+ * 2) Con SN válido + Modelo encontrado → se muestran resultados:
+ *    - W49 o Inactive → solo Antes.
+ *    - RF4500 o apply = 24-ene → SN < feb-2025 = Antes; SN >= feb-2025 = Después.
+ *    - Resto → Antes y Después.
+ * Al final se resume qué motor y PCB corresponden.
  */
 
 // =================== DATA (boletín) ===================
 const DATA = [
-  // Schema: { pjt, model, compressor_before, pcb_before, eeprom_after, pcb_after, apply }
+  // { pjt, model, compressor_before, pcb_before, eeprom_after, pcb_after, apply }
   { pjt: "RF4500", model: "RF22A4010S9/EM", compressor_before: "NN34M9112ARTS7", pcb_before: "DA92-01445G", eeprom_after: "NO14D7151ALTT9", pcb_after: "DA94-09408G", apply: "10-ene" },
   { pjt: "RF4500", model: "RF22A4110S9/EM", compressor_before: "NN34M9112ARTS7", pcb_before: "DA94-07785F", eeprom_after: "NO14D7151ALTT9", pcb_after: "DA94-09408E", apply: "10-ene" },
   { pjt: "RF4500", model: "RF22A4220B1/EM", compressor_before: "NN34M9112ARTS7", pcb_before: "DA94-07785C", eeprom_after: "NO14D7151ALTT9", pcb_after: "DA94-09408C", apply: "10-ene" },
@@ -87,7 +87,6 @@ const DATA = [
 ];
 
 // =================== IMÁGENES POR MODELO ===================
-// URL temporal para compresor/PCB:
 const url_compresor = "https://images.samsung.com/is/image/samsung/assets/global/about-us/brand/logo/256_144_2.png?$512_N_PNG$";
 const url_pcb       = "https://images.samsung.com/is/image/samsung/assets/global/about-us/brand/logo/256_144_2.png?$512_N_PNG$";
 
@@ -120,7 +119,7 @@ const normalize = (s) => (s || "").toString().trim().toLowerCase();
 function normalizeSerial(snRaw = "") {
   return (snRaw || "").toUpperCase().replace(/Υ/g, "Y").replace(/[^A-Z0-9]/g, "");
 }
-const YEAR_MAP = { H: 2016, J: 2017, K: 2018, M: 2019, N: 2020, R:2021, T: 2022, W: 2023, X: 2024, Y: 2025 };
+const YEAR_MAP = { H: 2016, J: 2017, K: 2018, M: 2019, N: 2020, R: 2021, T: 2022, W: 2023, X: 2024, Y: 2025 };
 const MONTH_MAP = { "1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9, A:10, B:11, C:12 };
 const MONTH_NAMES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const CUTOFF = new Date(2025, 1, 1); // 01-feb-2025
@@ -146,6 +145,7 @@ function isApply24Ene(apply = "") {
   return norm === "24ene";
 }
 
+// Resolver imágenes por modelo con fallback
 function getImagesForModel(model = "") {
   const entry = MODEL_PART_IMAGES[model] || {};
   return {
@@ -160,24 +160,13 @@ function getImagesForModel(model = "") {
   };
 }
 
-// Mini-componente de imagen con click para abrir lightbox
+// Mini-componente imagen + lightbox
 function ImgBox({ src, alt, caption, onOpen }) {
   return (
     <figure className={styles.imgBox}>
-      <button
-        type="button"
-        className={styles.imgBtn}
-        onClick={() => onOpen?.(src, alt, caption)}
-        title="Ver en grande"
-      >
+      <button type="button" className={styles.imgBtn} onClick={() => onOpen?.(src, alt, caption)} title="Ver en grande">
         <div className={styles.imageWrap}>
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            sizes="(max-width: 768px) 50vw, 33vw"
-            className={styles.imageContain}
-          />
+          <Image src={src} alt={alt} fill sizes="(max-width: 768px) 50vw, 33vw" className={styles.imageContain} />
         </div>
       </button>
       <figcaption className={styles.imgCaption}>{caption}</figcaption>
@@ -187,18 +176,23 @@ function ImgBox({ src, alt, caption, onOpen }) {
 
 // =================== COMPONENTE ===================
 export default function RefrigeratorLookup() {
-  const [query, setQuery] = useState("");
-  const [pjtFilter, setPjtFilter] = useState("");
-  const [selected, setSelected] = useState(null);
+  // Paso 1: SN
   const [serial, setSerial] = useState("");
+  const snInfo = useMemo(() => decodeSerial(serial), [serial]);
+  const snValid = !!snInfo?.valid;
 
-  // Lightbox state
+  // Paso 2: Modelo (solo aparece cuando SN es válido)
+  const [modelInput, setModelInput] = useState("");
+  const chosen = useMemo(() => {
+    const q = normalize(modelInput);
+    if (!q) return null;
+    return DATA.find((r) => normalize(r.model) === q) || null;
+  }, [modelInput]);
+
+  // Lightbox
   const [lightbox, setLightbox] = useState({ open: false, src: "", alt: "", caption: "" });
-  const openLightbox = useCallback((src, alt, caption) => {
-    setLightbox({ open: true, src, alt, caption });
-  }, []);
+  const openLightbox = useCallback((src, alt, caption) => setLightbox({ open: true, src, alt, caption }), []);
   const closeLightbox = useCallback(() => setLightbox((p) => ({ ...p, open: false })), []);
-  // Cerrar con ESC
   useEffect(() => {
     if (!lightbox.open) return;
     const onKey = (e) => { if (e.key === "Escape") closeLightbox(); };
@@ -206,70 +200,43 @@ export default function RefrigeratorLookup() {
     return () => window.removeEventListener("keydown", onKey);
   }, [lightbox.open, closeLightbox]);
 
-  const platformSet = useMemo(() => [...new Set(DATA.map((d) => d.pjt))], []);
-
-  const results = useMemo(() => {
-    const q = normalize(query);
-    const pf = normalize(pjtFilter);
-    let base = DATA.filter((r) => !pf || normalize(r.pjt) === pf);
-    if (!q) return base.slice(0, 50);
-    const starts = base.filter((r) => normalize(r.model).startsWith(q));
-    const includes = base.filter((r) => !starts.includes(r) && normalize(r.model).includes(q));
-    return [...starts, ...includes].slice(0, 50);
-  }, [query, pjtFilter]);
-
-  const exact = useMemo(() => {
-    const q = normalize(query);
-    if (!q) return null;
-    return DATA.find((r) => normalize(r.model) === q && (!pjtFilter || normalize(r.pjt) === normalize(pjtFilter))) || null;
-  }, [query, pjtFilter]);
-
-  const chosen = selected || exact || (results.length === 1 ? results[0] : null);
-
+  // Reglas por modelo
   const isRF4500 = (chosen?.pjt || "").toUpperCase() === "RF4500";
   const applyStr = String(chosen?.apply || "").toUpperCase();
   const isW49 = applyStr.endsWith("W49");
   const isInactive = applyStr.includes("INACTIVE");
   const needs24EneSN = isApply24Ene(chosen?.apply);
 
-  const requireSerial = !!chosen && (isRF4500 || needs24EneSN);
-  const snInfo = useMemo(() => (requireSerial ? decodeSerial(serial) : null), [serial, requireSerial]);
+  // Recomendación y secciones a mostrar (solo cuando hay SN válido + modelo encontrado)
+  const ready = snValid && !!chosen;
 
-  const showAfterSection = useMemo(() => {
-    if (!chosen) return false;
-    if (isW49 || isInactive) return false;
-    if (isRF4500 || needs24EneSN) {
-      if (!snInfo?.valid) return false;
-      return !snInfo.isBeforeCutoff;
-    }
-    return true;
-  }, [chosen, isRF4500, isW49, isInactive, needs24EneSN, snInfo]);
-
-  const indicated = useMemo(() => {
-    if (!chosen) return null;
+  const recommended = useMemo(() => {
+    if (!ready) return null;
     if (isW49 || isInactive) return "before";
-    if ((isRF4500 || needs24EneSN) && snInfo?.valid) {
-      return snInfo.isBeforeCutoff ? "before" : "after";
-    }
-    return null;
-  }, [chosen, isRF4500, isW49, isInactive, needs24EneSN, snInfo]);
+    if (isRF4500 || needs24EneSN) return snInfo.isBeforeCutoff ? "before" : "after";
+    return "both";
+  }, [ready, isW49, isInactive, isRF4500, needs24EneSN, snInfo]);
 
+  const showBefore = recommended === "before" || recommended === "both";
+  const showAfter  = recommended === "after"  || recommended === "both";
+
+  // Mensaje decisión
   const decision = useMemo(() => {
-    if (!chosen) return { text: "Selecciona un modelo para revisar si aplica al boletín.", tone: "info" };
-    if (isW49) return { text: "Aplica W49: seguir utilizando compresor y PCB originales (no se usa SN).", tone: "info" };
-    if (isInactive) return { text: "Estado Inactive: seguir utilizando compresor y PCB originales.", tone: "info" };
+    if (!snValid) return { text: "Escribe el número de serie (15).", tone: "info" };
+    if (!chosen) return { text: "Escribe el modelo exacto.", tone: "info" };
+
+    if (isW49) return { text: "Aplica W49: usar compresor y PCB originales (Antes).", tone: "info" };
+    if (isInactive) return { text: "Estado Inactive: usar compresor y PCB originales (Antes).", tone: "info" };
 
     if (isRF4500 || needs24EneSN) {
-      if (!serial) return { text: "Ingresa el número de serie (15) para validar fecha de fabricación.", tone: "info" };
-      if (!snInfo?.valid) return { text: snInfo?.message || "SN inválido.", tone: "warn" };
       if (snInfo.isBeforeCutoff) {
-        return { text: `${chosen.apply}: fabricado en ${snInfo.nice} (antes de feb-2025) → usar compresor y PCB originales (solo Antes).`, tone: "warn" };
+        return { text: `${chosen.apply}: fabricado en ${snInfo.nice} (antes de feb-2025). Usar Antes (original).`, tone: "warn" };
       }
-      return { text: `${chosen.apply}: fabricado en ${snInfo.nice} (feb-2025 o después) → usar Después (EEPROM/PCB nuevos).`, tone: "ok" };
+      return { text: `${chosen.apply}: fabricado en ${snInfo.nice} (feb-2025 o después). Usar Después (kit nuevo).`, tone: "ok" };
     }
 
-    return { text: "Este modelo no requiere validación por SN. Se muestran Antes y Después.", tone: "info" };
-  }, [chosen, isRF4500, needs24EneSN, isW49, isInactive, serial, snInfo]);
+    return { text: "Este modelo admite Antes y Después.", tone: "info" };
+  }, [snValid, chosen, isW49, isInactive, isRF4500, needs24EneSN, snInfo]);
 
   const toneIcon = (t) =>
     t === "ok" ? <CheckCircle2 className={styles.iconGreen} /> :
@@ -279,94 +246,68 @@ export default function RefrigeratorLookup() {
   const toneBadgeClass = (t) =>
     t === "ok" ? styles.badgeGreen : t === "warn" ? styles.badgeRed : styles.badgeBlue;
 
-  const indicatedStyle = (side) =>
-    indicated === side
-      ? { borderColor: "#10b981", boxShadow: "0 0 0 1px #10b981 inset" }
-      : undefined;
-
+  // Imágenes segun modelo
   const partImgs = getImagesForModel(chosen?.model);
+
+  // Datos para resumen
+  const motorCode = chosen?.compressor_before || "-"; // no hay compresor_after en el boletín
+  const pcbBefore = chosen?.pcb_before || "-";
+  const pcbAfter  = chosen?.pcb_after  || "-";
+  const eeprom    = chosen?.eeprom_after && chosen.eeprom_after !== "-" ? chosen.eeprom_after : null;
 
   return (
     <div className={styles.container}>
-      {/* Buscador de modelo (primero) */}
+      {/* Paso 1: Número de serie */}
       <div className={styles.searchRow}>
         <Search className={styles.iconMuted} />
         <input
           type="text"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setSelected(null); }}
-          placeholder="Escribe el modelo (ej. RS27T5200B1/EM)"
+          value={serial}
+          onChange={(e) => setSerial(normalizeSerial(e.target.value))}
+          placeholder="Número de serie (15 caracteres, ej. 0B2R4BBX400343M)"
           className={styles.input}
+          maxLength={15}
         />
+        <span className={`${styles.badge} ${serial ? (snValid ? styles.badgeGreen : styles.badgeRed) : styles.badgeGray}`}>
+          {serial ? (snValid ? "SN válido" : "SN inválido") : "SN"}
+        </span>
+        {snValid && (
+          <span className={`${styles.badge} ${styles.badgeBlue}`} title="Fecha de fabricación">
+            {snInfo.nice}
+          </span>
+        )}
       </div>
 
-      {/* Filtro por PJT */}
-      <div className={styles.filters}>
-        <div className={styles.filtersLabel}>Filtrar por plataforma (PJT)</div>
-        <div className={styles.filtersRow}>
-          {platformSet.map((p) => (
-            <button
-              key={p}
-              onClick={() => { setPjtFilter(p); setQuery(""); setSelected(null); }}
-              className={styles.filterBtn}
-              aria-pressed={normalize(pjtFilter) === normalize(p)}
-              style={{ borderColor: normalize(pjtFilter) === normalize(p) ? "#3b82f6" : undefined }}
-              title={`Filtrar por ${p}`}
-            >
-              {p}
-            </button>
-          ))}
-          {pjtFilter && (
-            <button onClick={() => { setPjtFilter(""); setSelected(null); }} className={styles.filterBtn}>
-              Quitar filtro
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Sugerencias de modelo */}
-      {(results.length > 0 && (query || pjtFilter)) && (
-        <div className={styles.suggestionsGrid}>
-          {results.map((r) => (
-            <button
-              key={r.model}
-              onClick={() => setSelected(r)}
-              className={styles.suggestionBtn}
-              style={{ borderColor: (selected?.model === r.model) ? "#3b82f6" : undefined }}
-            >
-              <div className={styles.pjt}>{r.pjt}</div>
-              <div className={styles.model}>{r.model}</div>
-              <span className={`${styles.badge} ${badgeClass(r.apply)}`}>{r.apply}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Campo de Número de Serie: RF4500 o 24-ene */}
-      {chosen && (isRF4500 || needs24EneSN) && (
+      {/* Paso 2: Modelo (solo si SN válido) */}
+      {snValid && (
         <div className={styles.searchRow}>
           <Search className={styles.iconMuted} />
           <input
             type="text"
-            value={serial}
-            onChange={(e) => setSerial(normalizeSerial(e.target.value))}
-            placeholder="Número de serie (15 caracteres, ej. 0B2R4BBX400343M)"
+            value={modelInput}
+            onChange={(e) => setModelInput(e.target.value)}
+            placeholder="Modelo exacto (ej. RS27T5200B1/EM)"
             className={styles.input}
-            maxLength={15}
           />
-          <span className={`${styles.badge} ${serial && snInfo?.valid ? styles.badgeGreen : serial ? styles.badgeRed : styles.badgeGray}`}>
-            {serial ? (snInfo?.valid ? "SN válido" : "SN inválido") : "SN"}
-          </span>
-          {snInfo?.valid && (
-            <span className={`${styles.badge} ${styles.badgeBlue}`} title="Fecha de fabricación">
-              {snInfo.nice}
-            </span>
-          )}
         </div>
       )}
 
-      {/* Tarjeta de resultado */}
-      {chosen ? (
+      {/* Ayudas cuando falta info */}
+      {!snValid && (
+        <div className={styles.helper}>
+          <Info className={styles.helperIcon} />
+          <p>Primero escribe un SN válido de 15 caracteres.</p>
+        </div>
+      )}
+      {snValid && !chosen && modelInput && (
+        <div className={styles.helper}>
+          <AlertTriangle className={styles.iconAmber} />
+          <p>Modelo no encontrado. Revisa mayúsculas, guiones y sufijos.</p>
+        </div>
+      )}
+
+      {/* Tarjeta de resultado: solo con SN válido + modelo */}
+      {ready && (
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <div>
@@ -386,53 +327,50 @@ export default function RefrigeratorLookup() {
 
           <div className={styles.cardGrid}>
             {/* ANTES */}
-            <div className={`${styles.section} ${styles.sectionBefore}`} style={indicatedStyle("before")}>
-              <div className={styles.sectionTitle}>
-                <AlertTriangle className={styles.iconAmber} />
-                <h3>Antes</h3>
-                {indicated === "before" && (
-                  <span className={`${styles.badge} ${styles.badgeGreen}`} style={{ marginLeft: 8 }}>Indicado</span>
-                )}
-              </div>
-              <ul className={styles.list}>
-                <li className={styles.listItem}>
-                  <span className={styles.label}>Compresor:</span>
-                  <span className={styles.code}>{chosen.compressor_before}</span>
-                  <button onClick={() => copy(chosen.compressor_before)} className={styles.copyBtn} title="Copiar compresor">
-                    <ClipboardCopy className={styles.copyIcon} />
-                  </button>
-                </li>
-                <li className={styles.listItem}>
-                  <span className={styles.label}>PCB:</span>
-                  <span className={styles.code}>{chosen.pcb_before}</span>
-                  <button onClick={() => copy(chosen.pcb_before)} className={styles.copyBtn} title="Copiar PCB">
-                    <ClipboardCopy className={styles.copyIcon} />
-                  </button>
-                </li>
-              </ul>
+            {showBefore && (
+              <div className={`${styles.section} ${styles.sectionBefore}`}>
+                <div className={styles.sectionTitle}>
+                  <AlertTriangle className={styles.iconAmber} />
+                  <h3>Antes</h3>
+                  {recommended === "before" && <span className={`${styles.badge} ${styles.badgeGreen}`} style={{ marginLeft: 8 }}>Indicado</span>}
+                </div>
+                <ul className={styles.list}>
+                  <li className={styles.listItem}>
+                    <span className={styles.label}>Compresor:</span>
+                    <span className={styles.code}>{chosen.compressor_before}</span>
+                    <button onClick={() => copy(chosen.compressor_before)} className={styles.copyBtn} title="Copiar compresor">
+                      <ClipboardCopy className={styles.copyIcon} />
+                    </button>
+                  </li>
+                  <li className={styles.listItem}>
+                    <span className={styles.label}>PCB:</span>
+                    <span className={styles.code}>{chosen.pcb_before}</span>
+                    <button onClick={() => copy(chosen.pcb_before)} className={styles.copyBtn} title="Copiar PCB">
+                      <ClipboardCopy className={styles.copyIcon} />
+                    </button>
+                  </li>
+                </ul>
 
-              {/* Imágenes ANTES */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 8 }}>
-                <ImgBox src={partImgs.before.compressor} alt={`Compresor (Antes) - ${chosen.model}`} caption="Compresor (Antes)" onOpen={openLightbox} />
-                <ImgBox src={partImgs.before.pcb}        alt={`PCB (Antes) - ${chosen.model}`}        caption="PCB (Antes)"        onOpen={openLightbox} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 8 }}>
+                  <ImgBox src={partImgs.before.compressor} alt={`Compresor - ${chosen.model}`} caption="Compresor (Antes)" onOpen={openLightbox} />
+                  <ImgBox src={partImgs.before.pcb}        alt={`PCB - ${chosen.model}`}        caption="PCB (Antes)"        onOpen={openLightbox} />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* DESPUÉS */}
-            {showAfterSection && (
-              <div className={styles.section} style={indicatedStyle("after")}>
+            {showAfter && (
+              <div className={styles.section}>
                 <div className={styles.sectionTitle}>
                   <CheckCircle2 className={styles.iconGreen} />
                   <h3>Después</h3>
-                  {indicated === "after" && (
-                    <span className={`${styles.badge} ${styles.badgeGreen}`} style={{ marginLeft: 8 }}>Indicado</span>
-                  )}
+                  {recommended === "after" && <span className={`${styles.badge} ${styles.badgeGreen}`} style={{ marginLeft: 8 }}>Indicado</span>}
                 </div>
                 <ul className={styles.list}>
                   <li className={styles.listItem}>
                     <span className={styles.label}>EEPROM:</span>
                     <span className={styles.code}>{chosen.eeprom_after}</span>
-                    {chosen.eeprom_after && chosen.eeprom_after !== "-" && (
+                    {eeprom && (
                       <button onClick={() => copy(chosen.eeprom_after)} className={styles.copyBtn} title="Copiar EEPROM">
                         <ClipboardCopy className={styles.copyIcon} />
                       </button>
@@ -447,18 +385,14 @@ export default function RefrigeratorLookup() {
                   </li>
                 </ul>
 
-                {/* Imágenes DESPUÉS */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 8 }}>
-                  <ImgBox src={partImgs.after.compressor} alt={`Compresor (Después) - ${chosen.model}`} caption="Compresor (Después)" onOpen={openLightbox} />
-                  <ImgBox src={partImgs.after.pcb}        alt={`PCB (Después) - ${chosen.model}`}        caption="PCB (Después)"        onOpen={openLightbox} />
+                  <ImgBox src={partImgs.after.compressor} alt={`Compresor - ${chosen.model}`} caption="Compresor (Después)" onOpen={openLightbox} />
+                  <ImgBox src={partImgs.after.pcb}        alt={`PCB - ${chosen.model}`}        caption="PCB (Después)"        onOpen={openLightbox} />
                 </div>
 
                 <div className={styles.helper} style={{ marginTop: 10 }}>
                   <Info className={styles.helperIcon} />
-                  <p>
-                    W## son semanas de calendario; 10-ene y 24-ene son fechas (día-mes).
-                    Si ves Inactive, la actualización fue retirada o no está vigente.
-                  </p>
+                  <p>W## son semanas; 10-ene y 24-ene son fechas (día-mes). Inactive indica actualización retirada.</p>
                 </div>
               </div>
             )}
@@ -472,18 +406,56 @@ export default function RefrigeratorLookup() {
             </div>
             <div className={styles.helper}>
               <span className={`${styles.badge} ${toneBadgeClass(decision.tone)}`}>
-                {(isRF4500 || needs24EneSN) && snInfo?.valid ? snInfo.nice : isW49 ? "W49" : isInactive ? "Inactive" : "Modelo"}
+                {isW49 ? "W49" : isInactive ? "Inactive" : (isRF4500 || needs24EneSN) ? snInfo.nice : "Modelo"}
               </span>
               <p style={{ margin: 0 }}>{decision.text}</p>
             </div>
           </div>
+
+          {/* Resumen final */}
+          <div className={styles.section}>
+            <div className={styles.sectionTitle} style={{ marginBottom: 6 }}>
+              <Info className={styles.iconMuted} />
+              <h3>Resumen</h3>
+            </div>
+
+            {recommended === "before" && (
+              <div className={styles.helper}>
+                <span className={`${styles.badge} ${styles.badgeGreen}`}>Antes</span>
+                <p style={{ margin: 0 }}>
+                  Motor: <strong>{motorCode}</strong> — PCB: <strong>{pcbBefore}</strong>.
+                </p>
+              </div>
+            )}
+
+            {recommended === "after" && (
+              <div className={styles.helper}>
+                <span className={`${styles.badge} ${styles.badgeGreen}`}>Después</span>
+                <p style={{ margin: 0 }}>
+                  Motor: <strong>{motorCode}</strong> (sin cambio). PCB: <strong>{pcbAfter}</strong>
+                  {eeprom ? <> — EEPROM: <strong>{eeprom}</strong></> : null}.
+                </p>
+              </div>
+            )}
+
+            {recommended === "both" && (
+              <>
+                <div className={styles.helper}>
+                  <span className={`${styles.badge} ${styles.badgeBlue}`}>De fábrica</span>
+                  <p style={{ margin: 0 }}>
+                    Motor: <strong>{motorCode}</strong> — PCB: <strong>{pcbBefore}</strong>.
+                  </p>
+                </div>
+                <div className={styles.helper}>
+                  <span className={`${styles.badge} ${styles.badgeBlue}`}>Actualizado</span>
+                  <p style={{ margin: 0 }}>
+                    PCB: <strong>{pcbAfter}</strong>{eeprom ? <> — EEPROM: <strong>{eeprom}</strong></> : null}. El compresor no cambia.
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      ) : (query || pjtFilter) ? (
-        <div className={styles.empty}>
-          {pjtFilter ? "Selecciona un modelo de la lista filtrada o escribe uno específico." : "Escribe el modelo completo para ver los detalles."}
-        </div>
-      ) : (
-        <div className={styles.empty}>Empieza escribiendo un modelo y/o filtra por PJT.</div>
       )}
 
       {/* LIGHTBOX */}
@@ -496,16 +468,9 @@ export default function RefrigeratorLookup() {
             aria-label="Vista ampliada"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              type="button"
-              className={styles.lbClose}
-              onClick={closeLightbox}
-              aria-label="Cerrar"
-              title="Cerrar"
-            >
+            <button type="button" className={styles.lbClose} onClick={closeLightbox} aria-label="Cerrar" title="Cerrar">
               <X size={20} />
             </button>
-
             <div className={styles.lbImgWrap}>
               <Image
                 src={lightbox.src}
@@ -516,7 +481,6 @@ export default function RefrigeratorLookup() {
                 priority
               />
             </div>
-
             {lightbox.caption && <div className={styles.lbCaption}>{lightbox.caption}</div>}
           </div>
         </div>
