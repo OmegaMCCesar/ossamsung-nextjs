@@ -153,7 +153,6 @@ export default function RefrigeratorPartsSelector() {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Estandarizacion de compresores</h2>
 
       <div className={styles.inputGroup}>
         <label>Número de serie:</label>
