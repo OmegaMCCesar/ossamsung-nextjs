@@ -1,5 +1,8 @@
-import { useState, useEffect } from "react";
-import styles from "../styles/RefrigeratorLookup.module.css";
+import React, { useState } from "react";
+import styles from "../styles/RefrigeratorLookup.module.css"; // usamos CSS Modules
+
+const YEAR_MAP = { H:2016, J:2017, K:2018, M:2019, N:2020, R:2021, T:2022, W:2023, X:2024, Y:2025 };
+const MONTH_MAP = { "1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"A":10,"B":11,"C":12 };
 
 const DATA = [
   // { pjt, model, compressor_before, pcb_before, eeprom_after, pcb_after, apply }
@@ -87,135 +90,145 @@ const MODEL_PART_IMAGES = {
   "RT42DG6734B1EM": { before: { compressor: url_compresor, pcb: url_pcb }, after: { compressor: url_compresor, pcb: url_pcb } },
 };
 
-const YEAR_MAP = { H: 2016, J: 2017, K: 2018, M: 2019, N: 2020, R: 2021, T: 2022, W: 2023, X: 2024, Y: 2025 };
-const MONTH_MAP = { "1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"A":10,"B":11,"C":12 };
+const RESTRICTED_MESSAGES = [
+  "Asistir a domicilio para validar partes.",
+  "Se necesita ir a revisar producto con visita técnica."
+];
 
-export default function RefrigeratorPartsSelector() {
+const ProductCheck = () => {
   const [serial, setSerial] = useState("");
   const [model, setModel] = useState("");
-  const [serialDate, setSerialDate] = useState(null);
   const [result, setResult] = useState(null);
-  const [error, setError] = useState("");
-  const [modalImage, setModalImage] = useState(null);
+  const [expandedImage, setExpandedImage] = useState(null);
 
-  const handleSerialChange = (e) => {
-    setSerial(e.target.value.toUpperCase());
-    setSerialDate(null);
-    setModel("");
-    setResult(null);
-    setError("");
-  };
+  const handleCheck = () => {
+    if (!serial || !model) return;
+    if (serial.length < 9) return setResult({ message: "Número de serie inválido" });
 
-  const validateSerial = () => {
-    if (serial.length < 15 || serial.length > 15) return setError("Número de serie inválido");
-    const yearChar = serial[7];
-    const monthChar = serial[8];
-    const year = YEAR_MAP[yearChar];
-    const month = MONTH_MAP[monthChar];
-    if (!year || !month) return setError("Número de serie inválido");
-    setSerialDate({ year, month });
-    setError("");
-  };
+    const year = YEAR_MAP[serial[7]];
+    const month = MONTH_MAP[serial[8]];
+    if (!year || !month) return setResult({ message: "Número de serie inválido" });
 
-  const handleModelSubmit = () => {
-    const data = DATA.find(d => d.model === model);
-    if (!data) return setError("Modelo no encontrado en base de datos");
+    const product = DATA.find(p => p.model === model);
+    if (!product) return setResult({ message: "Producto no encontrado" });
 
-    let useType = "before";
-    const { apply } = data;
-    const sDate = new Date(serialDate.year, serialDate.month - 1, 1);
+    const { apply, pcb_before, pcb_after, compressor_before, eeprom_after } = product;
 
-    if (apply === "Inactive") useType = "before";
-    else if (apply === "10-ene" || apply === "24-ene") {
-      const cutoff = new Date(2025, 1, 1);
-      useType = sDate >= cutoff ? "after" : "before";
-    } else if (apply.startsWith("W49")) {
-      const cutoff = new Date(2025, 0, 1);
-      useType = sDate >= cutoff ? "after" : "before";
+    let message = "";
+    let parts = {};
+    let imageKey = "before";
+
+    if (apply === "Inactive") {
+      parts = { pcb: pcb_before, compressor: compressor_before };
+      message = "Usar PCB y compresor antes de la actualización.";
+      imageKey = "before";
+    } else if (apply === "10-ene" || apply === "24-ene") {
+      if (year === 2025 && month === 1) {
+        message = "Se necesita ir a revisar producto con visita técnica.";
+        imageKey = "after";
+      } else if (year > 2025 || (year === 2025 && month > 1)) {
+        parts = { pcb: pcb_after, eeprom: eeprom_after };
+        message = "Usar PCB y EEPROM después de actualización.";
+        imageKey = "after";
+      } else {
+        parts = { pcb: pcb_before, compressor: compressor_before };
+        message = "Usar PCB y compresor antes de actualización.";
+        imageKey = "before";
+      }
+    } else if (apply.toLowerCase() === "w49") {
+      if (year === 2024 && month === 12) {
+        message = "Asistir a domicilio para validar partes.";
+        imageKey = "after";
+      } else if (year > 2024 || (year === 2025 && month >= 1)) {
+        parts = { pcb: pcb_after, eeprom: eeprom_after };
+        message = "Usar PCB y EEPROM después de actualización.";
+        imageKey = "after";
+      } else {
+        parts = { pcb: pcb_before, compressor: compressor_before };
+        message = "Usar PCB y compresor antes de actualización.";
+        imageKey = "before";
+      }
     }
 
-    const parts = useType === "before" 
-      ? { pcb: data.pcb_before, compressor: data.compressor_before }
-      : { pcb: data.pcb_after, eeprom: data.eeprom_after };
-
-    setResult({ parts, useType, model });
-    setError("");
+    const images = MODEL_PART_IMAGES[model] ? MODEL_PART_IMAGES[model][imageKey] : null;
+    setResult({ message, parts, images, year, month });
   };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Escape" && modalImage) setModalImage(null);
-  };
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [modalImage]);
 
   return (
     <div className={styles.container}>
 
       <div className={styles.inputGroup}>
-        <label>Número de serie:</label>
-        <input type="text" value={serial} onChange={handleSerialChange} placeholder="Ingresa número de serie" />
-        <button onClick={validateSerial}>Validar</button>
+        <label className={styles.label}>Número de serie:</label>
+        <input
+          type="text"
+          value={serial}
+          onChange={e => setSerial(e.target.value)}
+          placeholder="Número de serie de 15 caracteres"
+          className={styles.input}
+        />
       </div>
 
-      {serialDate && (
-        <div className={styles.info}>
-          <p>Fecha de fabricación: {serialDate.month}/{serialDate.year}</p>
-          <div className={styles.inputGroup}>
-            <label>Modelo:</label>
-            <input type="text" value={model} onChange={e => setModel(e.target.value)} placeholder="Ingresa modelo" />
-            <button onClick={handleModelSubmit}>Generar resultado</button>
-          </div>
-        </div>
-      )}
+      <div className={styles.inputGroup}>
+        <label className={styles.label}>Modelo:</label>
+        <input
+          type="text"
+          value={model}
+          onChange={e => setModel(e.target.value)}
+          placeholder="Ej. RF22A4010S9/EM"
+          className={styles.input}
+        />
+      </div>
 
-      {error && <p className={styles.error}>{error}</p>}
+      <button onClick={handleCheck} className={styles.button}>Verificar</button>
 
       {result && (
-        <div className={styles.result}>
-          <h3>Resultado para {result.model} ({result.useType})</h3>
-          <div className={styles.parts}>
-            <div className={styles.part}>
-              <p>PCB:</p>
-              <img
-                src={MODEL_PART_IMAGES[result.model]?.[result.useType]?.pcb || result.parts.pcb}
-                alt="pcb"
-                onClick={() => setModalImage(MODEL_PART_IMAGES[result.model]?.[result.useType]?.pcb || result.parts.pcb)}
-              />
-              <p className={styles.partName}>{result.parts.pcb}</p>
+        <div className={styles.resultCard}>
+          <p><strong>Mensaje:</strong> {result.message}</p>
+          <p><strong>Fabricación:</strong> {result.month}/{result.year}</p>
+
+          {/* Mostrar partes solo si el mensaje NO está restringido */}
+          {result.parts && !RESTRICTED_MESSAGES.includes(result.message) && (
+            <div className={styles.partsList}>
+              {result.parts.pcb && <p>PCB: {result.parts.pcb}</p>}
+              {result.parts.compressor && <p>Compresor: {result.parts.compressor}</p>}
+              {result.parts.eeprom && <p>EEPROM: {result.parts.eeprom}</p>}
             </div>
-            {result.useType === "before" ? (
-              <div className={styles.part}>
-                <p>Compresor:</p>
+          )}
+
+          {/* Mostrar imágenes solo si el mensaje NO está restringido */}
+          {result.images && !RESTRICTED_MESSAGES.includes(result.message) && (
+            <div className={styles.imagesContainer}>
+              {result.images.pcb && (
                 <img
-                  src={MODEL_PART_IMAGES[result.model]?.[result.useType]?.compressor || result.parts.compressor}
-                  alt="compressor"
-                  onClick={() => setModalImage(MODEL_PART_IMAGES[result.model]?.[result.useType]?.compressor || result.parts.compressor)}
+                  className={styles.image}
+                  src={result.images.pcb}
+                  alt="PCB"
+                  onClick={() => setExpandedImage(result.images.pcb)}
                 />
-                <p className={styles.partName}>{result.parts.compressor}</p>
-              </div>
-            ) : (
-              <div className={styles.part}>
-                <p>EEPROM:</p>
+              )}
+              {result.images.compressor && (
                 <img
-                  src={MODEL_PART_IMAGES[result.model]?.[result.useType]?.compressor || result.parts.eeprom}
-                  alt="eeprom"
-                  onClick={() => setModalImage(MODEL_PART_IMAGES[result.model]?.[result.useType]?.compressor || result.parts.eeprom)}
+                  className={styles.image}
+                  src={result.images.compressor}
+                  alt="Compresor"
+                  onClick={() => setExpandedImage(result.images.compressor)}
                 />
-                <p className={styles.partName}>{result.parts.eeprom}</p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
-      {modalImage && (
-        <div className={styles.modal} onClick={() => setModalImage(null)}>
-          <img src={modalImage} alt="expand" className={styles.modalImage} />
+      {/* Modal de imagen expandida */}
+      {expandedImage && (
+        <div className={styles.modalOverlay} onClick={() => setExpandedImage(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()} >
+            <img src={expandedImage} alt="Parte expandida" className={styles.expandedImage} onClick={() => setExpandedImage(null)} />
+          </div>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default ProductCheck;

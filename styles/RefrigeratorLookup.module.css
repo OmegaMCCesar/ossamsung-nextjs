@@ -1,149 +1,177 @@
+/* Contenedor principal */
 .container {
-  max-width: 95%;
-  margin: 2rem auto;
-  padding: 1.5rem;
-  background: #fdfdfd;
-  border-radius: 10px;
-  font-family: 'Arial', sans-serif;
-  color: #333;
+  max-width: 760px;
+  margin: 32px auto;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
 }
 
+/* Título */
 .title {
+  margin: 0 0 20px 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #111827;
   text-align: center;
-  font-size: 1.7rem;
-  margin-bottom: 1.2rem;
-  color: #1f3a60;
 }
 
+/* Grupos de entrada */
 .inputGroup {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
-.inputGroup label {
-  margin-bottom: 0.4rem;
-  font-weight: 600;
-}
-
-.inputGroup input {
-  padding: 0.5rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  outline: none;
-  transition: border 0.3s;
-}
-
-.inputGroup input:focus {
-  border: 1px solid #888; /* Gris suave al enfocar */
-}
-
-.inputGroup button {
-  padding: 0.5rem 1rem;
-  background: #ddd; /* Gris tenue */
-  color: #222;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s;
-  margin-top: 0.4rem;
-}
-
-.inputGroup button:hover {
-  background: #bbb;
-}
-
-.info {
-  margin-top: 0.8rem;
-}
-
-.error {
-  color: #d9534f;
-  font-weight: 600;
-  margin-top: 0.5rem;
-}
-
-.result {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border-radius: 10px;
-  background: #f9f9f9;
-}
-
-.result h3 {
-  text-align: center;
-  margin-bottom: 1rem;
-  color: #1f3a60;
-  font-size: 1.3rem;
-}
-
-.parts {
-  display: flex;
-  justify-content: center; /* Centra las cards horizontalmente */
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
-}
-
-
-.part {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.part img {
-  width: 140px;
-  height: auto;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.part img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.partName {
-  margin-top: 0.4rem;
-  font-weight: 500;
+.label {
   font-size: 0.95rem;
-  word-break: break-all;
+  color: #374151;
 }
 
-.modal {
-  position: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background: rgba(0,0,0,0.65);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index: 1000;
-  animation: fadeIn 0.25s ease-in;
-}
-
-.modalImage {
-  max-width: 85%;
-  max-height: 85%;
+/* Input 95% ancho, minimalista */
+.input {
+  width: 95%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
   border-radius: 12px;
-  border: 2px solid white;
-  animation: zoomIn 0.3s ease-out;
+  background: #ffffff;
+  color: #111827;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-@keyframes zoomIn {
-  from { transform: scale(0.7); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.input:focus {
+  border-color: #9ca3af;
+  box-shadow: 0 0 0 4px rgba(156,163,175,0.15);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Botón 95% ancho */
+.button {
+  width: 95%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 12px;
+  background: #111827; /* neutro oscuro */
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.06s ease, opacity 0.2s ease, background 0.2s ease;
+}
+
+.button:hover {
+  opacity: 0.95;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+/* Tarjeta de resultado */
+.resultCard {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  color: #111827;
+}
+
+/* Lista de partes */
+.partsList {
+  margin-top: 10px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px dashed #e5e7eb;
+  border-radius: 12px;
+}
+
+/* Imágenes */
+.imagesContainer {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.image {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+  display: block;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+/* Contenedor del modal */
+.modalContent {
+  position: relative;
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Imagen expandida */
+.expandedImage {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+/* Botón cerrar */
+.closeButton {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.closeButton:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container {
+    margin: 16px;
+    padding: 16px;
+  }
+  .input, .button {
+    width: 100%;
+  }
+  .imagesContainer {
+    grid-template-columns: 1fr;
+  }
 }
