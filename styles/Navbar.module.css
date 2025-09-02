@@ -1,47 +1,47 @@
-/* Estilos para el elemento <nav> principal */
+/* Navbar.module.css — compatible con CSS Modules y CSS nativo */
+
+/* Barra */
 .navbar {
   background-color: var(--navbar-light-bg);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
   z-index: 50;
   transition: background-color 0.3s ease-in-out;
 }
+html.dark .navbar { background-color: var(--navbar-dark-bg); }
 
-html.dark .navbar {
-  background-color: var(--navbar-dark-bg);
-}
-
-/* Contenedor principal de la barra de navegación */
+/* Contenido */
 .navbarContent {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Marca/botón a la izquierda, enlaces a la derecha en desktop */
+  justify-content: space-between;
   height: 4rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding: 0 1rem;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* Estilos para el área del Logo/Marca */
-.navbarBrand .navLink {
-  font-weight: bold;
-  padding: 0;
+/* Marca (opcional) */
+.navbarBrand {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.brandLink {
+  font-weight: 800;
+  text-decoration: none;
   color: var(--navbar-light-text);
 }
+html.dark .brandLink { color: var(--navbar-dark-text); }
 
-html.dark .navbarBrand .navLink {
-  color: var(--navbar-dark-text);
-}
-
-/* Estilos para el BOTÓN HAMBURGUESA */
+/* Botón hamburguesa (visible en móvil) */
 .hamburgerButton {
-  display: flex; /* Visible en móvil por defecto */
+  display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: var(--hamburger-size);
-  height: var(--hamburger-size);
+  width: 2rem;
+  height: 2rem;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -49,34 +49,18 @@ html.dark .navbarBrand .navLink {
   z-index: 60;
   transition: all 0.3s ease;
 }
-
-/* Ocultar el botón hamburguesa en pantallas medianas y grandes */
-@media (min-width: var(--breakpoint-md)) {
-  .hamburgerButton {
-    display: none;
-  }
-}
-
-/* Estilos para las líneas del icono hamburguesa */
 .hamburgerLine {
   width: 100%;
-  height: var(--hamburger-line-height);
+  height: 2px;
   background-color: var(--hamburger-color);
   transition: all 0.3s ease;
 }
+html.dark .hamburgerLine { background-color: var(--hamburger-dark-color); }
 
-html.dark .hamburgerLine {
-  background-color: var(--hamburger-dark-color);
-}
+/* Links (móvil cerrado) */
+.navLinks { display: none; }
 
-/* --- Estilos para el CONTENEDOR DE ENLACES (.navLinks) --- */
-
-/* ESTILOS POR DEFECTO (Móvil - MENÚ CERRADO) */
-.navLinks {
-  display: none; /* Oculto por defecto en móvil */
-}
-
-/* ESTILOS PARA MÓVIL - MENÚ ABIERTO */
+/* Móvil abierto */
 .navLinks.menuOpen {
   display: flex;
   flex-direction: column;
@@ -89,75 +73,47 @@ html.dark .hamburgerLine {
   padding: 1rem 0;
   z-index: 55;
   overflow-y: auto;
-  transform: translateX(0);
 }
+html.dark .navLinks.menuOpen { background-color: var(--menu-mobile-dark-bg); }
 
-html.dark .navLinks.menuOpen {
-  background-color: var(--menu-mobile-dark-bg);
-}
-
-/* Estilos de los enlaces DENTRO del menú móvil */
+/* Enlaces (móvil) */
 .navLinks.menuOpen .navLink,
 .navLinks.menuOpen .navLinkAdmin {
   width: 100%;
   padding: var(--navbar-padding-y-2) 1.5rem;
   text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
   border-radius: 0;
   color: var(--navbar-light-text);
+  text-decoration: none;
 }
-
 html.dark .navLinks.menuOpen .navLink,
 html.dark .navLinks.menuOpen .navLinkAdmin {
-  border-bottom-color: rgba(255, 255, 255, 0.1);
+  border-bottom-color: rgba(255,255,255,0.1);
   color: var(--navbar-dark-text);
 }
-
 .navLinks.menuOpen .navLink:hover,
 .navLinks.menuOpen .navLinkAdmin:hover {
   background-color: var(--navbar-light-hover-bg);
 }
-
 html.dark .navLinks.menuOpen .navLink:hover,
 html.dark .navLinks.menuOpen .navLinkAdmin:hover {
   background-color: var(--navbar-dark-hover-bg);
 }
 
-/* Estilo específico para el enlace Admin dentro del menú */
-.navLinks.menuOpen .navLinkAdmin {
-  color: white;
-}
-
-html.dark .navLinks.menuOpen .navLinkAdmin {
-  color: white;
-}
-
-/* --- Estilos para DESKTOP (Muestra enlaces horizontalmente) --- */
-
-@media (min-width: var(--breakpoint-md)) {
+/* Desktop (>=768px) */
+@media (min-width: 768px) {
+  .hamburgerButton { display: none; }   /* oculta hamburguesa */
   .navLinks {
-    display: flex; /* Mostrar como fila horizontal */
+    display: flex;                      /* muestra menú horizontal */
     align-items: center;
-    gap: var(--navbar-spacing-4);
-    position: static; /* Volver al flujo normal del documento */
-    top: auto;
-    left: auto;
-    width: auto;
-    height: auto;
-    background-color: transparent;
+    gap: 1rem;
+    position: static;
+    width: auto; height: auto;
+    background: transparent;
     padding: 0;
-    z-index: auto;
-    overflow-y: visible;
-    transform: none;
+    overflow: visible;
   }
-
-  /* Ajustes de gap responsivos en desktop */
-  @media (min-width: var(--breakpoint-sm)) and (max-width: calc(var(--breakpoint-md) - 1px)) {
-    .navLinks {
-      gap: var(--navbar-spacing-3);
-    }
-  }
-
   .navLinks .navLink,
   .navLinks .navLinkAdmin {
     width: auto;
@@ -165,5 +121,39 @@ html.dark .navLinks.menuOpen .navLinkAdmin {
     text-align: left;
     border-bottom: none;
     border-radius: var(--navbar-rounded-md);
+    color: var(--navbar-light-text);
+    text-decoration: none;
   }
+  html.dark .navLinks .navLink,
+  html.dark .navLinks .navLinkAdmin { color: var(--navbar-dark-text); }
+
+  .navLinks .navLink:hover,
+  .navLinks .navLinkAdmin:hover { background-color: var(--navbar-light-hover-bg); }
+  html.dark .navLinks .navLink:hover,
+  html.dark .navLinks .navLinkAdmin:hover { background-color: var(--navbar-dark-hover-bg); }
+}
+
+/* Backdrop (oscurece fondo en móvil al abrir menú) */
+.backdrop {
+  display: none;
+}
+@media (max-width: 767.98px) {
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 4rem 0 0 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 54;
+  }
+}
+
+/* Foco accesible en enlaces */
+.navLink:focus-visible,
+.navLinkAdmin:focus-visible,
+.brandLink:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(0,0,0,0.35),
+    0 0 0 6px rgba(110,168,254,0.45);
+  border-radius: var(--navbar-rounded-md);
 }
