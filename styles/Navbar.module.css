@@ -157,3 +157,28 @@ html.dark .navLinks.menuOpen .navLinkAdmin:hover {
     0 0 0 6px rgba(110,168,254,0.45);
   border-radius: var(--navbar-rounded-md);
 }
+
+/* Botón de tema (iconito circular) */
+.themeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem; height: 2rem;
+  margin-right: .5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--elev-1), var(--elev-2));
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  transition: transform .12s ease, filter .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.themeButton:hover { transform: translateY(-1px); filter: brightness(1.04); border-color: var(--brand); }
+.themeButton:active { transform: translateY(0); }
+.themeButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.35), 0 0 0 6px rgba(110,168,254,0.45);
+}
+
+/* Backdrop ya incluido en la versión anterior:
+.backdrop { ... } */
