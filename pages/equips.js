@@ -9,6 +9,7 @@ import { doc, increment, runTransaction, collection, query, where, getDocs } fro
 
 import styles from '../styles/equips.module.css';
 import emailjs from '@emailjs/browser';
+import Validador from '@/components/validador';
 
 const LOCAL_STORAGE_ASC_KEY = 'ASC_CODE_SAVED';
 
@@ -16,6 +17,8 @@ const EquipsPage = () => {
   const router = useRouter();
   const { user } = useAuth();
 
+  const [validadorVisible, setValidadorVisible] = useState(false);
+  const toggleValidador = () => setValidadorVisible(!validadorVisible);
   const [category, setCategory] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const { data, loading, error } = useFetchInfFirebase(category, searchTerm);
@@ -36,8 +39,6 @@ const EquipsPage = () => {
 
   const [ascCode, setAscCode] = useState('');
 
-  // ⚠️ Ojo: había un código con espacio final '6434525 ' en tu lista original.
-  // Aun así, abajo normalizamos ambos lados (trim/uppercase) para evitar falsos negativos.
   const validAscCodes = useMemo(
     () => [
       'Techsup', '6448834', '6434525', '1401501', '6449579', '6283007', '4907726',
@@ -534,7 +535,7 @@ const EquipsPage = () => {
         <div className={styles.serialNumberInputContainer}>
           <input
             className={`${styles.searchInputSN} ${serialNumberError ? styles.inputInvalid : ''}`}
-            placeholder="Ingresa Número de Serie (SN)"
+            placeholder="Ingresa Número de Serie (SNN)"
             type="text"
             value={serialNumber}
             onChange={(e) => {
@@ -560,6 +561,11 @@ const EquipsPage = () => {
           )}
           {serialNumberError && <p className={styles.serialNumberErrorMessage}>{serialNumberError}</p>}
         </div>
+        <div>
+          <Validador className={validadorVisible ? 'visible' : 'oculto'}  numeroSerie={serialNumber} />
+        </div>
+        <button className={styles.resetSNButton} onClick={() => setValidadorVisible(!validadorVisible)}  >{validadorVisible ? <p>Visualizar datos de validacion</p>:<p>Ocultar datos de validacion</p>}</button>
+        
       </div>
 
       <div className={styles.contentArea}>{renderContent()}</div>

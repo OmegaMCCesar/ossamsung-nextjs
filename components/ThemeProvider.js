@@ -4,37 +4,25 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 const ThemeContext = createContext({ theme: 'system', setTheme: () => {}, toggleTheme: () => {} });
 
 function applyTheme(theme) {
-  const root = document.documentElement; // <html>
-  if (theme === 'dark') {
-    root.classList.add('dark');
-    root.classList.remove('light');
-  } else if (theme === 'light') {
-    root.classList.add('light');
-    root.classList.remove('dark');
-  } else {
-    // system
-    root.classList.remove('dark', 'light');
-  }
+  const root = document.documentElement;
+  if (theme === 'dark') { root.classList.add('dark'); root.classList.remove('light'); }
+  else if (theme === 'light') { root.classList.add('light'); root.classList.remove('dark'); }
+  else { root.classList.remove('dark','light'); } // system
 }
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState('system'); // 'light' | 'dark' | 'system'
+  const [theme, setThemeState] = useState('system');
 
-  // Establecer desde localStorage o sistema en primer render
   useEffect(() => {
     try {
       const saved = localStorage.getItem('theme') || 'system';
       setThemeState(saved);
       applyTheme(saved);
-    } catch {
-      // no-op
-    }
-
-    // Sincronizar si el sistema cambia (sólo cuando estamos en "system")
+    } catch {}
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = () => {
       const t = localStorage.getItem('theme') || 'system';
-      if (t === 'system') applyTheme('system'); // quitar clases para que el @media gobierne
+      if (t === 'system') applyTheme('system');
     };
     mq.addEventListener?.('change', handler);
     return () => mq.removeEventListener?.('change', handler);
@@ -42,15 +30,14 @@ export function ThemeProvider({ children }) {
 
   const setTheme = useCallback((next) => {
     setThemeState(next);
-    try {
-      localStorage.setItem('theme', next);
-    } catch {}
+    try { localStorage.setItem('theme', next); } catch {}
     applyTheme(next);
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : prev === 'light' ? 'system' : 'dark'));
-  }, [setTheme]);
+  const toggleTheme = useCallback(
+    () => setTheme((prev) => (prev === 'dark' ? 'light' : prev === 'light' ? 'system' : 'dark')),
+    [setTheme]
+  );
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>

@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useTheme } from '../components/ThemeProvider'; // ⬅️ del provider que te di
+import { useTheme } from '../components/ThemeProvider';
 import styles from '../styles/Navbar.module.css';
 
 export default function Navbar() {
@@ -13,14 +13,12 @@ export default function Navbar() {
   const toggleMenu = () => setIsMenuOpen(v => !v);
   const closeMenu = () => setIsMenuOpen(false);
 
-  // Cerrar al cambiar de ruta
   useEffect(() => {
     const handleRoute = () => setIsMenuOpen(false);
     router.events.on('routeChangeStart', handleRoute);
     return () => router.events.off('routeChangeStart', handleRoute);
   }, [router.events]);
 
-  // Cerrar con ESC y bloquear scroll en móvil cuando está abierto
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') setIsMenuOpen(false); };
     window.addEventListener('keydown', onKey);
@@ -34,12 +32,7 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <div className={`container ${styles.navbarContent}`}>
-        {/* (Opcional) Marca a la izquierda */}
-        {/* <div className={styles.navbarBrand}>
-          <Link href="/" className={styles.brandLink}>OSSamsung</Link>
-        </div> */}
-
-        {/* Botón de tema (siempre visible) */}
+        {/* Botón de tema */}
         <button
           className={styles.themeButton}
           onClick={toggleTheme}
@@ -49,7 +42,7 @@ export default function Navbar() {
           {theme === 'dark' ? '🌙' : theme === 'light' ? '☀️' : '🖥'}
         </button>
 
-        {/* Hamburguesa (solo móvil por CSS) */}
+        {/* Hamburguesa (móvil) */}
         <button
           className={styles.hamburgerButton}
           onClick={toggleMenu}
@@ -77,8 +70,6 @@ export default function Navbar() {
           <Link href="/admin" className={styles.navLinkAdmin} onClick={closeMenu}>Login</Link>
         </div>
       </div>
-
-      {/* Backdrop para cerrar tocando fuera (móvil) */}
       {isMenuOpen && <div className={styles.backdrop} onClick={closeMenu} />}
     </nav>
   );

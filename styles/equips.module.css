@@ -6,35 +6,6 @@
    Page wrapper (+ design tokens locales)
    ───────────────────────────────────── */
 .equipsPageWrapper {
-  /* Paleta base (modo oscuro por defecto) */
-  --bg: #0f1115;
-  --elev-1: #121520;
-  --elev-2: #171b27;
-  --card: #141823;
-  --text: #e6e9ef;
-  --muted: #a7b0c0;
-  --brand: #6ea8fe;
-  --brand-strong: #4b90ff;
-  --ok: #2ecc71;
-  --warn: #ffb020;
-  --danger: #ff6b6b;
-  --border: rgba(255,255,255,0.08);
-  --shadow: 0 8px 30px rgba(0,0,0,0.25);
-  --shadow-soft: 0 8px 24px rgba(0,0,0,0.22);
-  --radius: 16px;
-  --radius-sm: 12px;
-  --radius-xs: 10px;
-  --gap: clamp(10px, 1.6vw, 16px);
-
-  /* Tokens de inputs con alto contraste (modo oscuro) */
-  --input-text: var(--text);
-  --input-bg: #1a2233;
-  --input-bg-hover: #1f2940;
-  --input-bg-focus: #212e48;
-  --input-border: rgba(255,255,255,0.28);
-  --input-border-strong: #86a7ff;
-  --input-placeholder: #c6d0e3;
-
   min-height: 100dvh;
   background: radial-gradient(1200px 800px at 20% -10%, rgba(78,115,255,0.08), transparent 60%),
               radial-gradient(1200px 800px at 120% 10%, rgba(110,168,254,0.10), transparent 60%),
@@ -46,31 +17,6 @@
   gap: clamp(14px, 2.4vw, 22px);
 }
 
-/* Overrides de tokens para modo claro, scopiados al wrapper (CSS Modules-safe) */
-@media (prefers-color-scheme: light) {
-  .equipsPageWrapper {
-    --bg: #f7f9fc;
-    --elev-1: #ffffff;
-    --elev-2: #ffffff;
-    --card: #ffffff;
-    --text: #0f1424;
-    --muted: #5f6b84;
-    --brand: #3b82f6;
-    --brand-strong: #1d4ed8;
-    --border: rgba(15,20,36,0.08);
-    --shadow: 0 8px 28px rgba(15,20,36,0.08);
-    --shadow-soft: 0 8px 24px rgba(15,20,36,0.08);
-
-    /* Inputs en claro */
-    --input-text: #0f1424;
-    --input-bg: #ffffff;
-    --input-bg-hover: #f7f9ff;
-    --input-bg-focus: #f2f6ff;
-    --input-border: rgba(15,20,36,0.28);
-    --input-border-strong: #3b82f6;
-    --input-placeholder: #6b7280;
-  }
-}
 
 /* ─────────────────────────────────────
    Header / Cabezal
@@ -453,4 +399,27 @@
 :where(.equipsPageWrapper) :where(a:focus-visible, button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select:focus-visible) {
   box-shadow: 0 0 0 3px rgba(110,168,254,0.35);
   border-color: var(--brand) !important;
+}
+/* Fila superior opcional del cabezal */
+.cabezalTopRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+/* Botón de tema dentro de Equips */
+.themeIconButton {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border-radius: 999px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--elev-1), var(--elev-2));
+  color: var(--text); box-shadow: var(--shadow-soft); cursor: pointer;
+  transition: transform .12s ease, filter .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.themeIconButton:hover { transform: translateY(-1px); filter: brightness(1.04); border-color: var(--brand); }
+.themeIconButton:active { transform: translateY(0); }
+.themeIconButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.35), 0 0 0 6px rgba(110,168,254,0.45);
 }

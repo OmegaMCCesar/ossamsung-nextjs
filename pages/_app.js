@@ -1,24 +1,21 @@
 // pages/_app.js
 
 import { UserProvider } from '@/context/UserContext';
-import { ThemeProvider } from '@/components/ThemeProvider';
+// pages/_app.js
 import '../styles/globals.css';
-import Layout from '@/components/Layout';
+import { ThemeProvider } from '../components/ThemeProvider';
+import Layout from '../components/Layout';
+import Navbar from '@/components/Navbar';
 
-
-
-function MyApp({ Component, pageProps }) {
-
+export default function MyApp({ Component, pageProps }) {
   return (
     <UserProvider>
-      <ThemeProvider>
-        <Layout>
-      {/* Renderiza el componente de la página actual */}
-      <Component {...pageProps} />
+    <ThemeProvider>
+      <Navbar />
+      <Layout>
+        <Component {...pageProps} />
       </Layout>
-      </ThemeProvider>
+    </ThemeProvider>
     </UserProvider>
   );
 }
-
-export default MyApp;

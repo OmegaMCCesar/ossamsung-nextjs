@@ -1,0 +1,67 @@
+/* Validador.module.css */
+
+/* --- Contenedor Principal --- */
+.container {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease-in-out;
+}
+
+.containerOff {
+    /* Estilo para cuando el validador está 'apagado' o no visible */
+    display: none; 
+}
+
+/* --- Estilos para el Estado de la Garantía (h3) --- */
+
+/* Garantía Válida (EN GARANTÍA) */
+.garantiaValida {
+    color: #155724; /* Verde oscuro */
+    background-color: #d4edda; /* Fondo verde claro */
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+/* Garantía Vencida */
+.garantiaVencida {
+    color: #721c24; /* Rojo oscuro */
+    background-color: #f8d7da; /* Fondo rojo claro */
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+/* Serial Inválido/Error */
+.invalido {
+    color: #856404; /* Naranja/Amarillo oscuro */
+    background-color: #fff3cd; /* Fondo amarillo claro */
+    border: 1px solid #ffeeba;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+/* --- Estilos para Texto Secundario (p) --- */
+
+/* Texto de Fabricación y Muted */
+.container p {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+
+.muted {
+    color: #6c757d; /* Gris para texto menos importante */
+    font-size: 0.9em;
+    border-top: 1px dashed #e9ecef;
+    padding-top: 10px;
+    margin-top: 10px;
+}
