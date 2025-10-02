@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "../styles/CompressorLookup.module.css";
-
+import Link from "next/link";
 const STORAGE_KEY = "compressor_resistances_dataset_v1";
 
 const seedData = [
@@ -151,6 +151,8 @@ export default function CompressorResistanceLookup() {
 
   return (
     <div className={styles.wrapper}>
+        
+        <Link href='/equips' > ← volver</Link>
       <header className={styles.header}>
         <h1 className={styles.title}>Resistencia de bobinas – Buscador por modelo</h1>
         <div className={styles.tabButtons}>
