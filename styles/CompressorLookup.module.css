@@ -1,0 +1,198 @@
+/* CompressorLookup.module.css */
+
+.wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--pad);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tabButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.activeTab,
+.inactiveTab {
+  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+}
+
+.activeTab {
+  background: var(--brand);
+  color: var(--color-white);
+  border-color: var(--brand-strong);
+}
+
+.inactiveTab {
+  background: var(--elev-1);
+  color: var(--muted);
+}
+
+.section {
+  margin-top: var(--gap);
+  display: grid;
+  gap: var(--gap);
+}
+
+.searchBox {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.input {
+  width: 100%;
+}
+
+.suggestions {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--card);
+  overflow-y: auto;
+  max-height: 220px;
+}
+
+.suggestion {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background: var(--input-bg-hover);
+}
+
+.card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--pad);
+  box-shadow: var(--shadow-soft);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap);
+}
+
+.model {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.unit {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--gap);
+}
+
+.valueBox {
+  background: var(--elev-1);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--pad);
+  text-align: center;
+}
+
+.valueLabel {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.noResults {
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.info {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 180px;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.importButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  padding: 10px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: var(--brand);
+  color: var(--color-white);
+  border: 1.5px solid var(--brand-strong);
+}
+
+.secondaryButton {
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+
+.counter {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.footer {
+  padding-top: var(--gap);
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--muted);
+}

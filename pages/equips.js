@@ -518,6 +518,7 @@ const EquipsPage = () => {
           <Link href='/ContactForm' className={styles.buzonButton}>Búzon</Link>
           <Link className={styles.volverButton} href="/">volver</Link>
           <Link className={styles.volverButton} href="esCom">Estandarizacion Compresores</Link>
+          <Link className={styles.volverButton} href="resistanceComPage">Resistencia de compresores</Link>
           <input
             type="text"
             className={styles.searchInput}
