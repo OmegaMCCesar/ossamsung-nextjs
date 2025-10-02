@@ -234,6 +234,8 @@ export default function CompressorResistanceLookup() {
         </section>
       )}
 
+      <img className={styles.imgCom} src='compre.ico' />
+
       <footer className={styles.footer}>
         Consejo: escribe solo una parte del modelo para ver sugerencias rápidas.
       </footer>

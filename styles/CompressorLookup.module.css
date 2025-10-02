@@ -196,3 +196,9 @@
   font-size: 0.75rem;
   color: var(--muted);
 }
+
+.imgCom{
+    margin: 1vh auto;
+    border-radius: 1vh;
+    border: 1px solid #000000;
+}
