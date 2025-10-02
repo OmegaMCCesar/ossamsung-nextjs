@@ -496,6 +496,10 @@ const EquipsPage = () => {
           <h2 className={styles.cabezalh2}>TECHNICAL SUPPORT SEM-S</h2>
         </div>
         <div className={styles.filters}>
+        <Link className={styles.volverButton} href="resistanceComPage">Resistencia de compresores</Link>
+          <Link href='/ContactForm' className={styles.buzonButton}>Búzon</Link>
+          <Link className={styles.volverButton} href="/">volver</Link>
+          <Link className={styles.volverButton} href="esCom">Estandarizacion Compresores</Link>
           <select
             onChange={(e) => setCategory(e.target.value)}
             value={category}
@@ -515,10 +519,6 @@ const EquipsPage = () => {
             <option value="AIR DRESSER">AIR DRESSER</option>
             <option value="NK">NK</option>
           </select>
-          <Link href='/ContactForm' className={styles.buzonButton}>Búzon</Link>
-          <Link className={styles.volverButton} href="/">volver</Link>
-          <Link className={styles.volverButton} href="esCom">Estandarizacion Compresores</Link>
-          <Link className={styles.volverButton} href="resistanceComPage">Resistencia de compresores</Link>
           <input
             type="text"
             className={styles.searchInput}
