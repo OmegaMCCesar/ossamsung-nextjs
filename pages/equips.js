@@ -39,6 +39,18 @@ const EquipsPage = () => {
 
   const [ascCode, setAscCode] = useState('');
 
+
+
+  
+  
+  if(serialNumber.length === 15){
+    const validChars7 = ['H', 'J', 'K', 'M', 'N', 'R', 'T', 'W', 'X', 'Y']
+    const validChars8 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C']
+    const char7 = serialNumber.charAt(7).toUpperCase();
+    const char8 = serialNumber.charAt(8).toUpperCase();
+    var NSValid = validChars7.includes(char7) && validChars8.includes(char8);
+  }
+
   const validAscCodes = useMemo(
     () => [
       'Techsup', '6448834', '6434525', '1401501', '6449579', '6283007', '4907726',
@@ -97,7 +109,7 @@ const EquipsPage = () => {
       setSerialNumberError('');
       setIsSerialNumberInProcess(false);
 
-      if (isAscCodeValid && serialNumber.length === 15 && db) {
+      if (NSValid && isAscCodeValid && serialNumber.length === 15 && db) {
         try {
           const serialNumbersRef = collection(db, 'serialNumbersInProcess');
           const q = query(serialNumbersRef, where('serialNumber', '==', serialNumber));
@@ -535,7 +547,7 @@ const EquipsPage = () => {
         <div className={styles.serialNumberInputContainer}>
           <input
             className={`${styles.searchInputSN} ${serialNumberError ? styles.inputInvalid : ''}`}
-            placeholder="Ingresa Número de Serie (SNN)"
+            placeholder="Ingresa Número de Serie (SN)"
             type="text"
             value={serialNumber}
             onChange={(e) => {
@@ -568,7 +580,7 @@ const EquipsPage = () => {
         
       </div>
 
-      <div className={styles.contentArea}>{renderContent()}</div>
+      <div className={styles.contentArea}>{NSValid && renderContent()}</div>
     </div>
   );
 };
