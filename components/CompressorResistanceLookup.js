@@ -154,12 +154,6 @@ export default function CompressorResistanceLookup() {
       <header className={styles.header}>
         <h1 className={styles.title}>Resistencia de bobinas – Buscador por modelo</h1>
         <div className={styles.tabButtons}>
-          <button
-            className={tab === "lookup" ? styles.activeTab : styles.inactiveTab}
-            onClick={() => setTab("lookup")}
-          >
-            Consultar
-          </button>
         </div>
       </header>
 
@@ -200,15 +194,15 @@ export default function CompressorResistanceLookup() {
               <div className={styles.valuesGrid}>
                 <div className={styles.valueBox}>
                   <div className={styles.valueLabel}>U – V</div>
-                  <div className={styles.value}>{selected.u_v}</div>
+                  <div className={styles.value}>{selected.u_v} Ω</div>
                 </div>
                 <div className={styles.valueBox}>
                   <div className={styles.valueLabel}>V – W</div>
-                  <div className={styles.value}>{selected.v_w}</div>
+                  <div className={styles.value}>{selected.v_w} Ω</div>
                 </div>
                 <div className={styles.valueBox}>
                   <div className={styles.valueLabel}>W – U</div>
-                  <div className={styles.value}>{selected.w_u}</div>
+                  <div className={styles.value}>{selected.w_u} Ω</div>
                 </div>
               </div>
             </div>
