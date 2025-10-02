@@ -163,6 +163,7 @@ export default function CompressorResistanceLookup() {
         <section className={styles.section}>
           <div className={styles.searchBox}>
             <label className={styles.label}>Modelo de compresor</label>
+            Consejo: escribe solo una parte del modelo para ver sugerencias rápidas.
             <input
               value={q}
               onChange={(e) => {
@@ -172,6 +173,7 @@ export default function CompressorResistanceLookup() {
               placeholder="Ej. MSV488AL1R/TT3"
               className={styles.input}
             />
+            
             {suggestions.length > 0 && (
               <div className={styles.suggestions}>
                 {suggestions.map((r) => (
@@ -237,7 +239,6 @@ export default function CompressorResistanceLookup() {
       <img className={styles.imgCom} src='compre.ico' />
 
       <footer className={styles.footer}>
-        Consejo: escribe solo una parte del modelo para ver sugerencias rápidas.
       </footer>
     </div>
   );
