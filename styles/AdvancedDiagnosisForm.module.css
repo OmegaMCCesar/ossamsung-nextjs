@@ -1,0 +1,81 @@
+/* Este archivo reemplaza las clases de Tailwind con estilos CSS puros */
+
+/* --- Estilos Base --- */
+.card {
+    padding: 1.5rem; /* p-6 */
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); /* shadow-lg */
+    border: 1px solid #e5e7eb; /* border-gray-100 */
+    background-color: white; /* bg-white */
+    transition: all 0.3s ease;
+}
+
+.inputField {
+    width: 100%; /* w-full */
+    padding: 0.75rem; /* p-3 */
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    border-radius: 0.5rem; /* rounded-lg */
+}
+
+/* --- Botones --- */
+.buttonBase {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem; /* p-3 */
+    margin: 0.5rem 0; /* my-2 */
+    border-radius: 0.5rem; /* rounded-lg */
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: flex; /* flex */
+    align-items: center; /* items-center */
+    justify-content: center; /* justify-center */
+}
+
+.primaryButton {
+    background-color: #2563eb; /* bg-blue-600 */
+    color: white;
+}
+
+.primaryButton:hover {
+    background-color: #1d4ed8; /* hover:bg-blue-700 */
+}
+
+/* --- Elementos de Resultado --- */
+.mainDiagnosisBox {
+    margin-bottom: 1.5rem; /* mb-6 */
+    padding: 1rem; /* p-4 */
+    border-left: 4px solid #3b82f6; /* border-l-4 border-blue-500 */
+    background-color: #eff6ff; /* bg-blue-50 */
+    border-radius: 0.375rem; /* rounded-md */
+}
+
+.beginnerTipsBox {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+}
+
+.advancedContainer {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #f87171; /* border-red-400 */
+    background-color: #fef2f2; /* bg-red-50 */
+    border-radius: 0.375rem;
+}
+
+/* --- Clases específicas para partes críticas --- */
+.partCritical {
+    padding: 0.75rem;
+    border-left: 4px solid #f97316; /* border-orange-500 */
+    background-color: #fff7ed; /* bg-orange-50 */
+    border-radius: 0.375rem;
+}
+
+.partStandard {
+    padding: 0.75rem;
+    border-left: 4px solid #10b981; /* border-green-500 */
+    background-color: #ecfdf5; /* bg-green-50 */
+    border-radius: 0.375rem;
+}
