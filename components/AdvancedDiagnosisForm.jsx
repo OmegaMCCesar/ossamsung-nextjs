@@ -6,10 +6,6 @@ import { RefreshCw, Zap, AlertTriangle, Cpu } from 'lucide-react';
 // IMPORTAR el archivo de estilos
 import styles from '../styles/AdvancedDiagnosisForm.module.css'; 
 
-// Eliminar las constantes de estilo Tailwind (ya no las necesitamos)
-// const CARD_STYLE = "...";
-// ...
-
 const PRODUCT_TYPES = [
   'Lavadora',
   'Lavasecadora',
@@ -69,10 +65,10 @@ const AdvancedDiagnosisForm = () => {
   };
 
 
-  // --- Renderizado del Formulario ---
+  // --- Renderizado del Formulario (con Spinner integrado) ---
   if (!diagnosisResult) {
     return (
-      <div className={styles.card}> {/* Usamos styles.card */}
+      <div className={styles.card}>
         <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <Cpu className="w-6 h-6 mr-2 text-blue-500" />
           Asistente de Prediagnóstico Inteligente
@@ -100,7 +96,7 @@ const AdvancedDiagnosisForm = () => {
             </select>
           </div>
           
-          {/* Modelo */}
+          {/* Modelo, Síntomas, Código de Error... (contenido omitido por brevedad) */}
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
               Modelo de Equipo (Ej: WA50F9A8DWW)
@@ -114,7 +110,6 @@ const AdvancedDiagnosisForm = () => {
             />
           </div>
 
-          {/* Síntomas */}
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
               Síntomas (Sé lo más detallado posible)
@@ -129,7 +124,6 @@ const AdvancedDiagnosisForm = () => {
             />
           </div>
 
-          {/* Código de Error */}
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
               Código de Error (Opcional)
@@ -151,11 +145,14 @@ const AdvancedDiagnosisForm = () => {
 
           <button 
             type="submit" 
-            className={styles.primaryButton + (isLoading ? ' opacity-75 cursor-not-allowed' : '')}
+            className={`${styles.primaryButton} ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
             disabled={isLoading}
           >
             {isLoading ? (
-              'Analizando con IA...'
+              <>
+                  <RefreshCw className={`w-5 h-5 mr-2 ${styles.spinner}`} />
+                Analizando con IA...
+              </>
             ) : (
               'Obtener Diagnóstico Avanzado'
             )}
@@ -167,8 +164,9 @@ const AdvancedDiagnosisForm = () => {
 
   const result = diagnosisResult; 
 
+  // --- Renderizado del Resultado ---
   return (
-    <div className={styles.card}> {/* Usamos styles.card */}
+    <div className={styles.card}>
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center">
         <Cpu className="w-7 h-7 mr-2 text-blue-500" />
         Diagnóstico Avanzado
@@ -178,9 +176,10 @@ const AdvancedDiagnosisForm = () => {
       </p>
 
       {/* Diagnóstico principal */}
-      <div className={styles.mainDiagnosisBox}> {/* Usamos styles.mainDiagnosisBox */}
+      <div className={styles.mainDiagnosisBox}>
         <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">Hipótesis de Falla Principal</h3>
         <p className="text-blue-700 dark:text-blue-300">{result.mainDiagnosis}</p>
+        {/* Nota: El uso de 'whitespace-pre-line' asume que tienes clases utilitarias disponibles (ej. Tailwind) */}
       </div>
 
       {/* Causas Comunes */}
@@ -194,7 +193,7 @@ const AdvancedDiagnosisForm = () => {
       </div>
 
       {/* Consejos para Principiantes */}
-      <div className={styles.beginnerTipsBox}> {/* Usamos styles.beginnerTipsBox */}
+      <div className={styles.beginnerTipsBox}>
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
           Guía para el Usuario (Nivel Básico)
         </h3>
@@ -211,7 +210,7 @@ const AdvancedDiagnosisForm = () => {
 
       {/* Consejos Avanzados y Repuestos (Oculto por defecto) */}
       {showAdvanced && (
-        <div className={styles.advancedContainer}> {/* Usamos styles.advancedContainer */}
+        <div className={styles.advancedContainer}>
             <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-3">
                 📋 Pasos de Verificación para Técnico
             </h3>
@@ -233,7 +232,6 @@ const AdvancedDiagnosisForm = () => {
                         <p className="font-bold text-gray-800 dark:text-gray-100">{part.partName} 
                             {part.isCritical && <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-red-500 text-white rounded-full">CRÍTICO</span>}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">{part.reason}</p>
                     </div>
                 ))}
             </div>
@@ -247,6 +245,7 @@ const AdvancedDiagnosisForm = () => {
         <RefreshCw className="w-5 h-5 mr-2" />
         Hacer un nuevo diagnóstico
       </button>
+      
     </div>
   );
 };
