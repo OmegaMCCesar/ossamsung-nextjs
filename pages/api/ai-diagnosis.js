@@ -1,37 +1,149 @@
 // pages/api/ai-diagnosis.js
-// Para Next.js con Pages Router
-// Requiere: npm install @google/genai y la clave GEMINI_API_KEY en .env.local
-
 import { GoogleGenAI } from '@google/genai';
+import { db } from '../../lib/firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
-// Inicializa el cliente con la clave de API desde las variables de entorno
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }); 
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const modelName = "gemini-2.5-flash";
 
+/**
+ * Normaliza texto: pasa a minúsculas, quita tildes, deja letras/números y espacios.
+ * Conservamos espacios para poder hacer split por palabras.
+ */
+function normalizeTextKeepSpaces(text = "") {
+  return String(text)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // quitar acentos
+    .replace(/[^a-z0-9\s]/g, "") // conservar letras, números y espacios
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Convierte texto en array de palabras únicas (sin vacíos)
+ */
+function wordsFrom(text = "") {
+  return normalizeTextKeepSpaces(text)
+    .split(" ")
+    .filter(Boolean);
+}
+
+/**
+ * Buscar partes en Firestore que sean compatibles con el modelo (array-contains).
+ * Retorna lista de objetos { docId?, partName, partNumber, imageUrl, partFunction, score } ordenada por score desc.
+ */
+async function getCompatiblePartsFromFirebase(partName, model, iaReason) {
+  if (!db) return [];
+
+  const normalizedModel = String(model).trim().toUpperCase();
+  const iaPartNormalized = normalizeTextKeepSpaces(partName || "");
+  const iaReasonNormalized = normalizeTextKeepSpaces(iaReason || "");
+  const iaWords = wordsFrom(iaPartNormalized);
+
+  try {
+    const q = query(
+      collection(db, "partsForDiagnosis"),
+      where("modelCompatibility", "array-contains", normalizedModel)
+    );
+
+    const snapshot = await getDocs(q);
+    const candidates = [];
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+
+      // Normalizar nombre y keywords de BD
+      const dbPartNameNormalized = normalizeTextKeepSpaces(data.partName || "");
+      const dbPartWords = wordsFrom(dbPartNameNormalized);
+
+      // Keywords (array) o fallback a texto
+      let dbKeywords = [];
+      if (Array.isArray(data.partFunctionKeywords) && data.partFunctionKeywords.length > 0) {
+        dbKeywords = data.partFunctionKeywords.map(k => normalizeTextKeepSpaces(k));
+      } else if (data.partFunctionText) {
+        dbKeywords = wordsFrom(data.partFunctionText);
+      } else if (data.partFunction) {
+        dbKeywords = wordsFrom(String(data.partFunction));
+      }
+
+      // Scoring:
+      // - nameScore: proporción de palabras de iaWords que aparecen en dbPartWords
+      // - keywordScore: si alguna keyword aparece en iaReasonNormalized o iaPartNormalized
+      let nameMatches = 0;
+      for (const w of iaWords) {
+        if (w && dbPartWords.includes(w)) nameMatches++;
+      }
+      const nameScore = iaWords.length ? nameMatches / iaWords.length : 0;
+
+      // También consideramos si dbPartName contiene iaPartNormalized o viceversa (includes) -> boost
+      let includeBoost = 0;
+      if (dbPartNameNormalized.includes(iaPartNormalized) && iaPartNormalized.length > 2) includeBoost = 0.25;
+      if (iaPartNormalized.includes(dbPartNameNormalized) && dbPartNameNormalized.length > 2) includeBoost = 0.25;
+
+      // keywordScore: 1 si alguna keyword aparece en reason o in name, 0 otherwise
+      let keywordMatch = false;
+      for (const kw of dbKeywords) {
+        if (!kw) continue;
+        if (iaReasonNormalized.includes(kw) || iaPartNormalized.includes(kw)) {
+          keywordMatch = true;
+          break;
+        }
+      }
+      const keywordScore = keywordMatch ? 0.8 : 0;
+
+      // finalScore combina nameScore (peso 0.6), keywordScore (peso 0.4) y includeBoost
+      const finalScore = Math.min(1, (nameScore * 0.6) + (keywordScore * 0.4) + includeBoost);
+
+      // Guardamos candidato solo si hay algo de score (evitar ruido)
+      if (finalScore > 0) {
+        candidates.push({
+          partName: data.partName || "",
+          partNumber: data.partNumber || null,
+          imageUrl: data.imageUrl || null,
+          partFunction: data.partFunctionText || data.partFunction || null,
+          score: finalScore,
+          rawKeywords: dbKeywords,
+          docId: doc.id,
+        });
+      }
+    });
+
+    // Ordenar por score descendente
+    candidates.sort((a, b) => b.score - a.score);
+
+    return candidates;
+
+  } catch (err) {
+    console.error("Error consultando partsForDiagnosis en Firebase:", err);
+    return [];
+  }
+}
+
+/**
+ * Handler principal
+ */
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-    // AHORA RECIBIMOS EL CAMPO 'productType' DEL FRONTEND
-    const { productType, model, symptoms, errorCode } = req.body; 
+  const { productType, model, symptoms, errorCode } = req.body || {};
 
-    if (!productType || !model || !symptoms) {
-        return res.status(400).json({ error: 'Tipo de producto, modelo y síntomas son obligatorios.' });
-    }
+  if (!productType || !model || !symptoms) {
+    return res.status(400).json({ error: 'Tipo de producto, modelo y síntomas son obligatorios.' });
+  }
 
-    // --- CONTEXTOS ESPECÍFICOS PARA LA IA ---
-    const instructionContext = {
-        'Refrigerador': 'Tu diagnóstico debe enfocarse en sistemas No-Frost, sistemas Inverter, sensores de deshielo (Defrost), damper y fallas de fábrica comunes en modelos Samsung.',
-        'Aire Acondicionado': 'Tu diagnóstico debe enfocarse en fallas de compresor Inverter, fugas de refrigerante, termistores NTC, y problemas de comunicación entre unidades (Eror E1, E4, etc.).',
-        'Horno (Microondas/Eléctrico)': 'Tu diagnóstico debe enfocarse en Magnetrones, tarjetas de control, fusibles, termostatos de seguridad y problemas de alto voltaje.',
-        'Lavasecadora': 'Tu diagnóstico debe enfocarse en fallas de motor, rodamientos, sistemas de secado por resistencia/condensación y la PCB principal.',
-        'Lavadora': 'Tu diagnóstico debe enfocarse en fallas de motor, rodamientos (baleros), sensores de velocidad (Hall Sensor), fallas de válvulas de agua y problemas de drenaje.',
-    };
+  // Contextos por tipo de equipo
+  const instructionContext = {
+    'Refrigerador': 'Tu diagnóstico debe enfocarse en sistemas No-Frost, sistemas Inverter, sensores de deshielo (Defrost), damper y fallas de fábrica comunes en modelos Samsung.',
+    'Aire Acondicionado': 'Tu diagnóstico debe enfocarse en fallas de compresor Inverter, fugas de refrigerante, termistores NTC, y problemas de comunicación entre unidades (Eror E1, E4, etc.).',
+    'Horno (Microondas/Eléctrico)': 'Tu diagnóstico debe enfocarse en Magnetrones, tarjetas de control, fusibles, termostatos de seguridad y problemas de alto voltaje.',
+    'Lavasecadora': 'Tu diagnóstico debe enfocarse en fallas de motor, rodamientos, sistemas de secado por resistencia/condensación y la PCB principal.',
+    'Lavadora': 'Tu diagnóstico debe enfocarse en fallas de motor, rodamientos (baleros), sensores de velocidad (Hall Sensor), fallas de válvulas de agua y problemas de drenaje.',
+  };
+  const contextNote = instructionContext[productType] || 'Tu diagnóstico debe ser 100% exacto, cubriendo fallas comunes, y evitando errores conceptuales.';
 
-    const contextNote = instructionContext[productType] || 'Tu diagnóstico debe ser 100% exacto, cubriendo fallas comunes, y evitando errores conceptuales.';
-
-    // --- PROMPT DINÁMICO Y AVANZADO ---
-    const prompt = `
+  // Prompt (mantener estrictura JSON en la salida)
+  const prompt = `
     **ROL Y CONTEXTO CRÍTICO:**
     Eres un Técnico Nivel 3 de Samsung con 25 años de experiencia, experto en la línea de ${productType}s. ${contextNote} La información que proporcionas es utilizada por técnicos para servicio y por la administración para preparar repuestos.
 
@@ -44,80 +156,164 @@ export default async function handler(req, res) {
     **OBJETIVO:**
     Proporcionar un diagnóstico preciso y estructurado en JSON que sirva tanto a usuarios novatos como a técnicos profesionales y administración de repuestos.
 
-    **REQUISITOS DE LA RESPUESTA JSON (ESTRUCTURA AVANZADA):**
-    El objeto JSON DEBE cumplir rigurosamente con el siguiente esquema y debe ser la ÚNICA respuesta (sin código markdown ni preámbulos). Los campos deben ser específicos para un equipo **${productType}**.
-
+    **REQUISITOS DE LA RESPUESTA JSON:**
     {
-        "mainDiagnosis": "Hipótesis de la falla más probable y breve explicación específica para un ${productType}.",
-        "commonCauses": [
-            "Lista de 3 a 5 fallas mecánicas o electrónicas más probables y específicas para el tipo de equipo.",
-            // ... otros elementos
-        ],
-        "beginnerTips": "Consejos claros y seguros para el usuario (Ej: qué revisar antes de llamar a un técnico. Usa saltos de línea \\n).",
-        "advancedDiagnosisSteps": [
-            "Paso 1: Instrucción precisa de verificación para el técnico (Ej: 'Medir la resistencia del motor.').",
-            "Paso 2: Acciones específicas a tomar o valores a esperar.",
-            // ... otros pasos
-        ],
-        "potentialParts": [
-            {
-                "partName": "Nombre del Componente (Ej: Main PCB, Válvula de Agua Fría, Compresor Inverter)",
-                "reason": "Razón específica por la que se sospecha de esta pieza en este tipo de equipo y falla.",
-                "isCritical": true
-            },
-            // ... otros repuestos posibles
-        ]
+      "mainDiagnosis": "Hipótesis de la falla más probable y breve explicación específica para un ${productType}.",
+      "commonCauses": ["Lista de 3 a 5 fallas mecánicas o electrónicas más probables y específicas para el tipo de equipo."],
+      "beginnerTips": "Consejos claros y seguros para el usuario (Ej: qué revisar antes de llamar a un técnico. Usa saltos de línea \\n).",
+      "advancedDiagnosisSteps": ["Paso 1: Instrucción precisa de verificación para el técnico."],
+      "potentialParts": [
+        {
+          "partName": "Nombre del Componente",
+          "reason": "Razón específica por la que se sospecha de esta pieza.",
+          "isCritical": true
+        }
+      ]
+    }
+  `;
+
+  try {
+    // Llamada a Gemini
+    const response = await ai.models.generateContent({
+      model: modelName,
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      config: { responseMimeType: "application/json" },
+    });
+
+    // Normalizar la respuesta JSON (varios formatos posibles)
+    let rawJsonText = "";
+    if (typeof response?.text === "string" && response.text.trim()) {
+      rawJsonText = response.text.trim();
+    } else if (response?.candidates && response.candidates[0]?.content) {
+      // fallback dependiendo del SDK
+      rawJsonText = response.candidates[0].content;
+    } else if (response?.output?.[0]?.content?.[0]?.text) {
+      rawJsonText = response.output[0].content[0].text;
+    } else {
+      throw new Error("Respuesta de la IA no tiene texto JSON esperable.");
     }
 
-    Tu respuesta DEBE ser solo el objeto JSON, sin preámbulos, código markdown o texto adicional.
-    `;
+    // quitar posibles fences ```json ... ```
+    rawJsonText = rawJsonText.replace(/^\s*```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
 
+    let diagnosisData;
     try {
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash", 
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-            config: {
-                responseMimeType: "application/json",
-                // El esquema de respuesta se ajusta a la nueva estructura.
-                responseSchema: {
-                    type: "object",
-                    properties: {
-                        mainDiagnosis: { type: "string" },
-                        commonCauses: { type: "array", items: { type: "string" } },
-                        beginnerTips: { type: "string" },
-                        advancedDiagnosisSteps: { type: "array", items: { type: "string" } }, // Nuevo
-                        potentialParts: { 
-                            type: "array", 
-                            items: {
-                                type: "object",
-                                properties: {
-                                    partName: { type: "string" },
-                                    reason: { type: "string" },
-                                    isCritical: { type: "boolean" }
-                                },
-                                required: ["partName", "reason", "isCritical"],
-                            }
-                        }, // Nuevo
-                    },
-                    required: ["mainDiagnosis", "commonCauses", "beginnerTips", "advancedDiagnosisSteps", "potentialParts"],
-                },
-            },
-        });
-
-        // La respuesta ya viene como un string JSON que necesita ser parseado.
-        const jsonText = response.text.trim();
-        const diagnosisData = JSON.parse(jsonText);
-
-        res.status(200).json(diagnosisData);
-
-    } catch (error) {
-        console.error('Error al llamar a la API de IA:', error);
-        res.status(500).json({ 
-            mainDiagnosis: "Fallo interno en el sistema de Diagnóstico Avanzado.", 
-            commonCauses: ["Verificar logs del servidor.", "Confirmar que la clave GEMINI_API_KEY es válida.", "Revisar la conexión a Internet."],
-            beginnerTips: "Lo sentimos, el servicio de diagnóstico avanzado no está disponible. Por favor, inténtalo más tarde.",
-            advancedDiagnosisSteps: ["Verificar que el SDK '@google/genai' esté instalado y actualizado.", "Revisar la configuración de `responseSchema` en la llamada a la API de Gemini."],
-            potentialParts: [{ partName: "Fallo de Sistema", reason: "Error de conexión o configuración del lado del servidor.", isCritical: true }]
-        });
+      diagnosisData = JSON.parse(rawJsonText);
+    } catch (err) {
+      console.error("No se pudo parsear JSON de la IA:", err, "RAW:", rawJsonText);
+      throw new Error("La IA no devolvió JSON válido.");
     }
+
+    // Procesar partes sugeridas por la IA
+    const partsFromIA = Array.isArray(diagnosisData.potentialParts) ? diagnosisData.potentialParts : [];
+    const uniquePartsMap = new Map();
+
+    for (const iaPart of partsFromIA) {
+      const iaPartName = iaPart.partName || "";
+      const iaReason = iaPart.reason || "";
+      const uniqueKey = normalizeTextKeepSpaces(iaPartName).replace(/\s+/g, " ");
+
+      // Buscar candidatos en Firebase (ordenados por score)
+      const foundParts = await getCompatiblePartsFromFirebase(iaPartName, model, iaReason);
+
+      // Estructura base que siempre devolvemos al frontend
+      let finalPart = {
+        partName: iaPartName,
+        reason: iaReason,
+        isCritical: !!iaPart.isCritical,
+        partNumber: "SIN INF. DE LA PARTE",
+        imageUrl: null,
+        partFunction: null,
+        foundInDB: false,
+        score: 0,
+      };
+
+      if (foundParts.length > 0) {
+        // Primer candidato (mejor puntuado)
+        const best = foundParts[0];
+
+        // Determinar si hay "coincidencia fuerte" (name includes IA name words)
+        const iaNorm = normalizeTextKeepSpaces(iaPartName);
+        const dbNameNorm = normalizeTextKeepSpaces(best.partName || "");
+        const iaWords = wordsFrom(iaNorm);
+        const dbWords = wordsFrom(dbNameNorm);
+        let commonWords = 0;
+        for (const w of iaWords) if (dbWords.includes(w)) commonWords++;
+        const wordMatchRatio = iaWords.length ? commonWords / iaWords.length : 0;
+
+        const isStrongNameMatch = wordMatchRatio >= 0.5 || dbNameNorm.includes(iaNorm) || iaNorm.includes(dbNameNorm) || best.score >= 0.8;
+
+        if (isStrongNameMatch) {
+          // sobrescribimos con datos de BD (coincidencia fuerte)
+          finalPart = {
+            ...finalPart,
+            partName: best.partName || finalPart.partName,
+            partNumber: best.partNumber || finalPart.partNumber,
+            imageUrl: best.imageUrl || null,
+            partFunction: best.partFunction || null,
+            foundInDB: true,
+            score: best.score,
+          };
+        } else {
+          // coincidencia débil -> inyectamos número de parte y función si existe, pero mantenemos nombre original de la IA
+          finalPart = {
+            ...finalPart,
+            partNumber: best.partNumber || finalPart.partNumber,
+            imageUrl: best.imageUrl || null,
+            partFunction: best.partFunction || finalPart.partFunction,
+            foundInDB: !!best.partNumber || !!best.imageUrl || !!best.partFunction,
+            score: best.score,
+          };
+
+          // Si hay otros candidatos con mejor match de nombre, verificarlos
+          for (let i = 1; i < foundParts.length; i++) {
+            const candidate = foundParts[i];
+            const candNameNorm = normalizeTextKeepSpaces(candidate.partName || "");
+            const candWords = wordsFrom(candNameNorm);
+            let candCommon = 0;
+            for (const w of iaWords) if (candWords.includes(w)) candCommon++;
+            const candRatio = iaWords.length ? candCommon / iaWords.length : 0;
+            if (candRatio > wordMatchRatio && candidate.score >= best.score) {
+              // promote candidate
+              finalPart = {
+                ...finalPart,
+                partName: candidate.partName,
+                partNumber: candidate.partNumber || finalPart.partNumber,
+                imageUrl: candidate.imageUrl || finalPart.imageUrl,
+                partFunction: candidate.partFunction || finalPart.partFunction,
+                foundInDB: true,
+                score: candidate.score,
+              };
+              break;
+            }
+          }
+        }
+      }
+
+      // Guardar en map por clave única (nombre IA limpio) para evitar duplicados
+      uniquePartsMap.set(uniqueKey, finalPart);
+    }
+
+    // Reemplazamos potentialParts por la versión enriquecida
+    diagnosisData.potentialParts = Array.from(uniquePartsMap.values());
+
+    // Enviar al frontend
+    return res.status(200).json(diagnosisData);
+
+  } catch (err) {
+    console.error("Error en ai-diagnosis handler:", err);
+    return res.status(500).json({
+      mainDiagnosis: "Fallo interno en el sistema de Diagnóstico Avanzado. Contactar a soporte.",
+      commonCauses: ["Verificar conexión de Firebase.", "Revisar logs del servidor."],
+      beginnerTips: "Servicio de diagnóstico avanzado no disponible. Intenta más tarde.",
+      advancedDiagnosisSteps: ["Verificar la función getCompatiblePartsFromFirebase y sus consultas.", "Asegurar que el modelo retorne JSON válido."],
+      potentialParts: [{
+        partName: "Fallo de Sistema",
+        reason: "Error de conexión o configuración del lado del servidor.",
+        isCritical: true,
+        partNumber: "SYSTEM-ERR",
+        foundInDB: false
+      }]
+    });
+  }
 }

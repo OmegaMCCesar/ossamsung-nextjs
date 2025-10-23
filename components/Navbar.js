@@ -66,7 +66,7 @@ export default function Navbar() {
           <Link href="/terminos" className={styles.navLink} onClick={closeMenu}>Términos</Link>
           <Link href="/privacidad" className={styles.navLink} onClick={closeMenu}>Privacidad</Link>
           <Link href="/aviso_legal" className={styles.navLink} onClick={closeMenu}>Aviso Legal</Link>
-          <Link href="/FaultSearch" className={styles.navLink} onClick={closeMenu}>Pre Diagnóstico</Link>
+          <Link href="/diagnosticoPage" className={styles.navLink} onClick={closeMenu}>Pre Diagnóstico IA</Link>
           <Link href="/admin" className={styles.navLinkAdmin} onClick={closeMenu}>Login</Link>
         </div>
       </div>

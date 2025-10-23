@@ -32,14 +32,6 @@ export default function Home() {
         >
           Cierre de Órdenes de Servicio
         </Link>
-        <Link href={'/checkIList'}
-        className={styles.startButton} >Check List de Instalacion</Link>
-         <Link href="/FaultSearch" className={styles.startButton} >
-            Ayuda Pre Diagnostico
-          </Link>
-          <Link href="/esCom" className={styles.startButton} >
-            Estandarizacion de compresores
-          </Link>
           <Link href="/diagnosticoPage" className={styles.startButton} >
             Pre Diagnóstico IA
           </Link>

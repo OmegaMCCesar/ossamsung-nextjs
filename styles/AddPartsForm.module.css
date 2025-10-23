@@ -1,0 +1,58 @@
+.container {
+    max-width: 48rem; /* Aumentado ligeramente para el panel de admin */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1.5rem;
+    background-color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    border-radius: 0.75rem;
+}
+
+.inputField {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    /* Ajustes para focus */
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inputField:focus {
+    border-color: #3b82f6; /* blue-500 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+.primaryButton {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
+    margin-top: 1rem; /* mt-4 */
+    border-radius: 0.5rem;
+    background-color: #10b981; /* green-600 */
+    color: white;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.primaryButton:hover {
+    background-color: #059669; /* hover:bg-green-700 */
+}
+
+/* Estilos de estado */
+.statusSuccess {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    background-color: #d1fae5; /* green-100 */
+    color: #065f46; /* green-700 */
+}
+
+.statusError {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    background-color: #fee2e2; /* red-100 */
+    color: #991b1b; /* red-700 */
+}
