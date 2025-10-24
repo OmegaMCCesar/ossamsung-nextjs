@@ -261,6 +261,132 @@
   }
 }
 
+/* --- NUEVOS ESTILOS PARA BOLETINES DE SERVICIO --- */
+
+.bulletinBox {
+    background-color: var(--warn, #ffb020); /* Color de advertencia o amarillo */
+    color: var(--color-black, #000); /* Texto negro para contraste */
+    border-radius: var(--radius-sm);
+    padding: var(--pad);
+    margin: var(--gap) 0;
+    box-shadow: var(--shadow-soft);
+}
+
+.bulletinTitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.bulletinSubtext {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.bulletinList {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.bulletinItem {
+    border-left: 4px solid var(--danger, #ff6b6b); /* Línea de color de peligro */
+    padding-left: 10px;
+    margin-bottom: 10px;
+}
+
+.bulletinItem strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.bulletinSummary {
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+/* --- NUEVOS ESTILOS PARA FORMULARIO DE BOLETINES --- */
+
+/* Contenedor para input y botón de añadir modelo */
+.inputWithButton {
+    display: flex;
+    gap: var(--gap, 10px); /* Usa la variable de espaciado que tienes definida */
+}
+
+.inputWithButton .inputField {
+    flex-grow: 1;
+}
+
+/* Botón secundario para "Añadir" */
+.secondaryButton {
+    background-color: var(--brand, #3b82f6);
+    color: var(--color-white, #ffffff);
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.secondaryButton:hover {
+    background-color: var(--brand-strong, #1d4ed8);
+}
+
+/* Contenedor para mostrar los tags de modelos */
+.modelsTagsContainer {
+    margin-top: var(--gap, 10px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 30px;
+}
+
+.modelTag {
+    background-color: var(--elev-1, #1f2937); /* Fondo de elevación/tarjeta */
+    color: var(--text, #d1d5db);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.modelTagRemove {
+    background: transparent;
+    border: none;
+    color: var(--danger, #ff6b6b);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 4px;
+    line-height: 1;
+}
+
+.mutedText {
+    color: var(--muted, #a7b0c0);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* Mensaje de éxito (simétrico al alert de error) */
+.successMessage {
+    background-color: var(--ok, #2ecc71);
+    color: var(--color-white, #ffffff);
+    border-radius: var(--radius-sm);
+    padding: var(--pad);
+    margin: var(--gap) 0;
+    font-weight: 600;
+}
+
 @media (max-width: 480px) {
   .card {
     padding: 0.75rem;

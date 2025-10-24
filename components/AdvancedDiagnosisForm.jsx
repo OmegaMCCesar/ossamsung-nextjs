@@ -158,6 +158,7 @@ const AdvancedDiagnosisForm = () => {
   }
 
   const result = diagnosisResult; 
+console.log("Diagnosis Result:", result);
 
   return (
     <div className={styles.card}>
@@ -173,6 +174,24 @@ const AdvancedDiagnosisForm = () => {
         <h3 className={styles.sectionTitle}>Hipótesis de Falla Principal</h3>
         <p>{result.mainDiagnosis}</p>
       </div>
+
+       {result.serviceBulletins && result.serviceBulletins.length > 0 && (
+          <div className={styles.bulletinBox}>
+              <h3 className={styles.bulletinTitle}>
+                  <AlertTriangle className={styles.iconSmall} />
+                  ¡Alerta! Boletines de Servicio Críticos Encontrados
+              </h3>
+              <p className={styles.bulletinSubtext}>Este modelo tiene boletines activos. Revíselos primero:</p>
+              <ul className={styles.bulletinList}>
+                  {result.serviceBulletins.map((bulletin, index) => (
+                      <li key={index} className={styles.bulletinItem}>
+                          <strong>{bulletin.bulletinNumber}: {bulletin.bulletinName}</strong>
+                          <p className={styles.bulletinSummary}>{bulletin.issueSummary}</p>
+                      </li>
+                  ))}
+              </ul>
+          </div>
+      )}
 
       <div className={styles.beginnerTipsBox}>
         <h3 className={styles.sectionTitle}>Guía para el Usuario (Nivel Básico)</h3>

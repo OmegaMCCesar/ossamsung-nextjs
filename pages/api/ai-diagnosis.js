@@ -30,6 +30,47 @@ function wordsFrom(text = "") {
 }
 
 /**
+ * Busca boletines de servicio aplicables al modelo.
+ * @param {string} model - El modelo de equipo a buscar.
+ * @returns {Promise<Array<{bulletinName: string, bulletinNumber: string, issueSummary: string}>>}
+ */
+
+async function getServiceBulletins(model) {
+    if (!db || !model) return [];
+
+    const normalizedModel = String(model).trim().toUpperCase();
+    console.log("modelo normalizado para búsqueda de boletines:", normalizedModel);
+    
+
+    try {
+        const q = query(
+            collection(db, "serviceBulletins"),
+            // La búsqueda utiliza el operador 'array-contains'
+            where("models", "array-contains", normalizedModel)
+        );
+
+        const snapshot = await getDocs(q);
+        const bulletins = [];
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            bulletins.push({
+                bulletinName: data.bulletinName || 'Sin nombre',
+                bulletinNumber: data.bulletinNumber || 'N/A',
+                issueSummary: data.issueSummary || 'Sin resumen disponible.',
+            });
+        });
+
+        return bulletins;
+
+    } catch (err) {
+        console.error("Error consultando serviceBulletins en Firebase:", err);
+        return [];
+    }
+}
+
+//Busca partes compatibles en Firestore basándose en el modelo y evalúa su relevancia según el nombre y la razón proporcionados por la IA.
+/**
  * Buscar partes en Firestore que sean compatibles con el modelo (array-contains).
  * Retorna lista de objetos { docId?, partName, partNumber, imageUrl, partFunction, score } ordenada por score desc.
  */
@@ -173,6 +214,7 @@ export default async function handler(req, res) {
   `;
 
   try {
+    const applicableBulletins = await getServiceBulletins(model);
     // Llamada a Gemini
     const response = await ai.models.generateContent({
       model: modelName,
@@ -296,6 +338,8 @@ export default async function handler(req, res) {
 
     // Reemplazamos potentialParts por la versión enriquecida
     diagnosisData.potentialParts = Array.from(uniquePartsMap.values());
+
+    diagnosisData.serviceBulletins = applicableBulletins;
 
     // Enviar al frontend
     return res.status(200).json(diagnosisData);

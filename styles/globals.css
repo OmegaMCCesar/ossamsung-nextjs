@@ -1,140 +1,195 @@
-/* styles/globals.css */
+/* ================================
+   styles/globals.css (CORREGIDO Y UNIFICADO)
+   ================================ */
 
 /* 1) Reset básico */
-*,
-*::before,
-*::after { box-sizing: border-box; }
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
-body, h1,h2,h3,h4,h5,h6, p, blockquote, figure, ol, ul { margin: 0; padding: 0; }
+body, h1, h2, h3, h4, h5, h6, p, blockquote, figure, ol, ul {
+  margin: 0;
+  padding: 0;
+}
 
 body {
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  /* Estas variables se toman de :root o html.[theme] */
   background: var(--bg);
   color: var(--text);
-  transition: background-color .2s ease, color .2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* 2) Media responsiva de imágenes */
-img, picture, video, canvas, svg { display: block; max-width: 100%; height: auto; }
-
-/* 3) Inputs heredan tipografía */
-input, button, textarea, select { font: inherit; }
-
-/* 4) Evitar desbordes */
-p, h1,h2,h3,h4,h5,h6 { overflow-wrap: break-word; }
-
-/* 5) Tipografía base responsiva */
-html { font-size: 14px; }
-@media (min-width: 768px) { html { font-size: 15px; } }
-@media (min-width: 1024px) { html { font-size: 16px; } }
-
-/* 6) Variables globales (tema oscuro por defecto) */
-:root {
-  --breakpoint-sm: 640px; --breakpoint-md: 768px; --breakpoint-lg: 1024px; --breakpoint-xl: 1280px; --breakpoint-2xl: 1536px;
-
-  --bg: #0f1115; --elev-1: #121520; --elev-2: #171b27; --card: #141823;
-  --text: #e6e9ef; --muted: #a7b0c0; --brand: #6ea8fe; --brand-strong: #4b90ff;
-  --ok: #2ecc71; --warn: #ffb020; --danger: #ff6b6b;
-  --border: rgba(255,255,255,0.08);
-  --shadow: 0 8px 30px rgba(0,0,0,0.25); --shadow-soft: 0 8px 24px rgba(0,0,0,0.22);
-
-  --radius: 16px; --radius-sm: 12px; --radius-xs: 10px;
-  --pad: clamp(12px, 2vw, 18px); --gap: clamp(10px, 1.6vw, 16px);
-
-  /* Tokens de inputs (oscuro base) */
-  --input-text: var(--text);
-  --input-bg: #1a2233; --input-bg-hover: #1f2940; --input-bg-focus: #212e48;
-  --input-border: rgba(255,255,255,0.28); --input-border-strong: #86a7ff; --input-placeholder: #c6d0e3;
-
-  /* Navbar variables */
-  --navbar-light-bg: #ffffff; --navbar-dark-bg: #1f2937;
-  --navbar-light-text: #4b5563; --navbar-dark-text: #d1d5db;
-  --navbar-light-hover-bg: #f3f4f6; --navbar-dark-hover-bg: #374151;
-  --navbar-padding-y-2: 0.5rem; --navbar-padding-x-3: 0.75rem; --navbar-rounded-md: 0.375rem;
-  --hamburger-color: #4b5563; --hamburger-dark-color: #d1d5db;
-  --menu-mobile-bg: var(--navbar-light-bg); --menu-mobile-dark-bg: var(--navbar-dark-bg);
-
-  /* Colores básicos */
-  --color-white: #ffffff; --color-black: #000000;
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-/* ✅ Cuando NO hay clase en <html>, usa la preferencia del SO */
+/* 3) Inputs heredan tipografía */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* 4) Evitar desbordes */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* 5) Tipografía base responsiva */
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html { font-size: 15px; }
+}
+
+@media (min-width: 1024px) {
+  html { font-size: 16px; }
+}
+
+/* ======================================================== */
+/* 6 & 7) TEMA OSCURO (DEFAULT/FALLBACK) y Variables Estructurales */
+/* El tema oscuro es el valor por defecto en :root */
+/* ======================================================== */
+:root {
+  /* Estructurales */
+  --breakpoint-sm: 640px; --breakpoint-md: 768px; --breakpoint-lg: 1024px; --breakpoint-xl: 1280px; --breakpoint-2xl: 1536px;
+  --ok: #2ecc71; --warn: #ffb020; --danger: #ff6b6b;
+  --radius: 16px; --radius-sm: 12px; --radius-xs: 10px;
+  --pad: clamp(12px, 2vw, 18px); --gap: clamp(10px, 1.6vw, 16px);
+  --color-white: #ffffff; --color-black: #000000;
+  
+  /* Colores DARK */
+  --bg: #0f1115; --elev-1: #121520; --elev-2: #171b27; --card: #141823;
+  --text: #e6e9ef; --muted: #a7b0c0; --brand: #6ea8fe; --brand-strong: #4b90ff;
+  --border: rgba(255, 255, 255, 0.10);
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.25); --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.22);
+
+  /* Inputs DARK */
+  --input-text: var(--text); --input-bg: #1a2233; --input-bg-hover: #1f2940; --input-bg-focus: #212e48;
+  --input-border: rgba(255, 255, 255, 0.28); --input-border-strong: #86a7ff; --input-placeholder: #c6d0e3;
+
+  /* Navbar DARK */
+  --navbar-bg: #1f2937; --navbar-text: #d1d5db; --navbar-hover-bg: #374151;
+  --hamburger-color: var(--navbar-text); --menu-mobile-bg: var(--navbar-bg);
+}
+
+/* ======================================================== */
+/* 8) TEMA CLARO (MODO SISTEMA) */
+/* Sobrescribe :root si el sistema lo prefiere Y NO hay clase en <html> */
+/* ======================================================== */
 @media (prefers-color-scheme: light) {
   :root {
     --bg: #f7f9fc; --elev-1: #ffffff; --elev-2: #ffffff; --card: #ffffff;
     --text: #0f1424; --muted: #5f6b84; --brand: #3b82f6; --brand-strong: #1d4ed8;
-    --border: rgba(15,20,36,0.10);
-    --shadow: 0 8px 28px rgba(15,20,36,0.08); --shadow-soft: 0 8px 24px rgba(15,20,36,0.08);
+    --border: rgba(15, 20, 36, 0.10);
+    --shadow: 0 8px 28px rgba(15, 20, 36, 0.08); --shadow-soft: 0 8px 24px rgba(15, 20, 36, 0.08);
 
     --input-text: #0f1424; --input-bg: #ffffff; --input-bg-hover: #f7f9ff; --input-bg-focus: #eef4ff;
-    --input-border: rgba(15,20,36,0.28); --input-border-strong: #3b82f6; --input-placeholder: #6b7280;
+    --input-border: rgba(15, 20, 36, 0.28); --input-border-strong: #3b82f6; --input-placeholder: #6b7280;
+
+    --navbar-bg: #ffffff; --navbar-text: #4b5563; --navbar-hover-bg: #f3f4f6;
+    --hamburger-color: var(--navbar-text); --menu-mobile-bg: var(--navbar-bg);
   }
 }
-@media (prefers-color-scheme: dark) {
-  :root {
+
+/* ======================================================== */
+/* 9) OVERRIDES FORZADOS (MÁXIMA ESPECIFICIDAD) */
+/* El uso de html.theme anula el media query y el :root */
+/* ======================================================== */
+
+/* MODO DARK FORZADO */
+html.dark {
+    /* Mantenemos el bloque aunque sea igual al :root para asegurar la ESPECIFICIDAD */
     --bg: #0f1115; --elev-1: #121520; --elev-2: #171b27; --card: #141823;
     --text: #e6e9ef; --muted: #a7b0c0; --brand: #6ea8fe; --brand-strong: #4b90ff;
-    --border: rgba(255,255,255,0.10);
-    --shadow: 0 8px 30px rgba(0,0,0,0.25); --shadow-soft: 0 8px 24px rgba(0,0,0,0.22);
-
+    --border: rgba(255, 255, 255, 0.10);
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.25); --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.22);
     --input-text: var(--text); --input-bg: #1a2233; --input-bg-hover: #1f2940; --input-bg-focus: #212e48;
-    --input-border: rgba(255,255,255,0.28); --input-border-strong: #86a7ff; --input-placeholder: #c6d0e3;
-  }
+    --input-border: rgba(255, 255, 255, 0.28); --input-border-strong: #86a7ff; --input-placeholder: #c6d0e3;
+    --navbar-bg: #1f2937; --navbar-text: #d1d5db; --navbar-hover-bg: #374151;
+    --hamburger-color: var(--navbar-text); --menu-mobile-bg: var(--navbar-bg);
 }
 
+/* MODO LIGHT FORZADO */
+html.light {
+    --bg: #f7f9fc; --elev-1: #ffffff; --elev-2: #ffffff; --card: #ffffff;
+    --text: #0f1424; --muted: #5f6b84; --brand: #3b82f6; --brand-strong: #1d4ed8;
+    --border: rgba(15, 20, 36, 0.10);
+    --shadow: 0 8px 28px rgba(15, 20, 36, 0.08); --shadow-soft: 0 8px 24px rgba(15, 20, 36, 0.08);
+    --input-text: #0f1424; --input-bg: #ffffff; --input-bg-hover: #f7f9ff; --input-bg-focus: #eef4ff;
+    --input-border: rgba(15, 20, 36, 0.28); --input-border-strong: #3b82f6; --input-placeholder: #6b7280;
+    --navbar-bg: #ffffff; --navbar-text: #4b5563; --navbar-hover-bg: #f3f4f6;
+    --hamburger-color: var(--navbar-text); --menu-mobile-bg: var(--navbar-bg);
+}
 
-/* 7) Contenedor */
-.container { width: 100%; margin-left: auto; margin-right: auto; padding: 0 16px; }
+/* 10) Contenedor */
+.container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
 @media (min-width: 640px) { .container { max-width: 640px; } }
 @media (min-width: 768px) { .container { max-width: 768px; padding: 0 24px; } }
 @media (min-width: 1024px) { .container { max-width: 1024px; } }
 @media (min-width: 1280px) { .container { max-width: 1280px; } }
 @media (min-width: 1536px) { .container { max-width: 1536px; } }
 
-/* 8) Enlaces globales */
-a { color: inherit; text-decoration: none; }
-a:hover { text-decoration: underline; }
-
-/* 9) Utilidad accesible */
-.visually-hidden {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+/* 11) Enlaces globales */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
 
-/* 10) Estados de input base */
+/* 12) Utilidad accesible */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 13) Inputs base */
 input, select, textarea {
   background: linear-gradient(180deg, var(--input-bg), var(--input-bg-hover));
   color: var(--input-text);
   border: 1.5px solid var(--input-border);
   border-radius: 10px;
   padding: 12px 14px;
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-}
-input::placeholder, textarea::placeholder { color: var(--input-placeholder); opacity: .9; }
-input:hover, select:hover, textarea:hover { background: var(--input-bg-hover); }
-input:focus, select:focus, textarea:focus {
-  background: var(--input-bg-focus);
-  border-color: var(--input-border-strong);
-  box-shadow: 0 0 0 3px rgba(110,168,254,0.25);
-  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-/* === Overrides por clase en <html> (tema forzado) === */
-html.dark {
-  --bg: #0f1115; --elev-1: #121520; --elev-2: #171b27; --card: #141823;
-  --text: #e6e9ef; --muted: #a7b0c0; --brand: #6ea8fe; --brand-strong: #4b90ff;
-  --border: rgba(255,255,255,0.10);
-  --shadow: 0 8px 30px rgba(0,0,0,0.25); --shadow-soft: 0 8px 24px rgba(0,0,0,0.22);
-  --input-text: var(--text); --input-bg: #1a2233; --input-bg-hover: #1f2940; --input-bg-focus: #212e48;
-  --input-border: rgba(255,255,255,0.28); --input-border-strong: #86a7ff; --input-placeholder: #c6d0e3;
+input::placeholder,
+textarea::placeholder {
+  color: var(--input-placeholder);
+  opacity: 0.9;
 }
-html.light {
-  --bg: #f7f9fc; --elev-1: #ffffff; --elev-2: #ffffff; --card: #ffffff;
-  --text: #0f1424; --muted: #5f6b84; --brand: #3b82f6; --brand-strong: #1d4ed8;
-  --border: rgba(15,20,36,0.10);
-  --shadow: 0 8px 28px rgba(15,20,36,0.08); --shadow-soft: 0 8px 24px rgba(15,20,36,0.08);
-  --input-text: #0f1424; --input-bg: #ffffff; --input-bg-hover: #f7f9ff; --input-bg-focus: #eef4ff;
-  --input-border: rgba(15,20,36,0.28); --input-border-strong: #3b82f6; --input-placeholder: #6b7280;
+
+input:hover,
+select:hover,
+textarea:hover {
+  background: var(--input-bg-hover);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: var(--input-bg-focus);
+  border-color: var(--input-border-strong);
+  box-shadow: 0 0 0 3px rgba(110, 168, 254, 0.25);
+  outline: none;
 }

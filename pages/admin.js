@@ -10,6 +10,7 @@ import styles from '../styles/admin.module.css'; // Asegúrate de que la ruta se
 import AgregarRequisito from '@/components/admin/usersAutorization/AgregarRequisito';
 import AgregarModelo from '@/components/admin/usersAutorization/AgregarModelo';
 import AddPartsForm from '@/components/admin/AddPartsForm';
+import ServiceBulletinForm from '@/components/admin/ServiceBulletinForm';
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
@@ -43,6 +44,9 @@ export default function AdminPage() {
           <Link href="/addAscInfo" className={styles.link}>Ir al Panel de Gestión de AscInfo</Link>
           <div>
             <AddPartsForm />
+          </div>
+          <div>
+            <ServiceBulletinForm />
           </div>
           <div>
             <AgregarRequisito />

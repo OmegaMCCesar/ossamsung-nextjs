@@ -35,9 +35,6 @@ export default function Home() {
           <Link href="/diagnosticoPage" className={styles.startButton} >
             Pre Diagnóstico IA
           </Link>
-          {/* <Link href="errorCode" className={styles.startButton} >
-            Códigos de error
-          </Link> */}
         </div>
       </div>
     </Layout>

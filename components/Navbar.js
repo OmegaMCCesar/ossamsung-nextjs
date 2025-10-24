@@ -2,13 +2,14 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useTheme } from '../components/ThemeProvider';
 import styles from '../styles/Navbar.module.css';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
+
+ 
+  
 
   const toggleMenu = () => setIsMenuOpen(v => !v);
   const closeMenu = () => setIsMenuOpen(false);
@@ -33,14 +34,6 @@ export default function Navbar() {
     <nav className={styles.navbar}>
       <div className={`container ${styles.navbarContent}`}>
         {/* Botón de tema */}
-        <button
-          className={styles.themeButton}
-          onClick={toggleTheme}
-          aria-label={`Cambiar tema (actual: ${theme})`}
-          title={`Tema: ${theme}`}
-        >
-          {theme === 'dark' ? '🌙' : theme === 'light' ? '☀️' : '🖥'}
-        </button>
 
         {/* Hamburguesa (móvil) */}
         <button

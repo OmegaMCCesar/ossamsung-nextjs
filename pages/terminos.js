@@ -8,7 +8,7 @@ export default function Terminos() {
       <h1>Términos y Condiciones del Servicio</h1>
 
       <p>
-        Bienvenido a os-samsung.vercel.app . Estos Términos y Condiciones rigen tu acceso y uso de nuestro sitio web
+        Bienvenido a www.ods-samg.com.mx . Estos Términos y Condiciones rigen tu acceso y uso de nuestro sitio web
         y los servicios de soporte técnico y educativo en línea blanca que ofrecemos.
         Al acceder o utilizar nuestro sitio web, confirmas que has leído, entendido y aceptado
         cumplir con estos Términos y Condiciones. Si no estás de acuerdo con alguna parte de estos términos,
