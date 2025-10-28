@@ -24,6 +24,11 @@ const AdvancedDiagnosisForm = () => {
     const [model, setModel] = useState('');
     const [symptoms, setSymptoms] = useState('');
     const [errorCode, setErrorCode] = useState('');
+    const [usageCount, setUsageCount] = useState({ 
+        currentCount: 0,
+        remaining: 100,
+        limit: 100
+    });
     const [diagnosisResult, setDiagnosisResult] = useState(null);
 
     // --- ESTADOS DE CONTROL ---
@@ -40,6 +45,26 @@ const AdvancedDiagnosisForm = () => {
             localStorage.setItem('ai_device_id', currentDeviceId);
         }
         setBrowserDeviceId(currentDeviceId);
+
+        const fetchUsageCount = async (deviceId) => {
+        if (!deviceId) return;
+        try {
+            const response = await fetch('/api/usage/count', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ browserDeviceId: deviceId }),
+            });
+            const data = await response.json();
+            setUsageCount(data);
+        } catch (err) {
+            console.error("No se pudo cargar el conteo de uso.");
+        }
+    };
+    
+    // Llamar a la función
+    if (currentDeviceId) {
+        fetchUsageCount(currentDeviceId);
+    }
     }, []);
 
     // FUNCIÓN 1: Verifica la ODS y avanza al formulario
@@ -200,12 +225,22 @@ const AdvancedDiagnosisForm = () => {
                         </div>
                     )}
                     <button 
-                        type="submit" 
-                        className={styles.primaryButton}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? 'Verificando ODS...' : 'Continuar al Diagnóstico'}
-                    </button>
+    type="submit" 
+    className={`${styles.primaryButton} ${isLoading || usageCount.remaining <= 0 ? 'opacity-75 cursor-not-allowed' : ''}`}
+    disabled={isLoading || usageCount.remaining <= 0}
+>
+    {isLoading ? (
+        <>
+            <RefreshCw className={`${styles.iconSmall} ${styles.spinner}`} />
+            Analizando con IA...
+        </>
+    ) : (
+        // **********************************************
+        // TEXTO MODIFICADO PARA MOSTRAR EL CONTADOR
+        // **********************************************
+        `Obtener Diagnóstico Avanzado (${usageCount.remaining} restantes)`
+    )}
+</button>
                  </form>
             </div>
         );

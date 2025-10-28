@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({ 
             currentCount,
-            remainingQueries: MAX_QUERIES - currentCount,
+            remaining: MAX_QUERIES - currentCount,
             limit: MAX_QUERIES 
         });
 
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ 
             error: 'No se pudo obtener el conteo de uso.',
             currentCount: 0, // Fallback
-            remainingQueries: 100 
+            remaining: 100 
         });
     }
 }

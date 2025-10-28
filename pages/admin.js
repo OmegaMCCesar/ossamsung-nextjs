@@ -29,7 +29,6 @@ export default function AdminPage() {
       router.push('/login');
     }
   }, [loading, user, router]);
- console.log('user', user);
  
   if (loading || !user) return <p className={styles.loading}>Cargando...</p>;
 
@@ -42,6 +41,7 @@ export default function AdminPage() {
       {user.uid === 'PdYdDmrFMiZqZS5fhA3ztO3cpY73' && <div>
           <Link href="/addEquipsEdit" className={styles.link}>Ir al Panel de Gestión de Equipos</Link>
           <Link href="/addAscInfo" className={styles.link}>Ir al Panel de Gestión de AscInfo</Link>
+          <Link href="/dashboard" className={styles.link}>Ir al Panel de Diagnóstico IA</Link>
           <div>
             <AddPartsForm />
           </div>
