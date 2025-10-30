@@ -1,15 +1,14 @@
-// pages/api/ai-diagnosis.js
 import { GoogleGenAI } from '@google/genai';
 import { db } from '../../lib/firebase';
-import { collection, getDocs, query, where, addDoc } from 'firebase/firestore'; // Importar addDoc
+import { collection, getDocs, query, where, addDoc } from 'firebase/firestore'; 
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const modelName = "gemini-2.5-flash";
 
 /**
- * Normaliza texto: pasa a minúsculas, quita tildes, deja letras/números y espacios.
- * Conservamos espacios para poder hacer split por palabras.
- */
+ * Normaliza texto: pasa a minúsculas, quita tildes, deja letras/números y espacios.
+ * Conservamos espacios para poder hacer split por palabras.
+ */
 function normalizeTextKeepSpaces(text = "") {
     return String(text)
         .toLowerCase()
@@ -21,8 +20,8 @@ function normalizeTextKeepSpaces(text = "") {
 }
 
 /**
- * Convierte texto en array de palabras únicas (sin vacíos)
- */
+ * Convierte texto en array de palabras únicas (sin vacíos)
+ */
 function wordsFrom(text = "") {
     return normalizeTextKeepSpaces(text)
         .split(" ")
@@ -30,10 +29,10 @@ function wordsFrom(text = "") {
 }
 
 /**
- * Busca boletines de servicio aplicables al modelo.
- * @param {string} model - El modelo de equipo a buscar.
- * @returns {Promise<Array<{bulletinName: string, bulletinNumber: string, issueSummary: string}>>}
- */
+ * Busca boletines de servicio aplicables al modelo.
+ * @param {string} model - El modelo de equipo a buscar.
+ * @returns {Promise<Array<{bulletinName: string, bulletinNumber: string, issueSummary: string}>>}
+ */
 async function getServiceBulletins(model) {
     if (!db || !model) return [];
 
@@ -68,11 +67,10 @@ async function getServiceBulletins(model) {
     }
 }
 
-//Busca partes compatibles en Firestore basándose en el modelo y evalúa su relevancia según el nombre y la razón proporcionados por la IA.
 /**
- * Buscar partes en Firestore que sean compatibles con el modelo (array-contains).
- * Retorna lista de objetos { docId?, partName, partNumber, imageUrl, partFunction, score } ordenada por score desc.
- */
+ * Buscar partes en Firestore que sean compatibles con el modelo (array-contains).
+ * Retorna lista de objetos { docId?, partName, partNumber, imageUrl, partFunction, score } ordenada por score desc.
+ */
 async function getCompatiblePartsFromFirebase(partName, model, iaReason) {
     if (!db) return [];
 
@@ -161,42 +159,59 @@ async function getCompatiblePartsFromFirebase(partName, model, iaReason) {
 }
 
 /**
- * Handler principal
- */
+ * Handler principal
+ */
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-    // OBTENER NUEVOS CAMPOS: odsNumber y browserDeviceId
-    const { productType, model, symptoms, errorCode, odsNumber, browserDeviceId } = req.body || {};
-
+    // OBTENER NUEVOS CAMPOS: odsNumber, browserDeviceId, y el userRole
+    const { productType, model, symptoms, errorCode, odsNumber, browserDeviceId, userRole } = req.body || {};
+    
+    // El userRole puede ser 'Anonymous', por lo que no es estrictamente obligatorio si se envía el default.
     if (!productType || !model || !symptoms || !odsNumber || !browserDeviceId) {
         return res.status(400).json({ error: 'Tipo de producto, modelo, síntomas, ODS e ID de dispositivo son obligatorios.' });
     }
 
     const cleanModel = String(model).trim().toUpperCase();
     const cleanOds = odsNumber.trim().toUpperCase();
+    
+    // Roles con acceso ilimitado
+    const UNLIMITED_ROLES = ['Admin'];
+    const MAX_QUERIES = 50; 
+    
+    // Si el usuario es 'Admin', salta la verificación de límites.
+    const hasUnlimitedAccess = UNLIMITED_ROLES.includes(userRole);
+    // Identificador para restringir la respuesta de la IA
+    const isAnonymous = userRole === 'Anonymous';
 
-    // ************ NUEVO: LÍMITE DE CONSULTAS POR DISPOSITIVO ************
-    const MAX_QUERIES = 100;
-    
-    try {
-        const qCount = query(
-            collection(db, "aiUsage"),
-            where("browserDeviceId", "==", browserDeviceId)
-        );
-        const snapshotCount = await getDocs(qCount);
 
-        if (snapshotCount.size >= MAX_QUERIES) {
-            // Error 429 para limitar el acceso
-            return res.status(429).json({ 
-                mainDiagnosis: `Límite de ${MAX_QUERIES} consultas alcanzado para este dispositivo (${browserDeviceId}). Por favor, usa una ODS o contacta a administración.`,
-                error: `Límite de ${MAX_QUERIES} consultas alcanzado.`
-            });
+    // ************ LÓGICA DE LÍMITE DE CONSULTAS POR ROL ************
+    // Solo se verifica el límite si el usuario NO es un Admin
+    if (!hasUnlimitedAccess) {
+        try {
+            // Consulta el número de usos registrados HOY para este deviceId
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Inicio del día
+
+            const qCount = query(
+                collection(db, "aiUsage"),
+                where("browserDeviceId", "==", browserDeviceId),
+                where("timestamp", ">=", today) // Solo cuenta usos de hoy
+            );
+            const snapshotCount = await getDocs(qCount);
+
+            if (snapshotCount.size >= MAX_QUERIES) {
+                // Error 429 para limitar el acceso
+                return res.status(429).json({ 
+                    mainDiagnosis: `Límite de ${MAX_QUERIES} consultas diarias alcanzado para tu dispositivo. Inicia sesión o contacta a administración.`,
+                    error: `Límite de ${MAX_QUERIES} consultas diarias alcanzado.`
+                });
+            }
+        } catch (e) {
+            console.error("Error al verificar límite de consultas por rol:", e);
+            // Continuar si falla el conteo, pero loguear el error
         }
-    } catch (e) {
-        console.error("Error al verificar límite de consultas:", e);
-        // Continuar si falla el conteo, pero loguear el error
-    }
+    }
     // *******************************************************************
 
     // Contextos por tipo de equipo
@@ -208,11 +223,32 @@ export default async function handler(req, res) {
         'Lavadora': 'Tu diagnóstico debe enfocarse en fallas de motor, rodamientos (baleros), sensores de velocidad (Hall Sensor), fallas de válvulas de agua y problemas de drenaje.',
     };
     const contextNote = instructionContext[productType] || 'Tu diagnóstico debe ser 100% exacto, cubriendo fallas comunes, y evitando errores conceptuales.';
+    
+    // **NUEVO: Ajuste del Prompt si es anónimo para evitar generar contenido avanzado**
+    const advancedFieldsPrompt = `
+        "commonCauses": ["Lista de 3 a 5 fallas mecánicas o electrónicas más probables y específicas para el tipo de equipo."],
+        "advancedDiagnosisSteps": ["Paso 1: Instrucción precisa de verificación para el técnico."],
+        "potentialParts": [
+            {
+              "partName": "Nombre del Componente",
+              "reason": "Razón específica por la que se sospecha de esta pieza.",
+              "isCritical": true
+            }
+        ],
+    `;
+    
+    // Si es anónimo, solo pedimos diagnóstico principal y tips básicos.
+    const requiredFields = isAnonymous ? '' : advancedFieldsPrompt;
+    
+    const roleContext = isAnonymous ? 
+        'Eres un asistente de diagnóstico BÁSICO, tu objetivo es dar una hipótesis y consejos de fácil seguimiento para el usuario final (no técnico).' :
+        `Eres un Técnico Nivel 3 de Samsung con 25 años de experiencia, experto en la línea de ${productType}s. ${contextNote} La información que proporcionas es utilizada por técnicos para servicio y por la administración para preparar repuestos.`;
+
 
     // Prompt (mantener estrictura JSON en la salida)
     const prompt = `
         **ROL Y CONTEXTO CRÍTICO:**
-        Eres un Técnico Nivel 3 de Samsung con 25 años de experiencia, experto en la línea de ${productType}s. ${contextNote} La información que proporcionas es utilizada por técnicos para servicio y por la administración para preparar repuestos.
+        ${roleContext}
 
         **INFORMACIÓN DEL EQUIPO:**
         - Tipo de Equipo: ${productType} Samsung
@@ -222,27 +258,23 @@ export default async function handler(req, res) {
         - ODS de Servicio: ${cleanOds}
 
         **OBJETIVO:**
-        Proporcionar un diagnóstico preciso y estructurado en JSON que sirva tanto a usuarios novatos como a técnicos profesionales y administración de repuestos.
+        Proporcionar un diagnóstico preciso y estructurado en JSON.
 
         **REQUISITOS DE LA RESPUESTA JSON:**
         {
           "mainDiagnosis": "Hipótesis de la falla más probable y breve explicación específica para un ${productType}.",
-          "commonCauses": ["Lista de 3 a 5 fallas mecánicas o electrónicas más probables y específicas para el tipo de equipo."],
           "beginnerTips": "Consejos claros y seguros para el usuario (Ej: qué revisar antes de llamar a un técnico. Usa saltos de línea \\n).",
-          "advancedDiagnosisSteps": ["Paso 1: Instrucción precisa de verificación para el técnico."],
-          "potentialParts": [
-            {
-              "partName": "Nombre del Componente",
-              "reason": "Razón específica por la que se sospecha de esta pieza.",
-              "isCritical": true
-            }
-          ]
+          ${requiredFields}
         }
     `;
+    // Fin de la construcción del prompt
+
 
     try {
-        const applicableBulletins = await getServiceBulletins(model);
-        // Llamada a Gemini
+        // La búsqueda de boletines SÍ se mantiene, es información básica de alerta.
+        const applicableBulletins = await getServiceBulletins(model); 
+        
+        // Llamada a Gemini
         const response = await ai.models.generateContent({
             model: modelName,
             contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -272,108 +304,121 @@ export default async function handler(req, res) {
             console.error("No se pudo parsear JSON de la IA:", err, "RAW:", rawJsonText);
             throw new Error("La IA no devolvió JSON válido.");
         }
+        
+        // **NUEVO: Post-proceso si es anónimo**
+        if (isAnonymous) {
+            // Si el anónimo solo pidió los campos básicos, aseguramos que los avanzados no existan 
+            // o sean nulos/vacíos para que el frontend no los muestre por error.
+            diagnosisData.commonCauses = [];
+            diagnosisData.advancedDiagnosisSteps = [];
+            diagnosisData.potentialParts = [];
+        } else {
+            // El proceso de enriquecimiento de partes SÓLO se ejecuta si NO es anónimo (para ahorrar CPU/DB)
+            // Procesar partes sugeridas por la IA
+            const partsFromIA = Array.isArray(diagnosisData.potentialParts) ? diagnosisData.potentialParts : [];
+            const uniquePartsMap = new Map();
 
-        // Procesar partes sugeridas por la IA
-        const partsFromIA = Array.isArray(diagnosisData.potentialParts) ? diagnosisData.potentialParts : [];
-        const uniquePartsMap = new Map();
+            for (const iaPart of partsFromIA) {
+                const iaPartName = iaPart.partName || "";
+                const iaReason = iaPart.reason || "";
+                const uniqueKey = normalizeTextKeepSpaces(iaPartName).replace(/\s+/g, " ");
 
-        for (const iaPart of partsFromIA) {
-            const iaPartName = iaPart.partName || "";
-            const iaReason = iaPart.reason || "";
-            const uniqueKey = normalizeTextKeepSpaces(iaPartName).replace(/\s+/g, " ");
+                // Buscar candidatos en Firebase (ordenados por score)
+                const foundParts = await getCompatiblePartsFromFirebase(iaPartName, model, iaReason);
 
-            // Buscar candidatos en Firebase (ordenados por score)
-            const foundParts = await getCompatiblePartsFromFirebase(iaPartName, model, iaReason);
+                // Estructura base que siempre devolvemos al frontend
+                let finalPart = {
+                    partName: iaPartName,
+                    reason: iaReason,
+                    isCritical: !!iaPart.isCritical,
+                    partNumber: "SIN INF. DE LA PARTE",
+                    imageUrl: null,
+                    partFunction: null,
+                    foundInDB: false,
+                    score: 0,
+                };
 
-            // Estructura base que siempre devolvemos al frontend
-            let finalPart = {
-                partName: iaPartName,
-                reason: iaReason,
-                isCritical: !!iaPart.isCritical,
-                partNumber: "SIN INF. DE LA PARTE",
-                imageUrl: null,
-                partFunction: null,
-                foundInDB: false,
-                score: 0,
-            };
+                if (foundParts.length > 0) {
+                    // Primer candidato (mejor puntuado)
+                    const best = foundParts[0];
 
-            if (foundParts.length > 0) {
-                // Primer candidato (mejor puntuado)
-                const best = foundParts[0];
+                    // Determinar si hay "coincidencia fuerte" (name includes IA name words)
+                    const iaNorm = normalizeTextKeepSpaces(iaPartName);
+                    const dbNameNorm = normalizeTextKeepSpaces(best.partName || "");
+                    const iaWords = wordsFrom(iaNorm);
+                    const dbWords = wordsFrom(dbNameNorm);
+                    let commonWords = 0;
+                    for (const w of iaWords) if (dbWords.includes(w)) commonWords++;
+                    const wordMatchRatio = iaWords.length ? commonWords / iaWords.length : 0;
 
-                // Determinar si hay "coincidencia fuerte" (name includes IA name words)
-                const iaNorm = normalizeTextKeepSpaces(iaPartName);
-                const dbNameNorm = normalizeTextKeepSpaces(best.partName || "");
-                const iaWords = wordsFrom(iaNorm);
-                const dbWords = wordsFrom(dbNameNorm);
-                let commonWords = 0;
-                for (const w of iaWords) if (dbWords.includes(w)) commonWords++;
-                const wordMatchRatio = iaWords.length ? commonWords / iaWords.length : 0;
+                    const isStrongNameMatch = wordMatchRatio >= 0.5 || dbNameNorm.includes(iaNorm) || iaNorm.includes(dbNameNorm) || best.score >= 0.8;
 
-                const isStrongNameMatch = wordMatchRatio >= 0.5 || dbNameNorm.includes(iaNorm) || iaNorm.includes(dbNameNorm) || best.score >= 0.8;
+                    if (isStrongNameMatch) {
+                        // sobrescribimos con datos de BD (coincidencia fuerte)
+                        finalPart = {
+                            ...finalPart,
+                            partName: best.partName || finalPart.partName,
+                            partNumber: best.partNumber || finalPart.partNumber,
+                            imageUrl: best.imageUrl || null,
+                            partFunction: best.partFunction || null,
+                            foundInDB: true,
+                            score: best.score,
+                        };
+                    } else {
+                        // coincidencia débil -> inyectamos número de parte y función si existe, pero mantenemos nombre original de la IA
+                        finalPart = {
+                            ...finalPart,
+                            partNumber: best.partNumber || finalPart.partNumber,
+                            imageUrl: best.imageUrl || null,
+                            partFunction: best.partFunction || finalPart.partFunction,
+                            foundInDB: !!best.partNumber || !!best.imageUrl || !!best.partFunction,
+                            score: best.score,
+                        };
 
-                if (isStrongNameMatch) {
-                    // sobrescribimos con datos de BD (coincidencia fuerte)
-                    finalPart = {
-                        ...finalPart,
-                        partName: best.partName || finalPart.partName,
-                        partNumber: best.partNumber || finalPart.partNumber,
-                        imageUrl: best.imageUrl || null,
-                        partFunction: best.partFunction || null,
-                        foundInDB: true,
-                        score: best.score,
-                    };
-                } else {
-                    // coincidencia débil -> inyectamos número de parte y función si existe, pero mantenemos nombre original de la IA
-                    finalPart = {
-                        ...finalPart,
-                        partNumber: best.partNumber || finalPart.partNumber,
-                        imageUrl: best.imageUrl || null,
-                        partFunction: best.partFunction || finalPart.partFunction,
-                        foundInDB: !!best.partNumber || !!best.imageUrl || !!best.partFunction,
-                        score: best.score,
-                    };
+                        // Si hay otros candidatos con mejor match de nombre, verificarlos
+                        for (let i = 1; i < foundParts.length; i++) {
+                            const candidate = foundParts[i];
+                            const candNameNorm = normalizeTextKeepSpaces(candidate.partName || "");
+                            const candWords = wordsFrom(candNameNorm);
+                            let candCommon = 0;
+                            for (const w of iaWords) if (candWords.includes(w)) candCommon++;
+                            const candRatio = iaWords.length ? candCommon / iaWords.length : 0;
+                            if (candRatio > wordMatchRatio && candidate.score >= best.score) {
+                                // promote candidate
+                                finalPart = {
+                                    ...finalPart,
+                                    partName: candidate.partName,
+                                    partNumber: candidate.partNumber || finalPart.partNumber,
+                                    imageUrl: candidate.imageUrl || finalPart.imageUrl,
+                                    partFunction: candidate.partFunction || finalPart.partFunction,
+                                    foundInDB: true,
+                                    score: candidate.score,
+                                };
+                                break;
+                            }
+                        }
+                    }
+                }
 
-                    // Si hay otros candidatos con mejor match de nombre, verificarlos
-                    for (let i = 1; i < foundParts.length; i++) {
-                        const candidate = foundParts[i];
-                        const candNameNorm = normalizeTextKeepSpaces(candidate.partName || "");
-                        const candWords = wordsFrom(candNameNorm);
-                        let candCommon = 0;
-                        for (const w of iaWords) if (candWords.includes(w)) candCommon++;
-                        const candRatio = iaWords.length ? candCommon / iaWords.length : 0;
-                        if (candRatio > wordMatchRatio && candidate.score >= best.score) {
-                            // promote candidate
-                            finalPart = {
-                                ...finalPart,
-                                partName: candidate.partName,
-                                partNumber: candidate.partNumber || finalPart.partNumber,
-                                imageUrl: candidate.imageUrl || finalPart.imageUrl,
-                                partFunction: candidate.partFunction || finalPart.partFunction,
-                                foundInDB: true,
-                                score: candidate.score,
-                            };
-                            break;
-                        }
-                    }
-                }
-            }
+                // Guardar en map por clave única (nombre IA limpio) para evitar duplicados
+                uniquePartsMap.set(uniqueKey, finalPart);
+            }
 
-            // Guardar en map por clave única (nombre IA limpio) para evitar duplicados
-            uniquePartsMap.set(uniqueKey, finalPart);
-        }
+            // Reemplazamos potentialParts por la versión enriquecida
+            diagnosisData.potentialParts = Array.from(uniquePartsMap.values());
+        } // Fin del bloque ELSE (no anónimo)
 
-        // Reemplazamos potentialParts por la versión enriquecida
-        diagnosisData.potentialParts = Array.from(uniquePartsMap.values());
 
         diagnosisData.serviceBulletins = applicableBulletins;
         
-        // ************ NUEVO: REGISTRAR USO EXITOSO ************
+        // ************ REGISTRAR USO EXITOSO ************
+        // Registramos el rol del usuario para futuros análisis
         await addDoc(collection(db, "aiUsage"), {
             odsNumber: cleanOds,
             browserDeviceId: browserDeviceId, 
             productType: productType,
             model: cleanModel,
+            userRole: userRole, // Guardamos el rol (incluyendo 'Anonymous')
             timestamp: new Date(),
         });
         // ******************************************************
@@ -385,19 +430,13 @@ export default async function handler(req, res) {
     } catch (err) {
         console.error("Error en ai-diagnosis handler:", err);
         
-        // Estructura de error para el frontend
+        // Estructura de error para el frontend (simplificada si es anónimo)
         const defaultError = {
-            mainDiagnosis: "Fallo interno en el sistema de Diagnóstico Avanzado. Contactar a soporte.",
-            commonCauses: ["Verificar conexión de Firebase.", "Revisar logs del servidor."],
-            beginnerTips: "Servicio de diagnóstico avanzado no disponible. Intenta más tarde.",
-            advancedDiagnosisSteps: ["Verificar la función getCompatiblePartsFromFirebase y sus consultas.", "Asegurar que el modelo retorne JSON válido."],
-            potentialParts: [{
-                partName: "Fallo de Sistema",
-                reason: "Error de conexión o configuración del lado del servidor.",
-                isCritical: true,
-                partNumber: "SYSTEM-ERR",
-                foundInDB: false
-            }]
+            mainDiagnosis: "Fallo interno en el sistema de Diagnóstico. Contactar a soporte.",
+            commonCauses: [],
+            beginnerTips: "Servicio de diagnóstico no disponible. Intenta más tarde.",
+            advancedDiagnosisSteps: [],
+            potentialParts: []
         };
         
         return res.status(500).json(defaultError);
