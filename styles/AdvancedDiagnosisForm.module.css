@@ -1,410 +1,332 @@
-/* --- Contenedor principal --- */
+/* ================================
+  styles/AdvancedDiagnosisForm.module.css
+  ================================ */
+
+/* Card Contenedora (usa elevaciones suaves) */
 .card {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: clamp(1rem, 2vw, 2rem);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border);
-  color: var(--text);
-  backdrop-filter: blur(8px);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-  max-width: 720px;
-  margin: 0 auto;
-  animation: fadeInCard 0.6s ease forwards;
-}
-
-@keyframes fadeInCard {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow);
-}
-
-/* --- Campos de entrada --- */
-.inputField {
-  width: 100%;
-  background: var(--input-bg);
-  color: var(--input-text);
-  border: 1.5px solid var(--input-border);
-  border-radius: var(--radius-xs);
-  padding: 0.75rem 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-  font-size: 1rem;
-}
-
-.inputField::placeholder {
-  color: var(--input-placeholder);
-}
-
-.inputField:hover {
-  background: var(--input-bg-hover);
-}
-
-.inputField:focus {
-  background: var(--input-bg-focus);
-  border-color: var(--input-border-strong);
-  box-shadow: 0 0 0 3px rgba(110, 168, 254, 0.25);
-  outline: none;
-}
-
-/* --- Botones --- */
-.primaryButton {
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.85rem 1rem;
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-  border: none;
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-  color: white;
-  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
-  transition: background 0.3s ease, transform 0.15s ease, box-shadow 0.2s ease;
-  font-size: 1rem;
-}
-
-.primaryButton:hover {
-  background: linear-gradient(135deg, var(--brand-strong), var(--brand));
-  box-shadow: 0 6px 14px rgba(59, 130, 246, 0.35);
-  transform: translateY(-1px);
-}
-
-.primaryButton:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
-}
-
-.primaryButton:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* --- Cajas de resultado --- */
-.mainDiagnosisBox,
-.beginnerTipsBox,
-.advancedContainer {
-  opacity: 0;
-  transform: translateY(15px);
-  animation: fadeUp 0.5s ease forwards;
-}
-
-.mainDiagnosisBox {
-  margin-bottom: 1.5rem;
-  padding: 1rem 1.25rem;
-  border-left: 4px solid var(--brand);
-  background: rgba(59, 130, 246, 0.1);
-  border-radius: var(--radius-xs);
-  box-shadow: inset 0 0 6px rgba(59, 130, 246, 0.08);
-  line-height: 1.6;
-  font-size: 0.95rem;
-  animation-delay: 0.1s;
-}
-
-.beginnerTipsBox {
-  margin-bottom: 1.5rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--border);
-  background: var(--elev-1);
-  border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-soft);
-  line-height: 1.5;
-  animation-delay: 0.2s;
-}
-
-.advancedContainer {
-  margin-top: 1rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  background: rgba(239, 68, 68, 0.08);
-  border-radius: var(--radius-xs);
-  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.1);
-  animation-delay: 0.3s;
-}
-
-/* --- Animación de aparición --- */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- Partes críticas y estándar --- */
-.partCritical, .partStandard {
-  padding: 0.85rem;
-  border-radius: var(--radius-xs);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  opacity: 0;
-  animation: fadeUp 0.6s ease forwards;
-}
-
-.partCritical {
-  border-left: 4px solid #f97316;
-  background: rgba(249, 115, 22, 0.08);
-  animation-delay: 0.15s;
-}
-
-.partStandard {
-  border-left: 4px solid #10b981;
-  background: rgba(16, 185, 129, 0.08);
-  animation-delay: 0.25s;
-}
-
-.partCritical:hover, .partStandard:hover {
-  transform: translateX(3px);
-  box-shadow: var(--shadow-soft);
-}
-
-/* Estados de partes según si se encuentran en DB */
-.partFound {
-  opacity: 1;
-}
-
-.partNotFound {
-  opacity: 0.6;
-}
-
-/* --- Spinner --- */
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.spinner {
-  animation: spin 1s linear infinite;
-}
-
-/* --- Alertas --- */
-.alert {
-  padding: 0.75rem 1rem;
-  display: flex;
-  align-items: center;
-  background: rgba(255, 107, 107, 0.15);
-  color: #ff6b6b;
-  border: 1px solid rgba(255, 107, 107, 0.25);
-  border-radius: var(--radius-xs);
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-/* --- Imágenes de partes --- */
-.partImage {
-  width: 160px;
-  height: 160px;
-  object-fit: cover;
-  border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-soft);
-  flex-shrink: 0;
-  animation: fadeUp 0.6s ease forwards;
-}
-
-/* --- Texto de botones toggle --- */
-.toggleAdvancedButton {
-  width: 100%;
-  text-align: center;
-  padding: 0.65rem 0.75rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--brand);
-  background: var(--elev-1);
-  border-radius: var(--radius-xs);
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.toggleAdvancedButton:hover {
-  background: var(--elev-2);
-  color: var(--brand-strong);
-}
-
-/* --- 📱 Ajustes Responsive --- */
-@media (max-width: 768px) {
-  .card {
-    padding: 1rem;
-    box-shadow: none;
-    border: 1px solid var(--border-light);
-  }
-
-  .partCritical, .partStandard {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-
-  .partImage {
-    width: 100%;
-    height: auto;
-    max-height: 200px;
-    margin: 0 auto;
-  }
-
-  .mainDiagnosisBox,
-  .beginnerTipsBox,
-  .advancedContainer {
-    padding: 0.85rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .primaryButton {
-    font-size: 0.95rem;
-    padding: 0.8rem;
-  }
-
-  .inputField {
-    font-size: 0.95rem;
-    padding: 0.65rem 0.9rem;
-  }
-}
-
-/* --- NUEVOS ESTILOS PARA BOLETINES DE SERVICIO --- */
-
-.bulletinBox {
-    background-color: var(--warn, #ffb020); /* Color de advertencia o amarillo */
-    color: var(--color-black, #000); /* Texto negro para contraste */
-    border-radius: var(--radius-sm);
+    background-color: var(--card); /* Blanco */
+    border-radius: var(--radius); /* Redondeo suave */
+    box-shadow: var(--shadow); /* Sombra sutil */
     padding: var(--pad);
-    margin: var(--gap) 0;
-    box-shadow: var(--shadow-soft);
+    margin: 20px auto;
+    max-width: 900px;
+    width: 95%;
+    border: 1px solid var(--border); /* Borde sutil */
 }
 
-.bulletinTitle {
-    font-size: 1.2rem;
-    font-weight: 700;
+/* Encabezado y Subtexto */
+.heading {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text); /* Negro */
+    margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 5px;
 }
 
-.bulletinSubtext {
-    font-size: 0.9rem;
-    margin-bottom: 10px;
+.subtext {
+    color: var(--muted); /* Gris oscuro */
+    margin-bottom: 25px;
+    font-size: 1rem;
 }
 
-.bulletinList {
-    list-style: none;
-    padding-left: 0;
-    margin-bottom: 0;
+.icon {
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    color: var(--brand); /* Samsung Blue */
 }
 
-.bulletinItem {
-    border-left: 4px solid var(--danger, #ff6b6b); /* Línea de color de peligro */
-    padding-left: 10px;
-    margin-bottom: 10px;
+.iconSmall {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
 }
 
-.bulletinItem strong {
-    display: block;
-    margin-bottom: 3px;
+/* Formulario General */
+.form {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: 1fr;
 }
 
-.bulletinSummary {
-    font-size: 0.85rem;
-    opacity: 0.85;
+@media (min-width: 640px) {
+    .form {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en móvil grande */
+    }
 }
 
-/* --- NUEVOS ESTILOS PARA FORMULARIO DE BOLETINES --- */
+.form > button {
+    grid-column: 1 / -1; /* Botones a ancho completo */
+    margin-top: 10px;
+}
 
-/* Contenedor para input y botón de añadir modelo */
-.inputWithButton {
+.fieldContainer {
     display: flex;
-    gap: var(--gap, 10px); /* Usa la variable de espaciado que tienes definida */
+    flex-direction: column;
 }
 
-.inputWithButton .inputField {
-    flex-grow: 1;
+.label {
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text);
+    font-size: 0.95rem;
 }
 
-/* Botón secundario para "Añadir" */
-.secondaryButton {
-    background-color: var(--brand, #3b82f6);
-    color: var(--color-white, #ffffff);
+/* Los estilos de .inputField se heredan principalmente de globals.css */
+.inputField {
+    width: 100%;
+    /* Mantenemos la apariencia de globals.css */
+}
+
+/* Botones */
+.primaryButton {
+    background-color: var(--brand);
+    color: var(--color-white);
+    padding: 14px 20px;
     border: none;
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
     display: flex;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
+    gap: 8px;
+}
+
+.primaryButton:hover:not(.disabledButton) {
+    background-color: var(--brand-strong);
+}
+
+.secondaryButton {
+    background-color: var(--elev-1);
+    color: var(--text);
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .secondaryButton:hover {
-    background-color: var(--brand-strong, #1d4ed8);
+    background-color: var(--input-bg-hover);
+    border-color: var(--muted);
 }
 
-/* Contenedor para mostrar los tags de modelos */
-.modelsTagsContainer {
-    margin-top: var(--gap, 10px);
+.disabledButton {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* Estados y Alertas */
+.alert {
+    grid-column: 1 / -1;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    min-height: 30px;
-}
-
-.modelTag {
-    background-color: var(--elev-1, #1f2937); /* Fondo de elevación/tarjeta */
-    color: var(--text, #d1d5db);
-    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 0.8rem;
-    display: inline-flex;
     align-items: center;
-    gap: 4px;
+    padding: 15px;
+    background-color: rgba(255, 107, 107, 0.1); /* Fondo Rojo Suave */
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: var(--radius-xs);
+    font-size: 0.95rem;
 }
 
-.modelTagRemove {
-    background: transparent;
-    border: none;
-    color: var(--danger, #ff6b6b);
-    cursor: pointer;
-    padding: 0;
-    margin-left: 4px;
-    line-height: 1;
-}
-
-.mutedText {
-    color: var(--muted, #a7b0c0);
-    font-style: italic;
-    font-size: 0.9rem;
-}
-
-/* Mensaje de éxito (simétrico al alert de error) */
 .successMessage {
-    background-color: var(--ok, #2ecc71);
-    color: var(--color-white, #ffffff);
-    border-radius: var(--radius-sm);
-    padding: var(--pad);
-    margin: var(--gap) 0;
-    font-weight: 600;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: rgba(46, 204, 113, 0.1); /* Fondo Verde Suave */
+    border: 1px solid var(--ok);
+    color: var(--ok);
+    border-radius: var(--radius-xs);
+    font-weight: 500;
+    margin-bottom: var(--gap);
 }
 
-@media (max-width: 480px) {
-  .card {
-    padding: 0.75rem;
-  }
+.spinner {
+    animation: spin 1s linear infinite;
+}
 
-  .partImage {
-    max-height: 160px;
-  }
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
 
-  .primaryButton {
-    padding: 0.7rem;
-  }
+/* --- SECCIONES DE RESULTADOS --- */
+.sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--brand); /* Samsung Blue para títulos de sección */
+    margin-top: 25px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 5px;
+}
 
-  .inputField {
-    padding: 0.6rem 0.85rem;
-  }
+.sectionTitleRed {
+  
+    color: var(--danger); /* Rojo para advertir de secciones avanzadas */
+}
 
-  .toggleAdvancedButton {
+.mainDiagnosisBox {
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 25px;
+    background-color: var(--elev-1);
+}
+
+.beginnerTipsBox {
+    margin-top: 25px;
+}
+
+.textPre {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    color: var(--text);
+}
+
+/* --- SECCIÓN FEEDBACK --- */
+.feedbackSection {
+    margin: 30px 0;
+    padding: 20px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.feedbackButtons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.feedbackButtons p {
+    flex-basis: 100%;
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.feedbackCorrecta {
+    background-color: var(--ok);
+}
+.feedbackCorrecta:hover {
+    background-color: #27ae60;
+}
+
+.feedbackCerca {
+    background-color: var(--warn);
+}
+.feedbackCerca:hover {
+    background-color: #e69100;
+}
+
+.feedbackIncorrecta {
+    background-color: var(--danger);
+}
+.feedbackIncorrecta:hover {
+    background-color: #c0392b;
+}
+
+/* --- SECCIÓN AVANZADA (Técnicos) --- */
+.advancedContainer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.causeList, .stepList {
+    margin-left: 20px;
+    margin-bottom: 20px;
+    color: var(--muted);
+}
+
+.causeList li, .stepList li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* Repuestos */
+.partsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--gap);
+    margin-top: 20px;
+}
+
+.partStandard {
+    background-color: var(--elev-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    transition: box-shadow 0.2s ease;
+}
+
+.partStandard:hover {
+    box-shadow: var(--shadow-soft);
+}
+
+.partCritical {
+    
+    border-color: var(--danger);
+    background-color: rgba(255, 107, 107, 0.05);
+}
+
+.partImage {
+    width: 60px;
+    height: 60px;
+    background-color: var(--input-bg-hover);
+    border-radius: 4px;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.partContent {
+    flex-grow: 1;
+}
+
+.partName {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.partCriticalLabel {
+    background-color: var(--danger);
+    color: var(--color-white);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7em;
+    font-weight: 700;
+    margin-left: 8px;
+}
+
+.partNumber, .partFunction, .partReason {
     font-size: 0.85rem;
-  }
+    color: var(--muted);
+    margin-bottom: 2px;
+}
+
+.mono {
+    font-family: monospace;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text);
 }

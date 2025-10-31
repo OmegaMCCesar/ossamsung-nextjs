@@ -4,7 +4,7 @@ import AIDashboard from '../../components/AIDashboard';
 import { useAuth } from '../../context/UserContext';
 
 // Define aquí los roles que tienen permiso para acceder al Dashboard
-const ALLOWED_ROLES = ['ADMIN', 'Supervisor', 'TechSupp', 'Tecnico', 'Administrativo']; // Asume 'Admin' o 'Supervisor' como roles de gestión, y 'TechSupp' si quieres que el soporte técnico avanzado lo vea.
+const ALLOWED_ROLES = ['Admin',]; // Asume 'Admin' o 'Supervisor' como roles de gestión, y 'TechSupp' si quieres que el soporte técnico avanzado lo vea.
 
 export default function DashboardPage() {
     const { user, loading } = useAuth();

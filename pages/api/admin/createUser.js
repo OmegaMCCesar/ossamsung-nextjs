@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     }
 
     // Validar roles permitidos (normalizar a la forma que uses en Firestore)
-    const validRoles = ['ADMIN', 'Tecnico', 'Administrativo', 'Supervisor', 'TechSupp'];
+    const validRoles = ['Admin', 'Tecnico', 'Administrativo', 'Supervisor', 'TechSupp'];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ message: 'El rol asignado no es válido.' });
     }
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
       const requesterRole = adminDocSnapshot.data().role;
 
       // Ajusta estos roles según lo que guardes en tu base de datos (coincidir mayúsculas/minúsculas)
-      const adminRoles = ['ADMIN', 'Supervisor']; // roles permitidos para crear usuarios
+      const adminRoles = ['Admin', 'Supervisor']; // roles permitidos para crear usuarios
       if (!adminRoles.includes(requesterRole)) {
         return res.status(403).json({
           message: 'Permiso denegado. Solo roles con privilegios pueden crear usuarios.'

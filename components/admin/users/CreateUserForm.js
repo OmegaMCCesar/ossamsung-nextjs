@@ -19,7 +19,7 @@ const CreateUserForm = () => {
     const validRoles = [
         { value: 'TechSupp', label: 'Técnico de Soporte Ingeneria' },
         { value: 'Supervisor', label: 'Supervisor' },
-        { value: 'ADMIN', label: 'Administrador' },
+        { value: 'Admin', label: 'Administrador' },
         { value: 'Tecnico', label: 'Técnico' },
         { value: 'Administrativo', label: 'Administrativo' },
     ];
@@ -96,7 +96,7 @@ const CreateUserForm = () => {
     // Si el usuario no está cargado o no tiene rol de admin, no debería poder ver el formulario
     // (Aunque la redirección en la página principal debe manejar esto)
     if (loading) return <p>Cargando información del administrador...</p>;
-    if (user.role !== 'ADMIN' && user.role !== 'Supervisor') {
+    if (user.role !== 'Admin' && user.role !== 'Supervisor') {
         return <p>Acceso denegado. Se requiere un rol de Administrador o Supervisor.</p>;
     }
 

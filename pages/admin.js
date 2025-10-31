@@ -37,11 +37,11 @@ export default function AdminPage() {
 
   return (
     <div className={styles.container}>
-      <button onClick={handleLogout} className={styles.logoutButton}>Cerrar sesión</button>
       <h1 className={styles.heading}>Panel de administrador</h1>
       <p className={styles.welcome}>Bienvenido, {user.email}</p>
       <Link href="/" className={styles.link}>Volver a la página principal</Link>
-      {user.role === 'ADMIN' && <div>
+      <button onClick={handleLogout} className={styles.logoutButton}>Cerrar sesión</button>
+      {user.role === 'Admin' && <div>
           <Link href="/addEquipsEdit" className={styles.link}>Ir al Panel de Gestión de Equipos</Link>
           <Link href="/addAscInfo" className={styles.link}>Ir al Panel de Gestión de AscInfo</Link>
           <Link href="/dashboard" className={styles.link}>Ir al Panel de Diagnóstico IA</Link>

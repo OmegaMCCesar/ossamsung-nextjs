@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         const snapshot = await getDocs(q);
         
         const currentCount = snapshot.size;
-        const MAX_QUERIES = 100; // Debe coincidir con ai-diagnosis.js
+        const MAX_QUERIES = 50; // Debe coincidir con ai-diagnosis.js
 
         return res.status(200).json({ 
             currentCount,

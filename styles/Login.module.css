@@ -1,0 +1,101 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--samsung-gray);
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 60px 80px;
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-gray);
+  margin-bottom: 16px;
+  font-family: var(--font-family);
+}
+
+.subtitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-gray);
+  margin-bottom: 8px;
+}
+
+.helper {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.label {
+  font-size: 14px;
+  text-align: left;
+  margin-bottom: 4px;
+  color: #444;
+  font-weight: 500;
+}
+
+.input {
+  border: none;
+  border-bottom: 2px solid #d0d0d0;
+  padding: 10px 5px;
+  font-size: 16px;
+  margin-bottom: 24px;
+  transition: border-color 0.2s ease;
+  outline: none;
+  font-family: var(--font-family);
+}
+
+.input:focus {
+  border-bottom-color: var(--samsung-blue);
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+  font-size: 14px;
+  color: #444;
+}
+
+.remember input {
+  margin-right: 8px;
+}
+
+.button {
+  background-color: #add5ff;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: var(--samsung-blue);
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
