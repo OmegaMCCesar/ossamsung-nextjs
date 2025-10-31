@@ -240,7 +240,7 @@ const AdvancedDiagnosisForm = () => {
                     Para comenzar, ingresa el **Número de Orden de Servicio (ODS)**.
                 </p>
                 <form onSubmit={handleOdsCheck} className={styles.form}>
-                    <div className={styles.fieldContainer}>
+                    <div className={`${styles.fieldContainer} ${styles.fullWidthField}`}>
                         <label className={styles.label}>
                             Número de ODS (Único)
                         </label>
@@ -307,7 +307,7 @@ const AdvancedDiagnosisForm = () => {
                 
                 <form onSubmit={handleSubmit} className={styles.form}>
                     {/* Tipo de Producto */}
-                    <div className={styles.fieldContainer}>
+                    <div className={`${styles.fieldContainer} ${styles.fullWidthField}`}>
                         <label className={styles.label}>Tipo de Producto Samsung</label>
                         <select
                             value={productType}
@@ -322,7 +322,7 @@ const AdvancedDiagnosisForm = () => {
                     </div>
 
                     {/* Modelo */}
-                    <div className={styles.fieldContainer}>
+                    <div className={`${styles.fieldContainer} ${styles.fullWidthField}`}>
                         <label className={styles.label}>Modelo de Equipo (Ej: WA50F9A8DWW)</label>
                         <input 
                             type="text" 
@@ -334,7 +334,7 @@ const AdvancedDiagnosisForm = () => {
                     </div>
 
                     {/* Síntomas */}
-                    <div className={styles.fieldContainer}>
+                    <div className={`${styles.fieldContainer} ${styles.fullWidthField}`}>
                         <label className={styles.label}>Síntomas (Sé lo más detallado posible)</label>
                         <textarea 
                             value={symptoms} 
@@ -347,7 +347,7 @@ const AdvancedDiagnosisForm = () => {
                     </div>
 
                     {/* Código de Error */}
-                    <div className={styles.fieldContainer}>
+                    <div className={`${styles.fieldContainer} ${styles.fullWidthField}`}>
                         <label className={styles.label}>Código de Error (Opcional)</label>
                         <input 
                             type="text" 
