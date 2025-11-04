@@ -12,7 +12,7 @@ const ContactForm = () => {
   const [isAscValid, setIsAscValid] = useState(true);
 
   useEffect(() => {
-    emailjs.init('OimePa9MbzuM5Lahj');
+    emailjs.init(process.env.NEXT_PUBLIC_PUBLIC_KEY);
   }, []);
 
   const validateASC = (value) => {
@@ -47,7 +47,7 @@ const ContactForm = () => {
     }
 
     emailjs
-      .sendForm('service_hp5g9er', 'template_fw5dsio', form.current)
+      .sendForm(process.env.NEXT_PUBLIC_SERVICE_ID, process.env.NEXT_PUBLIC_TEMPLATE_ID , form.current)
       .then(
         (result) => {
           alert('Correo enviado correctamente');

@@ -1,117 +1,100 @@
-/* styles/Acerca.module.css */
+/* --- Hero / Encabezado principal --- */
+.heroSection {
+  position: relative;
+  background: url("https://images.samsung.com/is/image/samsung/assets/global/about-us/brand/brand-identity/brand-identity-kv-pc.jpg")
+    center/cover no-repeat;
+  color: white;
+  text-align: center;
+  padding: 5rem 1rem;
+}
 
-/*
-  Estilos para el contenedor principal del contenido "Acerca de".
-  Esta clase se aplicará al div que envuelve el h1 y el p en tu componente.
-  Asume que tu Layout ya proporciona un contenedor general y centrado,
-  pero este añade padding específico para esta sección.
-*/
-.acercaPageContent {
-  /* Usamos las variables de espaciado para padding vertical y horizontal */
-  padding-top: var(--spacing-5); /* Equivalente a 20px */
-  padding-bottom: var(--spacing-5); /* Equivalente a 20px */
-  /* Usamos la variable específica para 15px que definiste */
-  padding-left: var(--spacing-15px); /* Equivalente a 15px */
-  padding-right: var(--spacing-15px); /* Equivalente a 15px */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+}
 
-  margin: 0 auto; /* Centrar el contenido si el Layout no lo hace completamente */
-  /* Opcional: Limitar el ancho máximo del texto para mejorar legibilidad en pantallas muy grandes */
+.heroContent {
+  position: relative;
+  z-index: 2;
   max-width: 800px;
+  margin: 0 auto;
 }
 
-/* Estilos para el encabezado h1 dentro de este componente */
-.acercaPageContent h1 {
-  font-size: 2rem; /* Tamaño de fuente base para móviles (usamos rem, escalable) */
-  /* Usamos variable de espaciado para el margen inferior */
-  margin-bottom: var(--spacing-4); /* Equivalente a 16px (1rem) */
-  /* Usamos variable de color - elegimos un gris oscuro similar a #333 */
-  color: var(--color-gray-700);
-  text-align: center; /* Centra el texto del encabezado */
-  line-height: 1.2; /* Espaciado de línea para el encabezado */
+.heroContent h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
 }
 
-/* Estilos para el párrafo dentro de este componente */
-.acercaPageContent p {
-  font-size: 1rem; /* Tamaño de fuente base para móviles (usamos rem) */
-   /* Usamos variable de espaciado para el margen inferior */
-  margin-bottom: var(--spacing-6); /* Equivalente a 24px (1.5rem) */
-  line-height: 1.8; /* Mayor interlineado para una mejor legibilidad en párrafos largos */
-  /* Usamos variable de color - elegimos un gris medio similar a #555 */
-  color: var(--color-gray-600);
-  text-align: justify; /* Opcional: Justifica el texto del párrafo */
+.heroContent p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #e0e0e0;
 }
 
-
-/* --- Media Queries usando Variables de Breakpoints --- */
-
-/* Ajustes para pantallas medianas (tablets y superiores) */
-@media (min-width: var(--breakpoint-md)) { /* Utiliza la variable para 768px */
-    .acercaPageContent {
-        /* Aumentamos el padding en pantallas más grandes usando variables */
-        padding-top: var(--spacing-8); /* Equivalente a 32px */
-        padding-bottom: var(--spacing-8); /* Equivalente a 32px */
-         /* Usamos la variable específica para 20px */
-        padding-left: var(--spacing-20px); /* Equivalente a 20px */
-        padding-right: var(--spacing-20px); /* Equivalente a 20px */
-    }
-
-    .acercaPageContent h1 {
-        font-size: 2.8rem; /* Aumenta el tamaño del h1 (usamos rem) */
-        margin-bottom: var(--spacing-6); /* Equivalente a 24px */
-    }
-
-    .acercaPageContent p {
-        font-size: 1.1rem; /* Aumenta ligeramente el tamaño del párrafo (usamos rem) */
-         /* La variable más cercana a 1.8rem (28.8px) es --spacing-7 (28px) */
-        margin-bottom: var(--spacing-7); /* Equivalente a 28px */
-    }
+.icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #00a8e8;
 }
 
-/* Ajustes para pantallas grandes (escritorios y superiores) */
-@media (min-width: var(--breakpoint-lg)) { /* Utiliza la variable para 1024px */
-     .acercaPageContent {
-        /* Aumentamos aún más el padding */
-        padding-top: var(--spacing-10); /* Equivalente a 40px */
-        padding-bottom: var(--spacing-10); /* Equivalente a 40px */
-         /* Usamos variable de espaciado para padding lateral (ej: 24px) */
-        padding-left: var(--spacing-6); /* Equivalente a 24px */
-        padding-right: var(--spacing-6); /* Equivalente a 24px */
-    }
-
-    .acercaPageContent h1 {
-        font-size: 3.5rem; /* Aumenta más el tamaño del h1 (usamos rem) */
-        margin-bottom: var(--spacing-8); /* Equivalente a 32px */
-    }
-
-    .acercaPageContent p {
-        font-size: 1.2rem; /* Aumenta más el tamaño del párrafo (usamos rem) */
-        margin-bottom: var(--spacing-8); /* Equivalente a 32px */
-    }
+/* --- Sección de valores --- */
+.valuesSection {
+  background: var(--color-background-light, #f8f9fa);
+  padding: 4rem 1.5rem;
+  text-align: center;
 }
 
-/* Ajustes opcionales para pantallas extra grandes */
-@media (min-width: var(--breakpoint-xl)) { /* Utiliza la variable para 1280px */
-     .acercaPageContent {
-        padding-top: var(--spacing-12); /* Equivalente a 48px */
-        padding-bottom: var(--spacing-12); /* Equivalente a 48px */
-         /* Puedes ajustar el padding lateral si lo deseas */
-         padding-left: var(--spacing-8); /* Equivalente a 32px */
-         padding-right: var(--spacing-8); /* Equivalente a 32px */
-    }
-
-    .acercaPageContent h1 {
-        font-size: 4rem; /* Aumenta más el tamaño del h1 */
-    }
-
-    .acercaPageContent p {
-        font-size: 1.3rem; /* Aumenta más el tamaño del párrafo */
-    }
+.valuesSection h2 {
+  color: var(--color-gray-800, #222);
+  font-size: 2rem;
+  margin-bottom: 2rem;
 }
 
-/*
-Recuerda que los valores específicos de espaciado (margin, padding)
-y tamaños de fuente en las media queries son sugerencias basadas
-en la escala de variables que proporcionaste y los tamaños comunes
-de texto responsive. Es posible que quieras ajustarlos ligeramente
-para que el resultado sea perfecto en tu diseño.
-*/
+.valuesGrid {
+  display: grid;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .valuesGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.valueCard {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.valueCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.valueCard img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
+.valueCard h3 {
+  color: #0074e4;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.valueCard p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}

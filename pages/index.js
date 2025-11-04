@@ -1,40 +1,33 @@
-// pages/index.js
 import Link from "next/link";
-import Layout from "../components/Layout"; // Asumiendo que usas este Layout
-import styles from '../styles/index.module.css'; // Importa el módulo CSS
+import Layout from "../components/Layout";
+import styles from "../styles/index.module.css";
 
 export default function Home() {
-  // Si tu Layout se aplica globalmente en _app.js o layout.js, puedes omitir el <Layout> aquí.
-  // Si lo usas aquí, asegúrate que el título se pase correctamente.
   return (
     <Layout title="Inicio - OSSamsung">
-      {/* Contenedor principal de la página de inicio */}
-      <div className={styles.container}>
-        {/* Contenedor del Logo */}
-        <div className={styles.logoContainer}>
+      <div className={styles.hero}>
+        <div className={styles.overlay}></div>
+
+        <div className={styles.content}>
           <img
-            src="https://tse4.mm.bing.net/th?id=OIP.Irb0SUESk0MSJiqSt5y3tQHaEf&pid=Api&P=0&h=180" // Tu URL de logo
+            src="https://firebasestorage.googleapis.com/v0/b/samsungcodeclose.firebasestorage.app/o/samsung-group-vector-logo.png?alt=media&token=cb5fa39b-42e0-4a13-b8d8-7fddc46bcb49"
             alt="Logo Samsung"
             className={styles.logo}
           />
-        </div>
 
-        {/* Título Principal */}
-        <h1 className={styles.title}>
-          Apoyo de cierre de Órdenes de servicio
-        </h1>
+          <h1 className={styles.title}>Smart Support para Centros de Servicio</h1>
+          <p className={styles.subtitle}>
+            Optimiza tus cierres y diagnósticos con herramientas impulsadas por IA.
+          </p>
 
-        {/* Link/Botón de Iniciar */}
-        <div className={styles.buttonContainer}>
-        <Link
-          href={'/equips'}
-          className={styles.startButton}
-        >
-          Cierre de Órdenes de Servicio
-        </Link>
-          <Link href="/diagnosticoPage" className={styles.startButton} >
-            Pre Diagnóstico IA
-          </Link>
+          <div className={styles.buttonContainer}>
+            <Link href="/equips" className={styles.startButton}>
+              Cierre de Órdenes de Servicio
+            </Link>
+            <Link href="/diagnosticoPage" className={styles.secondaryButton}>
+              Pre Diagnóstico IA
+            </Link>
+          </div>
         </div>
       </div>
     </Layout>

@@ -1,165 +1,143 @@
-/* Barra principal */
+/* Navbar principal */
 .navbar {
-  background-color: var(--navbar-light-bg);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
-  z-index: 50;
-  transition: background-color 0.3s ease-in-out;
-}
-html.dark .navbar {
-  background-color: var(--navbar-dark-bg);
+  z-index: 100;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* Contenedor interno centrado */
+/* Contenedor interno */
 .navbarContent {
+  max-width: 1300px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 4rem;
+  height: 4.5rem;
   padding: 0 1.5rem;
-  max-width: 1200px; /* <- límite de ancho */
-  margin: 0 auto; /* <- centrado horizontal */
-  width: 100%;
-  box-sizing: border-box;
-  flex-wrap: wrap; /* <- evita que se amontonen los links */
-  gap: 0.5rem;
 }
 
-/* Botón de tema */
-.themeButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  margin-right: 0.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: linear-gradient(180deg, var(--elev-1), var(--elev-2));
-  color: var(--text);
-  box-shadow: var(--shadow-soft);
+/* Logo */
+.logoSection img {
+  height: 26px;
   cursor: pointer;
-  transition: transform 0.12s, filter 0.15s, box-shadow 0.15s, border-color 0.15s;
 }
-.themeButton:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.04);
-  border-color: var(--brand);
-}
-.themeButton:active { transform: translateY(0); }
 
-/* Hamburguesa (solo móvil) */
-.hamburgerButton {
+/* Links centrales */
+.navLinks {
   display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navLink {
+  text-decoration: none;
+  font-weight: 600;
+  color: #000;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover {
+  color: #0074e4;
+}
+
+/* Lado derecho */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Caja de búsqueda */
+.searchBox {
+  position: relative;
+  background: #f5f5f5;
+  border-radius: 50px;
+  padding: 0.4rem 1rem 0.4rem 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.iconSearch {
+  position: absolute;
+  left: 0.8rem;
+  color: #888;
+  font-size: 1rem;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.9rem;
+  width: 120px;
+}
+
+/* Iconos */
+.icon {
+  font-size: 1.25rem;
+  color: #000;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.icon:hover {
+  color: #0074e4;
+}
+
+/* Botón negro tipo Samsung */
+.downloadButton {
+  background: #000;
+  color: #fff;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.downloadButton:hover {
+  background: #111;
+}
+
+/* Hamburguesa móvil */
+.hamburgerButton {
+  display: none;
   flex-direction: column;
-  justify-content: space-around;
-  width: 2rem;
-  height: 2rem;
+  justify-content: space-between;
+  width: 1.5rem;
+  height: 1.25rem;
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 0;
-  z-index: 60;
-  transition: all 0.3s ease;
 }
+
 .hamburgerLine {
   width: 100%;
   height: 2px;
-  background-color: var(--hamburger-color);
-  transition: all 0.3s ease;
-}
-html.dark .hamburgerLine {
-  background-color: var(--hamburger-dark-color);
+  background-color: #333;
+  border-radius: 2px;
 }
 
-/* Links (móvil cerrado) */
-.navLinks {
-  display: none;
-}
-
-/* Móvil abierto */
-.navLinks.menuOpen {
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 4rem;
-  left: 0;
-  width: 100%;
-  height: calc(100vh - 4rem);
-  background-color: var(--menu-mobile-bg);
-  padding: 1rem 0;
-  z-index: 55;
-  overflow-y: auto;
-}
-html.dark .navLinks.menuOpen {
-  background-color: var(--menu-mobile-dark-bg);
-}
-
-/* Enlaces en móvil */
-.navLinks.menuOpen .navLink,
-.navLinks.menuOpen .navLinkAdmin {
-  width: 100%;
-  padding: var(--navbar-padding-y-2) 1.5rem;
-  text-align: left;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-  color: var(--navbar-light-text);
-  text-decoration: none;
-}
-html.dark .navLinks.menuOpen .navLink,
-html.dark .navLinks.menuOpen .navLinkAdmin {
-  border-bottom-color: rgba(255,255,255,0.1);
-  color: var(--navbar-dark-text);
-}
-
-/* Desktop (>=768px) */
-@media (min-width: 768px) {
-  .hamburgerButton { display: none; }
-
+/* Modo responsive */
+@media (max-width: 960px) {
   .navLinks {
+    display: none;
+  }
+
+  .hamburgerButton {
     display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    flex-wrap: wrap;
   }
 
-  .navLinks .navLink,
-  .navLinks .navLinkAdmin {
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--navbar-rounded-md);
-    color: var(--navbar-light-text);
-    text-decoration: none;
-    white-space: nowrap; /* evita que los textos se partan */
-    font-size: 0.95rem;
-    font-weight: 500;
+  .actions {
+    gap: 0.5rem;
   }
 
-  html.dark .navLinks .navLink,
-  html.dark .navLinks .navLinkAdmin {
-    color: var(--navbar-dark-text);
-  }
-
-  .navLinks .navLink:hover,
-  .navLinks .navLinkAdmin:hover {
-    background-color: var(--navbar-light-hover-bg);
-  }
-
-  html.dark .navLinks .navLink:hover,
-  html.dark .navLinks .navLinkAdmin:hover {
-    background-color: var(--navbar-dark-hover-bg);
-  }
-}
-
-/* Backdrop (cerrar menú al tocar fuera) */
-.backdrop {
-  display: none;
-}
-@media (max-width: 767.98px) {
-  .backdrop {
-    display: block;
-    position: fixed;
-    inset: 4rem 0 0 0;
-    background: rgba(0,0,0,0.35);
-    z-index: 54;
+  .downloadButton {
+    display: none;
   }
 }

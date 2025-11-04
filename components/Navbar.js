@@ -1,15 +1,12 @@
-// components/Navbar.js
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import styles from '../styles/Navbar.module.css';
+import { FiUser } from 'react-icons/fi'; // ícono de usuario
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
-
- 
-  
 
   const toggleMenu = () => setIsMenuOpen(v => !v);
   const closeMenu = () => setIsMenuOpen(false);
@@ -33,7 +30,7 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <div className={`container ${styles.navbarContent}`}>
-        {/* Botón de tema */}
+        {/* Botón de tema (si lo usas) */}
 
         {/* Hamburguesa (móvil) */}
         <button
@@ -60,7 +57,17 @@ export default function Navbar() {
           <Link href="/privacidad" className={styles.navLink} onClick={closeMenu}>Privacidad</Link>
           <Link href="/aviso_legal" className={styles.navLink} onClick={closeMenu}>Aviso Legal</Link>
           <Link href="/diagnosticoPage" className={styles.navLink} onClick={closeMenu}>Pre Diagnóstico IA</Link>
-          <Link href="/admin" className={styles.navLinkAdmin} onClick={closeMenu}>Login</Link>
+
+          {/* Login - en desktop se muestra solo el icono; en móvil (menu abierto) se verá el texto */}
+          <Link
+            href="/admin"
+            className={`${styles.navLinkAdmin}`}
+            onClick={closeMenu}
+            aria-label="Iniciar sesión"
+          >
+            {/* icono visible en desktop; el texto se mostrará en el menú móvil por CSS */}
+            <FiUser className={styles.loginIcon} />
+          </Link>
         </div>
       </div>
       {isMenuOpen && <div className={styles.backdrop} onClick={closeMenu} />}
