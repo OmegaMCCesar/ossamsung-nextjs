@@ -54,6 +54,20 @@ const AdvancedDiagnosisForm = () => {
     const [error, setError] = useState(null);
     const [showAdvanced, setShowAdvanced] = useState(false); 
     const [browserDeviceId, setBrowserDeviceId] = useState(''); 
+
+    const [selectedPart, setSelectedPart] = useState(null);
+    const [showPartModal, setShowPartModal] = useState(false);
+
+    const openPartModal = (part) => {
+       setSelectedPart(part);
+       setShowPartModal(true);
+    };
+
+    const closePartModal = () => {
+      setShowPartModal(false);
+      setSelectedPart(null);
+    };
+
     
     useEffect(() => {
         let currentDeviceId = localStorage.getItem('ai_device_id');
@@ -257,6 +271,7 @@ const AdvancedDiagnosisForm = () => {
                             <AlertTriangle className={styles.iconSmall} /> {error}
                         </div>
                     )}
+                    <div className={styles.fullWidthField}  >
                     <button 
                         type="submit" 
                         className={`${styles.primaryButton} ${disableSubmit ? styles.disabledButton : ''}`}
@@ -271,6 +286,7 @@ const AdvancedDiagnosisForm = () => {
                             `Obtener Diagnóstico Avanzado ${!hasUnlimitedAccess ? `(${usageCount.remaining} restantes)` : ''}`
                         )}
                     </button>
+                    </div>
                     {!hasUnlimitedAccess && usageCount.remaining <= 0 && (
                          <div className={styles.alert} style={{ marginTop: '15px' }}>
                             <AlertTriangle className={styles.iconSmall} /> Has agotado tu límite de consultas diarias.
@@ -363,7 +379,7 @@ const AdvancedDiagnosisForm = () => {
                             <AlertTriangle className={styles.iconSmall} /> {error}
                         </div>
                     )}
-
+                    <div className={styles.fullWidthField} >
                     <button 
                         type="submit" 
                         className={`${styles.primaryButton} ${disableSubmit ? styles.disabledButton : ''}`}
@@ -378,11 +394,14 @@ const AdvancedDiagnosisForm = () => {
                             `Obtener Diagnóstico ${!hasUnlimitedAccess ? `(${usageCount.remaining} restantes)` : ''}`
                         )}
                     </button>
+                    </div>
                     
                     {!isAnonymous && (
+                        <div className={styles.fullWidthField} >
                         <button type="button" onClick={() => setStep('ods_input')} className={styles.secondaryButton}>
                             <RefreshCw className={styles.iconSmall} /> Cambiar ODS
                         </button>
+                        </div>
                     )}
                     
                     {!hasUnlimitedAccess && usageCount.remaining <= 0 && (
@@ -521,38 +540,90 @@ const AdvancedDiagnosisForm = () => {
                             💡 Repuestos Posibles (Para Administración)
                         </h3>
                         <div className={styles.partsContainer}>
-                            {result.potentialParts?.map((part, index) => (
-                                <div 
-                                    key={index} 
-                                    className={`${part.isCritical ? styles.partCritical : styles.partStandard} ${part.foundInDB ? styles.partFound : styles.partNotFound}`}
-                                >
-                                    {part.foundInDB && part.imageUrl ? (
-                                        <img src={part.imageUrl} alt={part.partName} className={styles.partImage} />
-                                    ) : (
-                                        <div className={styles.partImage}>
-                                            <Zap className={styles.iconSmall} />
-                                        </div>
-                                    )}
-                                    <div className={styles.partContent}>
-                                        <p className={styles.partName}>
-                                            {part.partName} 
-                                            {part.isCritical && <span className={styles.partCriticalLabel}>CRÍTICO</span>}
-                                        </p>
-                                        {part.foundInDB && part.partFunction && (
-                                            <p className={styles.partFunction}>Función: {part.partFunction}</p>
-                                        )}
-                                        <p className={styles.partNumber}>
-                                            <span className={styles.bold}>Nº Parte:</span> 
-                                            <span className={styles.mono}>{part.foundInDB ? part.partNumber : "SIN INF. DE LA PARTE"}</span>
-                                        </p>
-                                        <p className={styles.partReason}>{part.reason}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+  {result.potentialParts?.map((part, index) => (
+    <div 
+      key={index} 
+      className={`${styles.partCardCompact} ${part.isCritical ? styles.partCriticalCompact : ''}`}
+    >
+      {/* Imagen */}
+      {part.imageUrl ? (
+        <img src={part.imageUrl} alt={part.partName} className={styles.partCompactImage} />
+      ) : (
+        <div className={styles.partCompactImagePlaceholder}>
+          <Zap className={styles.iconSmall} />
+        </div>
+      )}
+
+      {/* Contenido */}
+      <div className={styles.partCompactContent}>
+        
+        <p className={styles.partCompactName}>
+          {part.partName}
+        </p>
+
+        {part.isCritical && (
+          <span className={styles.partCriticalBadge}>CRÍTICO</span>
+        )}
+
+        <p className={styles.partCompactNumber}>
+          Nº Parte: <strong>{part.partNumber || "N/A"}</strong>
+        </p>
+
+        <button 
+          className={styles.partDetailsButton}
+          onClick={() => openPartModal(part)}
+        >
+          Ver más
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
                     </div>
                 )}
                 
+                {showPartModal && selectedPart && (
+  <div className={styles.partModalOverlay}>
+    <div className={styles.partModal}>
+      
+      <button className={styles.modalCloseButton} onClick={closePartModal}>
+        ✕
+      </button>
+
+      <img 
+        src={selectedPart.imageUrl} 
+        alt={selectedPart.partName} 
+        className={styles.modalImage} 
+      />
+
+      <h2 className={styles.modalTitle}>{selectedPart.partName}</h2>
+
+      {selectedPart.isCritical && (
+        <span className={styles.modalCriticalBadge}>CRÍTICO</span>
+      )}
+
+      <p className={styles.modalPartNumber}>
+        <strong>Número de parte:</strong> {selectedPart.partNumber || "N/A"}
+      </p>
+
+      {selectedPart.partFunction && (
+        <p className={styles.modalDescription}>
+          <strong>Función:</strong> {selectedPart.partFunction}
+        </p>
+      )}
+
+      {selectedPart.reason && (
+        <p className={styles.modalReason}>
+          <strong>Motivo:</strong> {selectedPart.reason}
+        </p>
+      )}
+
+    </div>
+  </div>
+)}
+
+
                 {/* Botones de navegación */}
                 <button 
                     onClick={restartDiagnosis} 

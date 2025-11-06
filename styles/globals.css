@@ -69,6 +69,27 @@ html {
 
 :root {
 
+   --oneui-card-bg: #ffffff;
+  --oneui-card-radius: 18px;
+  --oneui-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  --oneui-shadow-strong: 0 6px 18px rgba(0,0,0,0.10);
+
+  --oneui-text: #1A1A1A;
+  --oneui-muted: #6B7280;
+
+  --oneui-blue: #1351F5;
+  --oneui-blue-strong: #0d3ecc;
+  
+  --oneui-danger: #D6453D;
+  --oneui-warning: #F4A100;
+  --oneui-ok: #22A861;
+
+  --oneui-radius-sm: 12px;
+  --oneui-radius-xs: 8px;
+
+  --pad: clamp(22px, 3vw, 40px);
+  --gap: 22px;
+
 
   /* COLORES BASE */
    --samsung-blue: #1428a0;

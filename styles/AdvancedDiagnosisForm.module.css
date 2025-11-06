@@ -1,622 +1,496 @@
-/* ================================
-  styles/AdvancedDiagnosisForm.module.css
-  ================================ */
+/* ============================================================
+   CARD PRINCIPAL — ONE UI
+   ============================================================ */
 
-/* Card Contenedora (usa elevaciones suaves) */
 .card {
-    background-color: var(--card); /* Blanco */
-    border-radius: var(--radius); /* Redondeo suave */
-    box-shadow: var(--shadow); /* Sombra sutil */
-    padding: var(--pad);
-    margin: 20px auto;
-    max-width: 900px;
-    width: 95%;
-    border: 1px solid var(--border); /* Borde sutil */
-}
-
-/* Encabezado y Subtexto */
-.heading {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: var(--text); /* Negro */
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-}
-
-.subtext {
-    color: var(--muted); /* Gris oscuro */
-    margin-bottom: 25px;
-    font-size: 1rem;
-}
-
-.icon {
-    width: 28px;
-    height: 28px;
-    margin-right: 10px;
-    color: var(--brand); /* Samsung Blue */
-}
-
-.iconSmall {
-    width: 18px;
-    height: 18px;
-    margin-right: 5px;
-}
-
-/* Formulario General */
-.form {
-    display: grid;
-    gap: var(--gap);
-    grid-template-columns: 1fr;
-}
-
-@media (min-width: 640px) {
-    .form {
-        grid-template-columns: repeat(2, 1fr); /* 2 columnas en móvil grande */
-    }
-}
-
-.form > button {
-    grid-column: 1 / -1; /* Botones a ancho completo */
-    margin-top: 10px;
-}
-
-.fieldContainer {
-    display: flex;
-    flex-direction: column;
-}
-
-.label {
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: var(--text);
-    font-size: 0.95rem;
-}
-
-/* Los estilos de .inputField se heredan principalmente de globals.css */
-.inputField {
-    width: 100%;
-    /* Mantenemos la apariencia de globals.css */
-}
-
-/* Botones */
-.primaryButton {
-    background-color: var(--brand);
-    color: var(--color-white);
-    padding: 14px 20px;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease, opacity 0.15s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.primaryButton:hover:not(.disabledButton) {
-    background-color: var(--brand-strong);
-}
-
-.secondaryButton {
-    background-color: var(--elev-1);
-    color: var(--text);
-    padding: 12px 20px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.secondaryButton:hover {
-    background-color: var(--input-bg-hover);
-    border-color: var(--muted);
-}
-
-.disabledButton {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-
-/* Estados y Alertas */
-.alert {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background-color: rgba(255, 107, 107, 0.1); /* Fondo Rojo Suave */
-    border: 1px solid var(--danger);
-    color: var(--danger);
-    border-radius: var(--radius-xs);
-    font-size: 0.95rem;
-}
-
-.successMessage {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background-color: rgba(46, 204, 113, 0.1); /* Fondo Verde Suave */
-    border: 1px solid var(--ok);
-    color: var(--ok);
-    border-radius: var(--radius-xs);
-    font-weight: 500;
-    margin-bottom: var(--gap);
-}
-
-.spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* --- SECCIONES DE RESULTADOS --- */
-.sectionTitle {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--brand); /* Samsung Blue para títulos de sección */
-    margin-top: 25px;
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--border);
-    padding-bottom: 5px;
-}
-
-.sectionTitleRed {
-  
-    color: var(--danger); /* Rojo para advertir de secciones avanzadas */
-}/* ================================
-  styles/AdvancedDiagnosisForm.module.css
-  ================================ */
-
-/* Contenedor principal */
-.card {
-  background-color: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: clamp(24px, 3vw, 40px);
-  margin: 40px auto;
-  max-width: 900px;
-  width: 95%;
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-/* Encabezado */
-.heading {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 0.25rem;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.subtext {
-  color: var(--muted);
-  margin-bottom: 32px;
-  font-size: 1rem;
-  text-align: center;
-  line-height: 1.4;
-}
-
-/* Iconos */
-.icon {
-  width: 28px;
-  height: 28px;
-  margin-right: 10px;
-  color: var(--brand);
-}
-
-.iconSmall {
-  width: 18px;
-  height: 18px;
-  margin-right: 5px;
-}
-
-/* Formulario */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-
-  
-}
-
-@media (min-width: 768px) {
-  .form {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px 24px;
-  }
-
-  .fullWidthField {
-    grid-column: 1 / -1; /* Ocupa de la primera a la última columna */
-  }
-}
-
-.fieldContainer {
-  display: flex;
-  flex-direction: column;
-}
-
-.label {
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: var(--text);
-  font-size: 0.95rem;
-}
-
-/* Inputs */
-.inputField {
+  background: var(--oneui-card-bg);
+  border-radius: var(--oneui-card-radius);
+  box-shadow: var(--oneui-shadow);
+  padding: var(--pad);
+  margin: 30px auto;
+  transition: box-shadow .25s ease;
+  max-width: 1100px;
   width: 100%;
 }
 
-/* Botones */
-.form > button {
-  grid-column: 1 / -1;
-  margin-top: 20px;
+.card:hover {
+  box-shadow: var(--oneui-shadow-strong);
 }
 
+/* ============================================================
+   ENCABEZADOS
+   ============================================================ */
+
+.heading {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--oneui-text);
+  text-align: center;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.subtext {
+  text-align: center;
+  color: var(--oneui-muted);
+  margin-bottom: 28px;
+  line-height: 1.45;
+  font-size: 1rem;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  color: var(--oneui-blue);
+}
+
+.iconSmall {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+@media (min-width: 780px) {
+  .form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+  .fullWidthField {
+    grid-column: 1 / -1;
+  }
+}
+
+.fieldContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--oneui-text);
+  margin-bottom: 6px;
+}
+
+.inputField {
+  padding: 13px 15px;
+  border-radius: var(--oneui-radius-sm);
+  border: 1px solid #dcdcdc;
+  background: #F8F9FB;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: var(--oneui-blue);
+  box-shadow: 0 0 0 2px rgba(35, 111, 255, 0.4);
+}
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+
+.containerButton{
+  background-color: red;
+  width: 100%;
+}   
+
 .primaryButton {
-  background-color: var(--brand);
-  color: var(--color-white);
-  padding: 14px 20px;
+  background: var(--oneui-blue);
+  color: #fff;
+  padding: 14px;
+  border-radius: var(--oneui-radius-sm);
   border: none;
-  border-radius: var(--radius-sm);
+  font-size: 1.07rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
   gap: 8px;
+  transition: 0.2s;
 }
 
 .primaryButton:hover:not(.disabledButton) {
-  background-color: var(--brand-strong);
+  background: var(--oneui-blue-strong);
 }
 
 .secondaryButton {
-  background-color: var(--elev-1);
-  color: var(--text);
-  padding: 12px 20px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  background: #F2F3F5;
+  border: 1px solid #d8d8d8;
+  color: var(--oneui-text);
+  padding: 12px;
+  border-radius: var(--oneui-radius-sm);
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  transition: 0.2s;
+  width: 100%;
 }
 
 .secondaryButton:hover {
-  background-color: var(--input-bg-hover);
-  border-color: var(--muted);
+  background: #E7E9EC;
 }
 
 .disabledButton {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Mensajes */
-.alert, .successMessage {
-  grid-column: 1 / -1;
+/* ============================================================
+   ALERTAS Y MENSAJES
+   ============================================================ */
+
+.alert,
+.successMessage {
+  padding: 16px;
+  border-radius: var(--oneui-radius-sm);
+  font-weight: 600;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 18px;
-  border-radius: var(--radius-xs);
-  font-size: 0.95rem;
-  font-weight: 500;
-  text-align: center;
+  gap: 8px;
+  align-items: flex-start;
 }
 
 .alert {
-  background-color: rgba(255, 107, 107, 0.08);
-  border: 1px solid var(--danger);
-  color: var(--danger);
+  background: rgba(214, 69, 61, 0.10);
+  border: 1px solid var(--oneui-danger);
+  color: var(--oneui-danger);
 }
 
 .successMessage {
-  background-color: rgba(46, 204, 113, 0.08);
-  border: 1px solid var(--ok);
-  color: var(--ok);
+  background: rgba(34, 168, 97, 0.15);
+  border: 1px solid var(--oneui-ok);
+  color: var(--oneui-ok);
 }
 
-/* Resultados / Diagnóstico */
+/* ============================================================
+   TÍTULOS DE SECCIONES
+   ============================================================ */
+
 .sectionTitle {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--brand);
-  margin-top: 32px;
-  margin-bottom: 16px;
-  border-bottom: 2px solid var(--border);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--oneui-blue);
+  margin-top: 35px;
+  border-bottom: 2px solid #ececec;
   padding-bottom: 6px;
-  text-align: left;
 }
 
 .sectionTitleRed {
-  color: var(--danger);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--oneui-danger);
+  margin-top: 35px;
 }
+
+/* ============================================================
+   CUADRO DE DIAGNÓSTICO PRINCIPAL
+   ============================================================ */
 
 .mainDiagnosisBox {
+  background: #F8F9FB;
   padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background-color: var(--elev-1);
-  margin-bottom: 24px;
+  border-radius: var(--oneui-radius-sm);
+  border: 1px solid #e5e5e5;
+  margin-top: 14px;
+  line-height: 1.55;
 }
 
-.textPre {
-  white-space: pre-wrap;
-  line-height: 1.6;
-  color: var(--text);
-}
+/* ============================================================
+   FEEDBACK
+   ============================================================ */
 
-/* Feedback */
 .feedbackSection {
-  margin: 32px 0;
-  padding: 24px;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-sm);
+  margin: 35px 0;
+  padding: 22px;
+  border-radius: var(--oneui-radius-sm);
+  border: 2px dashed #cfcfcf;
+  background: #FAFAFC;
   text-align: center;
 }
 
+/* ===============================================
+   FEEDBACK — BOTONES RESPONSIVE ESTILO ONE UI
+   =============================================== */
+
 .feedbackButtons {
+  margin-top: 20px;
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 12px;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  align-items: center; /* centra en escritorio */
 }
 
-.feedbackButtons p {
-  flex-basis: 100%;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-
-.feedbackCorrecta {
-  background-color: var(--ok);
-}
-.feedbackCerca {
-  background-color: var(--warn);
-}
-.feedbackIncorrecta {
-  background-color: var(--danger);
-}
-
-/* Repuestos */
-.partsContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-}
-
-.partStandard {
-  background-color: var(--elev-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+/* Botones */
+.feedbackButtons button {
+  width: 100%;
+  max-width: 380px; /* límite para que no crezcan demasiado */
   padding: 14px;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  transition: box-shadow 0.2s ease;
+  font-size: 1rem;
+  border-radius: var(--oneui-radius-sm);
+  font-weight: 700;
+  color: white;
+  box-shadow: var(--oneui-shadow);
+  transition: 0.2s ease;
 }
 
-.partStandard:hover {
-  box-shadow: var(--shadow-soft);
+/* Hover escritorio */
+@media (hover: hover) {
+  .feedbackButtons button:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--oneui-shadow-strong);
+  }
 }
 
-.partCritical {
-  border-color: var(--danger);
-  background-color: rgba(255, 107, 107, 0.04);
-}
+/* MODO TABLET / PC */
+@media (min-width: 700px) {
+  .feedbackButtons {
+    flex-direction: row;
+    justify-content: center;
+  }
 
-.partImage {
-  width: 60px;
-  height: 60px;
-  background-color: var(--input-bg-hover);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.partName {
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 4px;
-}
-
-.partNumber,
-.partFunction,
-.partReason {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-/* Animación */
-.spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+  .feedbackButtons button {
+    width: auto;       /* ← YA NO SE EXPANDE */
+    max-width: none;
+    min-width: 180px;  /* tamaño uniforme */
+    padding: 12px 22px;
+    font-size: 0.95rem;
   }
 }
 
 
-.mainDiagnosisBox {
-    padding: 20px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    margin-bottom: 25px;
-    background-color: var(--elev-1);
+.feedbackCorrecta { background: var(--oneui-ok); }
+.feedbackCerca { background: var(--oneui-warning); }
+.feedbackIncorrecta { background: var(--oneui-danger); }
+
+
+
+/* ============================================================
+   LISTAS AVANZADAS
+   ============================================================ */
+
+.causeList,
+.stepList {
+  margin-left: 20px;
+  margin-top: 15px;
+  line-height: 1.55;
+  color: var(--oneui-muted);
 }
 
-.beginnerTipsBox {
-    margin-top: 25px;
-}
+/* ============================================================
+   TARJETAS DE REPUESTOS — COMPACT MODE
+   ============================================================ */
 
-.textPre {
-    white-space: pre-wrap;
-    line-height: 1.6;
-    color: var(--text);
-}
+/* ============================================================
+   TARJETAS DE REPUESTOS — GRID RESPONSIVE REAL
+   ============================================================ */
 
-/* --- SECCIÓN FEEDBACK --- */
-.feedbackSection {
-    margin: 30px 0;
-    padding: 20px;
-    border: 1px dashed var(--border);
-    border-radius: var(--radius-sm);
-    text-align: center;
-}
-
-.feedbackButtons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-.feedbackButtons p {
-    flex-basis: 100%;
-    margin-bottom: 10px;
-    font-size: 1.05rem;
-    font-weight: 500;
-    color: var(--text);
-}
-
-.feedbackCorrecta {
-    background-color: var(--ok);
-}
-.feedbackCorrecta:hover {
-    background-color: #27ae60;
-}
-
-.feedbackCerca {
-    background-color: var(--warn);
-}
-.feedbackCerca:hover {
-    background-color: #e69100;
-}
-
-.feedbackIncorrecta {
-    background-color: var(--danger);
-}
-.feedbackIncorrecta:hover {
-    background-color: #c0392b;
-}
-
-/* --- SECCIÓN AVANZADA (Técnicos) --- */
-.advancedContainer {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-}
-
-.causeList, .stepList {
-    margin-left: 20px;
-    margin-bottom: 20px;
-    color: var(--muted);
-}
-
-.causeList li, .stepList li {
-    margin-bottom: 8px;
-    line-height: 1.5;
-}
-
-/* Repuestos */
 .partsContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--gap);
-    margin-top: 20px;
+  display: grid;
+  gap: 22px;
+  margin-top: 30px;
+  justify-content: center; /* Centra la grilla */
 }
 
-.partStandard {
-    background-color: var(--elev-1);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 15px;
-    display: flex;
-    gap: 15px;
-    transition: box-shadow 0.2s ease;
+/* Celular — 1 columna */
+@media (max-width: 600px) {
+  .partsContainer {
+    grid-template-columns: 1fr;
+  }
 }
 
-.partStandard:hover {
-    box-shadow: var(--shadow-soft);
+/* Tablet — 2 columnas */
+@media (min-width: 601px) and (max-width: 1020px) {
+  .partsContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-.partCritical {
-    
-    border-color: var(--danger);
-    background-color: rgba(255, 107, 107, 0.05);
+/* Laptop y Desktop — 3 columnas centradas */
+@media (min-width: 1021px) {
+  .partsContainer {
+    grid-template-columns: repeat(3, 300px);
+    justify-content: center; /* Centra las 3 tarjetas */
+  }
 }
 
-.partImage {
-    width: 60px;
-    height: 60px;
-    background-color: var(--input-bg-hover);
-    border-radius: 4px;
-    object-fit: cover;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+
+.partCardCompact {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: var(--oneui-card-radius);
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--oneui-shadow);
+  transition: .2s ease;
 }
 
-.partContent {
-    flex-grow: 1;
+.partCardCompact:hover {
+  box-shadow: var(--oneui-shadow-strong);
 }
 
-.partName {
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-    line-height: 1.2;
+/* Imagen */
+.partCompactImage {
+  width: 100%;
+  height: 130px;
+  object-fit: contain;
+  background: #F3F4F6;
+  border-radius: 10px;
 }
 
-.partCriticalLabel {
-    background-color: var(--danger);
-    color: var(--color-white);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.7em;
-    font-weight: 700;
-    margin-left: 8px;
+.partCompactImagePlaceholder {
+  width: 100%;
+  height: 130px;
+  background: #E7E9EC;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.partNumber, .partFunction, .partReason {
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 2px;
+/* Textos compactos */
+.partCompactName {
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--oneui-text);
 }
 
-.mono {
-    font-family: monospace;
-    font-size: 0.9em;
-    font-weight: 600;
-    color: var(--text);
+.partCompactNumber {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: var(--oneui-muted);
+}
+
+.partCriticalBadge {
+  display: inline-block;
+  background: var(--oneui-danger);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+/* Botón Ver más */
+.partDetailsButton {
+  margin-top: 14px;
+  background: var(--oneui-blue);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: var(--oneui-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  transition: .2s ease;
+}
+
+.partDetailsButton:hover {
+  background: var(--oneui-blue-strong);
+}
+
+/* ============================================================
+   MODAL FULLSCREEN — ONE UI
+   ============================================================ */
+
+.partModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 40px;
+  z-index: 9999;
+}
+
+.partModal {
+  width: 94%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: var(--oneui-card-radius);
+  padding: 22px;
+  box-shadow: var(--oneui-shadow-strong);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modalCloseButton {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  float: right;
+  cursor: pointer;
+  color: var(--oneui-text);
+}
+
+.modalImage {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  background: #F3F4F6;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.modalTitle {
+  text-align: center;
+  font-size: 1.45rem;
+  margin-top: 15px;
+  font-weight: 700;
+}
+
+.modalCriticalBadge {
+  display: inline-block;
+  background: var(--oneui-danger);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin: 10px auto;
+  font-weight: 700;
+}
+
+.modalPartNumber,
+.modalDescription,
+.modalReason {
+  margin-top: 14px;
+  line-height: 1.55;
+  color: var(--oneui-text);
+}
+
+/* ===============================================
+   SPINNER — ANIMACIÓN DE CARGA (One UI)
+   =============================================== */
+
+.spinner {
+  animation: spin 0.9s linear infinite;
+  transform-origin: center;
+}
+
+/* Animación One UI estilo Samsung */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
