@@ -173,10 +173,6 @@ export default async function handler(req, res) {
     // 1. OBTENER CAMPOS: Ahora 'ascId' se recibe directamente del cuerpo de la solicitud (req.body)
     const { productType, model, symptoms, errorCode, odsNumber, browserDeviceId, userRole, ascId } = req.body || {};
     
-    // ⭐ LOG PARA VERIFICACIÓN CLAVE
-    console.log("ASC ID recibido en AI Diagnosis (desde req.body):", ascId);
-    console.log("Rol de Usuario:", userRole);
-    // ⭐ FIN LOG
 
     // El userRole puede ser 'Anonymous', por lo que no es estrictamente obligatorio si se envía el default.
     if (!productType || !model || !symptoms || !odsNumber || !browserDeviceId) {

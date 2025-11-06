@@ -18,6 +18,8 @@ export default function Document() {
   return (
     <Html lang="es" suppressHydrationWarning>
       <Head>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4497215621533514"
+     crossorigin="anonymous"></script>
         <meta name="color-scheme" content="dark light" />
         <meta name="google-adsense-account" content="ca-pub-4497215621533514" />
         <link rel="icon" href="/logo.ico" />
