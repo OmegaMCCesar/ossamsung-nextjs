@@ -14,7 +14,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/dashboard');
+      router.push('/');
     } catch (err) {
       setError('Credenciales inválidas. Inténtelo de nuevo.');
     }
