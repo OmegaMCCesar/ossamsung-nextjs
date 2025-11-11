@@ -278,6 +278,19 @@
   border-radius: var(--radius-sm);
 }
 
+/* Bloque visual para punto de fuga */
+.leakBlock {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: rgba(80,150,255,0.12);
+  border-left: 4px solid var(--brand);
+  border-radius: 10px;
+  color: var(--brand-strong);
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+
 /* ===============================
    Content
    =============================== */

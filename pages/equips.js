@@ -89,6 +89,8 @@ const EquipsPage = () => {
   // === Modal ===
   const [showLeakModal, setShowLeakModal] = useState(false);
   const [selectedLeakPoint, setSelectedLeakPoint] = useState(null);
+  const [leakExtraInfo, setLeakExtraInfo] = useState('');
+
 
   // ==================================================================
   // VALIDAR SN
@@ -290,9 +292,7 @@ const EquipsPage = () => {
 
     const code = table[point];
 
-    setSelectedSubRepairCode(
-      `${selectedSubRepairCode} •Punto ${point} ${code}`
-    );
+    setLeakExtraInfo(`Punto ${point} ${code}`);
 
     setShowLeakModal(false);
     setShowSummary(true);
@@ -414,6 +414,12 @@ const EquipsPage = () => {
             <p><strong>Sub-Síntoma:</strong> {selectedSubSymptom?.subSymptomCode}</p>
             <p><strong>Código reparación:</strong> {selectedRepairCode?.repairCode}</p>
             <p><strong>Sub-código:</strong> {selectedSubRepairCode}</p>
+            {leakExtraInfo && (
+                <p className={styles.leakBlock}>
+                <strong>Punto de fuga:</strong> {leakExtraInfo}
+                 </p>
+)}
+
           </div>
 
           <button onClick={() => window.location.reload()} className={styles.resetButton}>
