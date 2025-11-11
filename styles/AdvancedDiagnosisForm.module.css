@@ -47,10 +47,37 @@
   color: var(--oneui-blue);
 }
 
+.bulletinItem{
+  color: yellow;
+  background-color: red;
+  border-radius: 5px;
+  padding: 2px;
+}
+
+.bulletinBox{
+  background-color: black;
+  border-radius: 10px;
+  color: white;
+  padding: 10px;
+}
+
+.bulletinTitle{
+  border: yellow solid 1px;
+  border-radius: 10px;
+  background-color: red;
+  color: yellow;
+  box-shadow: #cfcfcf;
+  padding: 10px;
+}
+
 .iconSmall {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
   margin-right: 4px;
+  margin-left: 10px;
+  color: yellow;
+  background-color: red;
+  border-radius: 5px;
 }
 
 /* ============================================================
