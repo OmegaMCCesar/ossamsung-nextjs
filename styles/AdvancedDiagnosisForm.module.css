@@ -48,8 +48,8 @@
 }
 
 .bulletinItem{
-  color: yellow;
-  background-color: red;
+  color: #efefe3;
+  background-color: #ff000000;
   border-radius: 5px;
   padding: 2px;
 }
@@ -75,8 +75,8 @@
   height: 30px;
   margin-right: 4px;
   margin-left: 10px;
-  color: yellow;
-  background-color: red;
+  color: #ebebe5;
+  background-color: #ff000000;
   border-radius: 5px;
 }
 

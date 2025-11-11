@@ -27,11 +27,10 @@
 }
 
 .logoutButton {
+  border-radius:5px;
   background-color: var(--samsung-blue);
   color: var(--color-white);
-  padding: var(--spacing-2) var(--spacing-4);
   border: none;
-  border-radius: var(--border-radius-medium);
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-bottom: var(--spacing-4);
@@ -42,6 +41,7 @@
 }
 
 .link {
+  border-radius:5px;
   color: var(--samsung-blue);
   text-decoration: underline;
   transition: color 0.3s ease;
