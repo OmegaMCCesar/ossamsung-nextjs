@@ -810,7 +810,7 @@ const EquipsPage = () => {
       </div>
 
       {/* CONTENIDO */}
-      <div className={styles.contentArea}>{NSValid && renderContent()}</div>
+      <div className={styles.contentArea}>{/* NSValid && renderContent() */ NSValid && 'El número de consultas a la base de datos ha sido superado.'}</div>
     </div>
   );
 };

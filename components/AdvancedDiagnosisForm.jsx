@@ -194,7 +194,7 @@ const AdvancedDiagnosisForm = () => {
                 if (response.status === 429) {
                         throw new Error(errorData.mainDiagnosis);
                 }
-                throw new Error(errorData.error || 'La IA no pudo generar un diagnóstico. Inténtalo de nuevo.');
+                throw new Error(errorData.error || 'No fue posible generar el diagnóstico. Se ha excedido el límite de consultas permitidas.');
             }
             const data = await response.json();
             setDiagnosisResult(data);

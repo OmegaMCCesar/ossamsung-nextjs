@@ -5,7 +5,8 @@ import { collection, getDocs, query, where, addDoc } from 'firebase/firestore';
 // ❌ IMPORTACIÓN ELIMINADA: import { useAuth } from '@/context/UserContext'; 
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const modelName = "gemini-2.5-flash";
+const modelName = "gemini-flash";
+
 // ❌ LÍNEA ELIMINADA: const { user } = useAuth();
 
 /**
