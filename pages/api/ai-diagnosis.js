@@ -1,17 +1,25 @@
+
 // pages/api/ai-diagnosis.js
 import { GoogleGenAI } from '@google/genai';
 import { db } from '../../lib/firebase';
 import { collection, getDocs, query, where, addDoc } from 'firebase/firestore'; 
-// ❌ IMPORTACIÓN ELIMINADA: import { useAuth } from '@/context/UserContext'; 
 
+// --- CONFIGURACIÓN Y CONSTANTES ---
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const modelName = "gemini-flash";
+const modelName = "gemini-2.5-flash"; // Usaremos la versión más reciente por defecto
 
-// ❌ LÍNEA ELIMINADA: const { user } = useAuth();
+const UNLIMITED_ROLES = ['Admin'];
+const MAX_QUERIES_PER_DEVICE = 50; 
+const SCORE_WEIGHTS = {
+    NAME: 0.6,
+    KEYWORD: 0.4,
+    BOOST: 0.25,
+};
+
+// --- FUNCIONES DE UTILIDAD ---
 
 /**
  * Normaliza texto: pasa a minúsculas, quita tildes, deja letras/números y espacios.
- * Conservamos espacios para poder hacer split por palabras.
  */
 function normalizeTextKeepSpaces(text = "") {
     return String(text)
@@ -32,9 +40,7 @@ function wordsFrom(text = "") {
         .filter(Boolean);
 }
 
-// ❌ LÓGICA DE 'ascId' GLOBAL ELIMINADA: Esta lógica de auth en el servidor estaba mal.
-// let ascId; 
-// if (user && user.ascId) { /* ... */ } else { /* ... */ }
+// --- FUNCIONES DE BASE DE DATOS ---
 
 /**
  * Busca boletines de servicio aplicables al modelo.
@@ -45,12 +51,10 @@ async function getServiceBulletins(model) {
     if (!db || !model) return [];
 
     const normalizedModel = String(model).trim().toUpperCase();
-    console.log("modelo normalizado para búsqueda de boletines:", normalizedModel);
-
+    
     try {
         const q = query(
             collection(db, "serviceBulletins"),
-            // La búsqueda utiliza el operador 'array-contains'
             where("models", "array-contains", normalizedModel)
         );
 
@@ -87,6 +91,7 @@ async function getCompatiblePartsFromFirebase(partName, model, iaReason) {
     const iaWords = wordsFrom(iaPartNormalized);
 
     try {
+        // 1. Obtener todas las partes compatibles con el modelo
         const q = query(
             collection(db, "partsForDiagnosis"),
             where("modelCompatibility", "array-contains", normalizedModel)
@@ -94,15 +99,14 @@ async function getCompatiblePartsFromFirebase(partName, model, iaReason) {
 
         const snapshot = await getDocs(q);
         const candidates = [];
-
+        
+        // 2. Aplicar el Scoring
         snapshot.forEach(doc => {
             const data = doc.data();
-
-            // Normalizar nombre y keywords de BD
+            
             const dbPartNameNormalized = normalizeTextKeepSpaces(data.partName || "");
             const dbPartWords = wordsFrom(dbPartNameNormalized);
 
-            // Keywords (array) o fallback a texto
             let dbKeywords = [];
             if (Array.isArray(data.partFunctionKeywords) && data.partFunctionKeywords.length > 0) {
                 dbKeywords = data.partFunctionKeywords.map(k => normalizeTextKeepSpaces(k));
@@ -112,21 +116,19 @@ async function getCompatiblePartsFromFirebase(partName, model, iaReason) {
                 dbKeywords = wordsFrom(String(data.partFunction));
             }
 
-            // Scoring:
-            // - nameScore: proporción de palabras de iaWords que aparecen en dbPartWords
-            // - keywordScore: si alguna keyword aparece en iaReasonNormalized o iaPartNormalized
+            // Scoring: nameScore
             let nameMatches = 0;
             for (const w of iaWords) {
                 if (w && dbPartWords.includes(w)) nameMatches++;
             }
             const nameScore = iaWords.length ? nameMatches / iaWords.length : 0;
 
-            // También consideramos si dbPartName contiene iaPartNormalized o viceversa (includes) -> boost
+            // Scoring: includeBoost
             let includeBoost = 0;
-            if (dbPartNameNormalized.includes(iaPartNormalized) && iaPartNormalized.length > 2) includeBoost = 0.25;
-            if (iaPartNormalized.includes(dbPartNameNormalized) && dbPartNameNormalized.length > 2) includeBoost = 0.25;
+            if (dbPartNameNormalized.includes(iaPartNormalized) && iaPartNormalized.length > 2) includeBoost = SCORE_WEIGHTS.BOOST;
+            if (iaPartNormalized.includes(dbPartNameNormalized) && dbPartNameNormalized.length > 2) includeBoost = SCORE_WEIGHTS.BOOST;
 
-            // keywordScore: 1 si alguna keyword aparece en reason o in name, 0 otherwise
+            // Scoring: keywordScore
             let keywordMatch = false;
             for (const kw of dbKeywords) {
                 if (!kw) continue;
@@ -135,12 +137,15 @@ async function getCompatiblePartsFromFirebase(partName, model, iaReason) {
                     break;
                 }
             }
-            const keywordScore = keywordMatch ? 0.8 : 0;
+            const keywordScore = keywordMatch ? 0.8 : 0; // Se mantiene 0.8 de match exacto
 
-            // finalScore combina nameScore (peso 0.6), keywordScore (peso 0.4) y includeBoost
-            const finalScore = Math.min(1, (nameScore * 0.6) + (keywordScore * 0.4) + includeBoost);
+            // finalScore combina
+            const finalScore = Math.min(1, 
+                (nameScore * SCORE_WEIGHTS.NAME) + 
+                (keywordScore * SCORE_WEIGHTS.KEYWORD) + 
+                includeBoost
+            );
 
-            // Guardamos candidato solo si hay algo de score (evitar ruido)
             if (finalScore > 0) {
                 candidates.push({
                     partName: data.partName || "",
@@ -165,67 +170,51 @@ async function getCompatiblePartsFromFirebase(partName, model, iaReason) {
     }
 }
 
-/**
- * Handler principal
- */
+// --- HANDLER PRINCIPAL ---
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-    // 1. OBTENER CAMPOS: Ahora 'ascId' se recibe directamente del cuerpo de la solicitud (req.body)
+    // 1. OBTENER Y VALIDAR CAMPOS
     const { productType, model, symptoms, errorCode, odsNumber, browserDeviceId, userRole, ascId } = req.body || {};
     
-
-    // El userRole puede ser 'Anonymous', por lo que no es estrictamente obligatorio si se envía el default.
     if (!productType || !model || !symptoms || !odsNumber || !browserDeviceId) {
         return res.status(400).json({ error: 'Tipo de producto, modelo, síntomas, ODS e ID de dispositivo son obligatorios.' });
     }
 
     const cleanModel = String(model).trim().toUpperCase();
     const cleanOds = odsNumber.trim().toUpperCase();
-    
-    // **Ajuste:** Si ascId viene vacío o nulo (es anónimo), asegúrate de que sea null en lugar de una cadena vacía.
     const cleanAscId = ascId ? String(ascId).trim().toUpperCase() : null; 
     
-    // Roles con acceso ilimitado
-    const UNLIMITED_ROLES = ['Admin'];
-    const MAX_QUERIES = 50; 
-    
-    // Si el usuario es 'Admin', salta la verificación de límites.
     const hasUnlimitedAccess = UNLIMITED_ROLES.includes(userRole);
-    // Identificador para restringir la respuesta de la IA
     const isAnonymous = userRole === 'Anonymous';
 
 
-    // ************ LÓGICA DE LÍMITE DE CONSULTAS POR ROL ************
-    // Solo se verifica el límite si el usuario NO es un Admin
+    // 2. LÓGICA DE LÍMITE DE CONSULTAS POR ROL 
     if (!hasUnlimitedAccess) {
         try {
-            // Consulta el número de usos registrados HOY para este deviceId
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Inicio del día
+            today.setHours(0, 0, 0, 0); 
 
             const qCount = query(
                 collection(db, "aiUsage"),
                 where("browserDeviceId", "==", browserDeviceId),
-                where("timestamp", ">=", today) // Solo cuenta usos de hoy
+                where("timestamp", ">=", today) 
             );
             const snapshotCount = await getDocs(qCount);
 
-            if (snapshotCount.size >= MAX_QUERIES) {
-                // Error 429 para limitar el acceso
+            if (snapshotCount.size >= MAX_QUERIES_PER_DEVICE) {
                 return res.status(429).json({ 
-                    mainDiagnosis: `Límite de ${MAX_QUERIES} consultas diarias alcanzado para tu dispositivo. Inicia sesión o contacta a administración.`,
-                    error: `Límite de ${MAX_QUERIES} consultas diarias alcanzado.`
+                    mainDiagnosis: `Límite de ${MAX_QUERIES_PER_DEVICE} consultas diarias alcanzado para tu dispositivo. Inicia sesión o contacta a administración.`,
+                    error: `Límite de ${MAX_QUERIES_PER_DEVICE} consultas diarias alcanzado.`
                 });
             }
         } catch (e) {
             console.error("Error al verificar límite de consultas por rol:", e);
-            // Continuar si falla el conteo, pero loguear el error
         }
     }
-    // *******************************************************************
 
-    // Contextos por tipo de equipo
+    // 3. CONSTRUCCIÓN DEL PROMPT Y CONTEXTO
     const instructionContext = {
         'Refrigerador': 'Tu diagnóstico debe enfocarse en sistemas No-Frost, sistemas Inverter, sensores de deshielo (Defrost), damper y fallas de fábrica comunes en modelos Samsung.',
         'Aire Acondicionado': 'Tu diagnóstico debe enfocarse en fallas de compresor Inverter, fugas de refrigerante, termistores NTC, y problemas de comunicación entre unidades (Eror E1, E4, etc.).',
@@ -235,28 +224,11 @@ export default async function handler(req, res) {
     };
     const contextNote = instructionContext[productType] || 'Tu diagnóstico debe ser 100% exacto, cubriendo fallas comunes, y evitando errores conceptuales.';
     
-    // **NUEVO: Ajuste del Prompt si es anónimo para evitar generar contenido avanzado**
-    const advancedFieldsPrompt = `
-        "commonCauses": ["Lista de 3 a 5 fallas mecánicas o electrónicas más probables y específicas para el tipo de equipo."],
-        "advancedDiagnosisSteps": ["Paso 1: Instrucción precisa de verificación para el técnico."],
-        "potentialParts": [
-            {
-              "partName": "Nombre del Componente",
-              "reason": "Razón específica por la que se sospecha de esta pieza.",
-              "isCritical": true
-            }
-        ],
-    `;
-    
-    // Si es anónimo, solo pedimos diagnóstico principal y tips básicos.
-    const requiredFields = isAnonymous ? '' : advancedFieldsPrompt;
-    
     const roleContext = isAnonymous ? 
         'Eres un asistente de diagnóstico BÁSICO, tu objetivo es dar una hipótesis y consejos de fácil seguimiento para el usuario final (no técnico).' :
         `Eres un Técnico Nivel 3 de Samsung con 25 años de experiencia, experto en la línea de ${productType}s. ${contextNote} La información que proporcionas es utilizada por técnicos para servicio y por la administración para preparar repuestos.`;
 
-
-    // Prompt (mantener estrictura JSON en la salida)
+    // El prompt pide todos los campos, pero se le instruye dejarlos vacíos si es anónimo.
     const prompt = `
         **ROL Y CONTEXTO CRÍTICO:**
         ${roleContext}
@@ -272,40 +244,43 @@ export default async function handler(req, res) {
         Proporcionar un diagnóstico preciso y estructurado en JSON.
 
         **REQUISITOS DE LA RESPUESTA JSON:**
+        Proporciona un diagnóstico en el formato JSON EXACTO, sin texto adicional, sin excepción.
+        Si el usuario es anónimo o básico, los campos 'commonCauses', 'advancedDiagnosisSteps', y 'potentialParts' **deben ser arrays vacíos ([])**.
+
         {
           "mainDiagnosis": "Hipótesis de la falla más probable y breve explicación específica para un ${productType}.",
           "beginnerTips": "Consejos claros y seguros para el usuario (Ej: qué revisar antes de llamar a un técnico. Usa saltos de línea \\n).",
-          ${requiredFields}
+          "commonCauses": ["Lista de 3 a 5 fallas mecánicas o electrónicas más probables y específicas para el tipo de equipo."],
+          "advancedDiagnosisSteps": ["Paso 1: Instrucción precisa de verificación para el técnico."],
+          "potentialParts": [
+            {
+              "partName": "Nombre del Componente",
+              "reason": "Razón específica por la que se sospecha de esta pieza.",
+              "isCritical": true
+            }
+          ]
         }
     `;
-    // Fin de la construcción del prompt
-
 
     try {
-        // La búsqueda de boletines SÍ se mantiene, es información básica de alerta.
-        const applicableBulletins = await getServiceBulletins(model); 
+        // 4. EJECUCIÓN PARALELA DE CONSULTAS (Optimización)
+        const [applicableBulletins, aiResponse] = await Promise.all([
+            getServiceBulletins(model), 
+            ai.models.generateContent({
+                model: modelName,
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                config: { responseMimeType: "application/json" },
+            })
+        ]);
         
-        // Llamada a Gemini
-        const response = await ai.models.generateContent({
-            model: modelName,
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-            config: { responseMimeType: "application/json" },
-        });
+        // 5. POST-PROCESO Y ENRIQUECIMIENTO
+        let rawJsonText = aiResponse?.text || aiResponse?.candidates?.[0]?.content || "";
 
-        // Normalizar la respuesta JSON (varios formatos posibles)
-        let rawJsonText = "";
-        if (typeof response?.text === "string" && response.text.trim()) {
-            rawJsonText = response.text.trim();
-        } else if (response?.candidates && response.candidates[0]?.content) {
-            // fallback dependiendo del SDK
-            rawJsonText = response.candidates[0].content;
-        } else if (response?.output?.[0]?.content?.[0]?.text) {
-            rawJsonText = response.output[0].content[0].text;
-        } else {
+        if (!rawJsonText) {
             throw new Error("Respuesta de la IA no tiene texto JSON esperable.");
         }
 
-        // quitar posibles fences ```json ... ```
+        // Limpiar fences ```json ... ```
         rawJsonText = rawJsonText.replace(/^\s*```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
 
         let diagnosisData;
@@ -316,16 +291,8 @@ export default async function handler(req, res) {
             throw new Error("La IA no devolvió JSON válido.");
         }
         
-        // **NUEVO: Post-proceso si es anónimo**
-        if (isAnonymous) {
-            // Si el anónimo solo pidió los campos básicos, aseguramos que los avanzados no existan 
-            // o sean nulos/vacíos para que el frontend no los muestre por error.
-            diagnosisData.commonCauses = [];
-            diagnosisData.advancedDiagnosisSteps = [];
-            diagnosisData.potentialParts = [];
-        } else {
-            // El proceso de enriquecimiento de partes SÓLO se ejecuta si NO es anónimo (para ahorrar CPU/DB)
-            // Procesar partes sugeridas por la IA
+        // El proceso de enriquecimiento de partes SÓLO se ejecuta si NO es anónimo
+        if (!isAnonymous) {
             const partsFromIA = Array.isArray(diagnosisData.potentialParts) ? diagnosisData.potentialParts : [];
             const uniquePartsMap = new Map();
 
@@ -334,10 +301,8 @@ export default async function handler(req, res) {
                 const iaReason = iaPart.reason || "";
                 const uniqueKey = normalizeTextKeepSpaces(iaPartName).replace(/\s+/g, " ");
 
-                // Buscar candidatos en Firebase (ordenados por score)
                 const foundParts = await getCompatiblePartsFromFirebase(iaPartName, model, iaReason);
 
-                // Estructura base que siempre devolvemos al frontend
                 let finalPart = {
                     partName: iaPartName,
                     reason: iaReason,
@@ -350,10 +315,8 @@ export default async function handler(req, res) {
                 };
 
                 if (foundParts.length > 0) {
-                    // Primer candidato (mejor puntuado)
                     const best = foundParts[0];
 
-                    // Determinar si hay "coincidencia fuerte" (name includes IA name words)
                     const iaNorm = normalizeTextKeepSpaces(iaPartName);
                     const dbNameNorm = normalizeTextKeepSpaces(best.partName || "");
                     const iaWords = wordsFrom(iaNorm);
@@ -362,10 +325,10 @@ export default async function handler(req, res) {
                     for (const w of iaWords) if (dbWords.includes(w)) commonWords++;
                     const wordMatchRatio = iaWords.length ? commonWords / iaWords.length : 0;
 
+                    // Coincidencia fuerte
                     const isStrongNameMatch = wordMatchRatio >= 0.5 || dbNameNorm.includes(iaNorm) || iaNorm.includes(dbNameNorm) || best.score >= 0.8;
 
                     if (isStrongNameMatch) {
-                        // sobrescribimos con datos de BD (coincidencia fuerte)
                         finalPart = {
                             ...finalPart,
                             partName: best.partName || finalPart.partName,
@@ -376,7 +339,7 @@ export default async function handler(req, res) {
                             score: best.score,
                         };
                     } else {
-                        // coincidencia débil -> inyectamos número de parte y función si existe, pero mantenemos nombre original de la IA
+                        // Coincidencia débil: inyectamos datos de parte, pero mantenemos nombre original de la IA
                         finalPart = {
                             ...finalPart,
                             partNumber: best.partNumber || finalPart.partNumber,
@@ -385,8 +348,7 @@ export default async function handler(req, res) {
                             foundInDB: !!best.partNumber || !!best.imageUrl || !!best.partFunction,
                             score: best.score,
                         };
-
-                        // Si hay otros candidatos con mejor match de nombre, verificarlos
+                        // Lógica de promoción de candidato si hay mejor match de nombre
                         for (let i = 1; i < foundParts.length; i++) {
                             const candidate = foundParts[i];
                             const candNameNorm = normalizeTextKeepSpaces(candidate.partName || "");
@@ -395,7 +357,6 @@ export default async function handler(req, res) {
                             for (const w of iaWords) if (candWords.includes(w)) candCommon++;
                             const candRatio = iaWords.length ? candCommon / iaWords.length : 0;
                             if (candRatio > wordMatchRatio && candidate.score >= best.score) {
-                                // promote candidate
                                 finalPart = {
                                     ...finalPart,
                                     partName: candidate.partName,
@@ -410,39 +371,30 @@ export default async function handler(req, res) {
                         }
                     }
                 }
-
-                // Guardar en map por clave única (nombre IA limpio) para evitar duplicados
                 uniquePartsMap.set(uniqueKey, finalPart);
             }
-
-            // Reemplazamos potentialParts por la versión enriquecida
             diagnosisData.potentialParts = Array.from(uniquePartsMap.values());
         } // Fin del bloque ELSE (no anónimo)
 
 
+        // 6. FINALIZAR RESPUESTA Y REGISTRO
         diagnosisData.serviceBulletins = applicableBulletins;
         
-        // ************ REGISTRAR USO EXITOSO ************
-        // **CLAVE:** Incluir el ascId limpio en el registro de aiUsage.
         await addDoc(collection(db, "aiUsage"), {
             odsNumber: cleanOds,
             browserDeviceId: browserDeviceId, 
             productType: productType,
             model: cleanModel,
-            userRole: userRole, // Guardamos el rol (incluyendo 'Anonymous')
-            ascId: cleanAscId, // <-- ¡AHORA LIMPIO Y OBTENIDO DE req.body!
+            userRole: userRole, 
+            ascId: cleanAscId, 
             timestamp: new Date(),
         });
-        // ******************************************************
 
-
-        // Enviar al frontend
         return res.status(200).json(diagnosisData);
 
     } catch (err) {
         console.error("Error en ai-diagnosis handler:", err);
         
-        // Estructura de error para el frontend (simplificada si es anónimo)
         const defaultError = {
             mainDiagnosis: "Fallo interno en el sistema de Diagnóstico. Contactar a soporte.",
             commonCauses: [],

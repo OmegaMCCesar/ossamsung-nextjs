@@ -663,8 +663,8 @@ const EquipsPage = () => {
         )}
 
         <div className={styles.cabezalTitle}>
-          <h1 className={styles.cabezalh1}>INGENIERIA LINEA BLANCA</h1>
-          <h2 className={styles.cabezalh2}>TECHNICAL SUPPORT SEM-S</h2>
+          <h1 className={styles.cabezalh1}>INNOVACIÓN TECNOLÓGICA</h1>
+          <h2 className={styles.cabezalh2}>DIGITAL LAB / WHITE LINE</h2>
         </div>
 
         {/* FILTROS */}
@@ -805,12 +805,12 @@ const EquipsPage = () => {
           className={styles.resetSNButton}
           onClick={() => setValidadorVisible(!validadorVisible)}
         >
-          {validadorVisible ? 'Ocultar validación' : 'Ver validación'}
+          {validadorVisible ? 'Ver validación' : 'Ocultar validación'}
         </button>
       </div>
 
       {/* CONTENIDO */}
-      <div className={styles.contentArea}>{/* NSValid && renderContent() */ NSValid && 'El número de consultas a la base de datos ha sido superado.'}</div>
+      <div className={styles.contentArea}>{ NSValid && renderContent()}</div>
     </div>
   );
 };
