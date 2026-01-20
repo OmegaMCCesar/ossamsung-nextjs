@@ -1,0 +1,25 @@
+
+  .errorcontainer {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .errorcontainerh1 {
+    font-size: 4rem;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+  }
+
+  .errorcontainerp {
+    font-size: 1.2rem;
+    max-width: 400px;
+    opacity: 0.9;
+  }
