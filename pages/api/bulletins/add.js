@@ -1,5 +1,5 @@
 // pages/api/bulletins/add.js
-import { db } from '../../../lib/firebase';
+import { db } from '@/lib/firebaseAdmin';
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 
 export default async function handler(req, res) {

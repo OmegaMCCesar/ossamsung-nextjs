@@ -1,5 +1,5 @@
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../../../lib/firebase";
+import { db } from "@/lib/firebaseAdmin";
 
 export default async function handler(req, res) {
     if (req.method !== "POST") {

@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   try {
     // Importar admin aquí para que Next no lo intente empaquetar en cliente
-    const admin = require('../../../lib/firebaseAdmin');
+    const admin = require('@/lib/firebaseAdmin');
 
     // Validación básica del body
     const { uid, email, name } = req.body || {};

@@ -1,5 +1,5 @@
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../../lib/firebase";
+import { db } from "@/lib/firebaseAdmin";
 import lowLevelQuestions from "../../../lib/questions/lowLevel";
 import mediumQuestions from "../../../lib/questions/mediumLevel";
 import highLevelQuestions from "../../../lib/questions/highLevel";

@@ -1,5 +1,5 @@
 // pages/api/feedback/submit.js
-import { db } from '../../../lib/firebase';
+import { db } from '@/lib/firebaseAdmin';
 import { collection, addDoc } from 'firebase/firestore';
 
 export default async function handler(req, res) {

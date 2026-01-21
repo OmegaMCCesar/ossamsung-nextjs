@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { db } from "../../lib/firebase";
+import { db } from "@/lib/firebaseAdmin";
 import {
   addDoc,
   collection,

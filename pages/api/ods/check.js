@@ -1,5 +1,5 @@
 // pages/api/ods/check.js
-import { db } from '../../../lib/firebase';
+import { db } from '@/lib/firebaseAdmin';
 import { collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
 
 export default async function handler(req, res) {

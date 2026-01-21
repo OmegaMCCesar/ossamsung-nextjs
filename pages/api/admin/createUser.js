@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
     // Importar firebase-admin / tu singleton en tiempo de ejecución (evita bundling del cliente)
     // Nota: require aquí evita que Next intente resolver esto en el bundle cliente.
-    const admin = require('../../../lib/firebaseAdmin');
+    const admin = require('@/lib/firebaseAdmin');
 
     // Comprobación defensiva: asegurarnos que el SDK esté disponible e inicializado
     if (!admin || !admin.auth || !admin.firestore) {

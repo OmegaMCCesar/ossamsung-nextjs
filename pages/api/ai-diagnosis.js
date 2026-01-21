@@ -1,7 +1,7 @@
 
 // pages/api/ai-diagnosis.js
 import { GoogleGenAI } from '@google/genai';
-import { db } from '../../lib/firebase';
+import { db } from '@/lib/firebaseAdmin';
 import { collection, getDocs, query, where, addDoc } from 'firebase/firestore'; 
 
 // --- CONFIGURACIÓN Y CONSTANTES ---
