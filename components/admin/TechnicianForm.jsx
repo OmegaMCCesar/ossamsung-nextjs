@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "../../styles/adminPanel.module.css";
+import styles from "../../styles/AdminPanel.module.css";
 import { createTechnician } from "../../pages/services/adminService";
 
 const TechnicianForm = ({ ascs, onSaved }) => {
