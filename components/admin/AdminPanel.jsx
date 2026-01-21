@@ -4,7 +4,7 @@ import styles from "../../styles/AdminPanel.module.css";
 import {
   getTechniciansByAsc,
   getAscs
-} from "../../pages/services/adminService";
+} from "../../lib/services/adminService";
 
 import AscForm from "../../pages/admin/AscForm";
 import AscList from "../../pages/admin/AscList";
