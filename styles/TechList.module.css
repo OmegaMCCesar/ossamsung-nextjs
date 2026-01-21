@@ -1,0 +1,66 @@
+.container {
+  padding: 20px;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filters input,
+.filters select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  align-items: center;
+}
+
+.avatar {
+  width: 55px;
+  height: 55px;
+}
+
+.info p {
+  margin: 2px 0;
+}
+
+.actions {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.editBtn {
+  background: #0a84ff;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.deleteBtn {
+  background: #d0342c;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}

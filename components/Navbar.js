@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import styles from '../styles/Navbar.module.css';
 import { FiUser } from 'react-icons/fi'; // ícono de usuario
+import { useAuth } from '../context/UserContext';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user , loading } = useAuth();
   const router = useRouter();
 
   const toggleMenu = () => setIsMenuOpen(v => !v);
@@ -26,6 +28,8 @@ export default function Navbar() {
       document.body.style.overflow = '';
     };
   }, [isMenuOpen]);
+
+  const isUserTrue = user?.role || false;
 
   return (
     <nav className={styles.navbar}>
@@ -57,6 +61,9 @@ export default function Navbar() {
           <Link href="/privacidad" className={styles.navLink} onClick={closeMenu}>Privacidad</Link>
           <Link href="/aviso_legal" className={styles.navLink} onClick={closeMenu}>Aviso Legal</Link>
           <Link href="/diagnosticoPage" className={styles.navLink} onClick={closeMenu}>Pre Diagnóstico IA</Link>
+          {isUserTrue &&<>
+           <Link href='/admin/tech-list/panel_ra' className={styles.navLink} onClick={closeMenu}>Panel de RA</Link>
+           <Link href='/test_device' className={styles.navLink} onClick={closeMenu}>Nivel de conocimientos</Link></>}
 
           {/* Login - en desktop se muestra solo el icono; en móvil (menu abierto) se verá el texto */}
           <Link

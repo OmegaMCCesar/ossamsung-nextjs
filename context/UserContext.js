@@ -1,7 +1,9 @@
+// context/UserContext.jsx
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore'; 
-import { auth, db } from '../lib/firebase'; // Asegúrate de que 'db' se exporte desde firebase.js
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 
 const UserContext = createContext();
 
@@ -12,52 +14,74 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Usuario autenticado por Firebase: buscar datos en Firestore
         try {
           const userDocRef = doc(db, 'users', firebaseUser.uid);
           const userDoc = await getDoc(userDocRef);
 
           if (userDoc.exists()) {
-            const userData = userDoc.data();
-            
-            // Adjuntar datos de Firestore (rol y nombre) al objeto de Firebase
-            const userWithRole = {
-              uid: firebaseUser.uid, 
+            const data = userDoc.data();
+
+            const userWithData = {
+              uid: firebaseUser.uid,
               email: firebaseUser.email,
-              // Propiedades adicionales de Firestore:
-              role: userData.role || 'Público', 
-              userName: userData.userName || 'Usuario',
-              ascId: userData.ascId || null,
+
+              // Datos base
+              role: data.role || "Público",
+              userName: data.userName || "Usuario",
+
+              // Datos propios del técnico
+              alias: data.alias || null,
+              asc: data.asc || null,
+              bp: data.bp || null,
+              avatar: data.avatar || "default1",
+
+              level: data.level || 1,
+              medals: data.medals || [],
+              examHistory: data.examHistory || [],
             };
-            setUser(userWithRole);
+
+            // Inicializar perfil si es técnico
+            if (userWithData.role === "Tecnico") {
+              await fetch("/api/users/initProfile", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ uid: firebaseUser.uid }),
+              });
+            }
+
+            setUser(userWithData);
           } else {
-            // Usuario en Auth pero no en la colección 'users' (ej. usuario nuevo o público con login)
-            setUser({ 
-                uid: firebaseUser.uid, 
-                email: firebaseUser.email, 
-                role: 'Público', // Asignar rol por defecto para acceso limitado
-                userName: 'Cliente'
+            // No existe documento en users → Usuario público
+            setUser({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              role: "Público",
+              userName: "Cliente",
             });
           }
+
         } catch (error) {
-          console.error("Error al obtener el rol del usuario desde Firestore:", error);
-          // Fallback en caso de error de DB
-          setUser({ uid: firebaseUser.uid, email: firebaseUser.email, role: 'Público' }); 
+          console.error("Error leyendo Firestore:", error);
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            role: "Público",
+          });
         }
       } else {
-        // Usuario desconectado
-        setUser(null); 
+        setUser(null);
       }
+
       setLoading(false);
     });
-    
+
     return () => unsubscribe();
   }, []);
 
   const logout = () => signOut(auth);
 
   return (
-    <UserContext.Provider value={{ user, loading, logout }}> 
+    <UserContext.Provider value={{ user, loading, logout }}>
       {children}
     </UserContext.Provider>
   );

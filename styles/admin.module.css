@@ -11,6 +11,11 @@
   justify-content: center;
 }
 
+.subContainer{
+  display: flex;
+  flex-direction: row;
+}
+
 .heading {
   font-size: 2rem;
   font-weight: bold;

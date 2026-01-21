@@ -1,5 +1,4 @@
 // pages/_document.js
-import Navbar from "@/components/Navbar";
 import { Html, Head, Main, NextScript } from "next/document";
 
 const noFlashScript = `
