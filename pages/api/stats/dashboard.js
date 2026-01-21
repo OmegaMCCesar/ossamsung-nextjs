@@ -1,6 +1,6 @@
 // pages/api/stats/dashboard.js
 import { db } from '../../../lib/firebase';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {

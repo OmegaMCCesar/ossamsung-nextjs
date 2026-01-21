@@ -6,9 +6,6 @@ import useFetchInfFirebase from '../hooks/useFetchInfFirebase';
 import { useAuth } from '../context/UserContext';
 import { db } from '../lib/firebase';
 import {
-  doc,
-  increment,
-  runTransaction,
   collection,
   query,
   where,

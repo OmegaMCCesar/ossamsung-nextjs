@@ -39,7 +39,8 @@ const TechnicianForm = ({ ascs, onSaved }) => {
 
   return (
     <div className={styles.card}>
-      <h2 className={styles.title}>Registrar Técnico</h2>
+      <h2 className={styles.title}>Registrar Técnico a ASC</h2>
+      <h3 className={styles.subtitle}>Ingrese los datos solicitados</h3>
 
       <form className={styles.gridForm} onSubmit={handleSubmit}>
         <input
