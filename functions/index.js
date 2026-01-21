@@ -1,7 +1,14 @@
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { defineString } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 
 admin.initializeApp();
+
+/**
+ * Secret (API KEY, por ejemplo Gemini)
+ * Se define aquí pero SOLO se usa en runtime.
+ */
+const GEMINI_API_KEY = defineString("GEMINI_API_KEY");
 
 /**
  * Se ejecuta cada 10 días (240 horas).
@@ -11,8 +18,10 @@ exports.checkRAExpiration = onSchedule(
   {
     schedule: "every 240 hours",
     timeZone: "America/Mexico_City", // MUY recomendado
+    // Si en el futuro necesitas usar la API Key aquí, ya está lista
+    secrets: [GEMINI_API_KEY],
   },
-  async (event) => {
+  async () => {
     const db = admin.firestore();
     const today = new Date();
 
