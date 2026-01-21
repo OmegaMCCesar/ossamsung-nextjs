@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "../../styles/AdminPanel.module.css";
 
-const AscList = ({ ascs }) => {
+const AscList = ({ ascs = [] }) => {
   return (
     <div className={styles.card}>
       <h3 className={styles.title}>ASC Registrados</h3>
