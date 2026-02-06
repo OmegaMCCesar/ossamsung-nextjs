@@ -1,523 +1,402 @@
-/* ============================================================
-   CARD PRINCIPAL — ONE UI
-   ============================================================ */
-
+/* ---------- CONTENEDOR PRINCIPAL (Tema Claro) ---------- */
 .card {
-  background: var(--oneui-card-bg);
-  border-radius: var(--oneui-card-radius);
-  box-shadow: var(--oneui-shadow);
-  padding: var(--pad);
-  margin: 30px auto;
-  transition: box-shadow .25s ease;
-  max-width: 1100px;
-  width: 100%;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 40px;
+  background: #ffffff; /* Blanco */
+  color: #334155; /* Gris oscuro legible */
+  border-radius: 20px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08); /* Sombra suave */
+  border: 1px solid #f1f5f9;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.card:hover {
-  box-shadow: var(--oneui-shadow-strong);
-}
-
-/* ============================================================
-   ENCABEZADOS
-   ============================================================ */
-
+/* ---------- TITULOS ---------- */
 .heading {
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: var(--oneui-text);
-  text-align: center;
-  margin-bottom: 15px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
 .subtext {
-  text-align: center;
-  color: var(--oneui-muted);
-  margin-bottom: 28px;
-  line-height: 1.45;
-  font-size: 1rem;
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
 }
 
+.sectionTitle {
+  margin-top: 32px;
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0f172a;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 8px;
+}
+
+.sectionTitleRed {
+  mask-composite: sectionTitle;
+  color: #b91c1c; /* Rojo oscuro profesional */
+  border-color: #fecaca;
+}
+
+/* ---------- ICONOS ---------- */
 .icon {
-  width: 32px;
-  height: 32px;
-  color: var(--oneui-blue);
-}
-
-.bulletinItem{
-  color: #efefe3;
-  background-color: #ff000000;
-  border-radius: 5px;
-  padding: 2px;
-}
-
-.bulletinBox{
-  background-color: black;
-  border-radius: 10px;
-  color: white;
-  padding: 10px;
-}
-
-.bulletinTitle{
-  border: yellow solid 1px;
-  border-radius: 10px;
-  background-color: red;
-  color: yellow;
-  box-shadow: #cfcfcf;
-  padding: 10px;
+  color: #2563eb; /* Azul corporativo */
 }
 
 .iconSmall {
-  width: 30px;
-  height: 30px;
-  margin-right: 4px;
-  margin-left: 10px;
-  color: #ebebe5;
-  background-color: #ff000000;
-  border-radius: 5px;
+  width: 18px;
+  height: 18px;
 }
 
-/* ============================================================
-   FORMULARIO
-   ============================================================ */
-
+/* ---------- FORMULARIO ---------- */
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
-}
-
-@media (min-width: 780px) {
-  .form {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 22px;
-  }
-  .fullWidthField {
-    grid-column: 1 / -1;
-  }
+  display: grid;
+  gap: 20px;
 }
 
 .fieldContainer {
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
 .label {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--oneui-text);
-  margin-bottom: 6px;
+  color: #475569;
 }
 
 .inputField {
-  padding: 13px 15px;
-  border-radius: var(--oneui-radius-sm);
-  border: 1px solid #dcdcdc;
-  background: #F8F9FB;
+  width: 100%;
+  background: #f8fafc; /* Gris muy claro */
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  padding: 12px 16px;
+  border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s ease;
 }
 
 .inputField:focus {
   outline: none;
-  border-color: var(--oneui-blue);
-  box-shadow: 0 0 0 2px rgba(35, 111, 255, 0.4);
+  background: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* ============================================================
-   BOTONES
-   ============================================================ */
+textarea.inputField {
+  min-height: 100px;
+  resize: vertical;
+}
 
-.containerButton{
-  background-color: red;
-  width: 100%;
-}   
-
+/* ---------- BOTONES ---------- */
 .primaryButton {
-  background: var(--oneui-blue);
-  color: #fff;
-  padding: 14px;
-  border-radius: var(--oneui-radius-sm);
-  border: none;
-  font-size: 1.07rem;
-  font-weight: 600;
-  cursor: pointer;
-  width: 100%;
-  display: flex;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: 0.2s;
+  background: #2563eb; /* Azul sólido */
+  color: #ffffff;
+  border: none;
+  padding: 14px 24px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
 }
 
-.primaryButton:hover:not(.disabledButton) {
-  background: var(--oneui-blue-strong);
+.primaryButton:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 12px -2px rgba(37, 99, 235, 0.3);
+}
+
+.primaryButton:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .secondaryButton {
-  background: #F2F3F5;
-  border: 1px solid #d8d8d8;
-  color: var(--oneui-text);
-  padding: 12px;
-  border-radius: var(--oneui-radius-sm);
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 12px 20px;
+  font-weight: 600;
+  border-radius: 12px;
   cursor: pointer;
-  transition: 0.2s;
-  width: 100%;
+  transition: all 0.2s ease;
 }
 
 .secondaryButton:hover {
-  background: #E7E9EC;
+  background: #f1f5f9;
+  color: #1e293b;
+  border-color: #94a3b8;
 }
 
-.disabledButton {
-  opacity: 0.5;
-  cursor: not-allowed;
+.restartButton {
+  background: #475569;
+  width: 100%;
+  margin-top: 24px;
 }
 
-/* ============================================================
-   ALERTAS Y MENSAJES
-   ============================================================ */
-
-.alert,
-.successMessage {
-  padding: 16px;
-  border-radius: var(--oneui-radius-sm);
-  font-weight: 600;
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
-
+/* ---------- MENSAJES Y ALERTAS ---------- */
 .alert {
-  background: rgba(214, 69, 61, 0.10);
-  border: 1px solid var(--oneui-danger);
-  color: var(--oneui-danger);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff1f2; /* Fondo rojizo muy suave */
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 0.95rem;
 }
 
 .successMessage {
-  background: rgba(34, 168, 97, 0.15);
-  border: 1px solid var(--oneui-ok);
-  color: var(--oneui-ok);
-}
-
-/* ============================================================
-   TÍTULOS DE SECCIONES
-   ============================================================ */
-
-.sectionTitle {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--oneui-blue);
-  margin-top: 35px;
-  border-bottom: 2px solid #ececec;
-  padding-bottom: 6px;
-}
-
-.sectionTitleRed {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--oneui-danger);
-  margin-top: 35px;
-}
-
-/* ============================================================
-   CUADRO DE DIAGNÓSTICO PRINCIPAL
-   ============================================================ */
-
-.mainDiagnosisBox {
-  background: #F8F9FB;
-  padding: 20px;
-  border-radius: var(--oneui-radius-sm);
-  border: 1px solid #e5e5e5;
-  margin-top: 14px;
-  line-height: 1.55;
-}
-
-/* ============================================================
-   FEEDBACK
-   ============================================================ */
-
-.feedbackSection {
-  margin: 35px 0;
-  padding: 22px;
-  border-radius: var(--oneui-radius-sm);
-  border: 2px dashed #cfcfcf;
-  background: #FAFAFC;
-  text-align: center;
-}
-
-/* ===============================================
-   FEEDBACK — BOTONES RESPONSIVE ESTILO ONE UI
-   =============================================== */
-
-.feedbackButtons {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 100%;
-  align-items: center; /* centra en escritorio */
-}
-
-/* Botones */
-.feedbackButtons button {
-  width: 100%;
-  max-width: 380px; /* límite para que no crezcan demasiado */
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
   padding: 14px;
-  font-size: 1rem;
-  border-radius: var(--oneui-radius-sm);
-  font-weight: 700;
-  color: white;
-  box-shadow: var(--oneui-shadow);
-  transition: 0.2s ease;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-weight: 500;
 }
 
-/* Hover escritorio */
-@media (hover: hover) {
-  .feedbackButtons button:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--oneui-shadow-strong);
-  }
+/* ---------- CAJAS DE RESULTADOS ---------- */
+.mainDiagnosisBox {
+  background: #eff6ff; /* Azul muy suave */
+  border-left: 5px solid #2563eb;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 30px;
 }
 
-/* MODO TABLET / PC */
-@media (min-width: 700px) {
-  .feedbackButtons {
-    flex-direction: row;
-    justify-content: center;
-  }
-
-  .feedbackButtons button {
-    width: auto;       /* ← YA NO SE EXPANDE */
-    max-width: none;
-    min-width: 180px;  /* tamaño uniforme */
-    padding: 12px 22px;
-    font-size: 0.95rem;
-  }
+.mainDiagnosisBox h3 {
+  color: #1e40af;
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
 }
 
+.mainDiagnosisBox p {
+  color: #1e3a8a;
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
 
-.feedbackCorrecta { background: var(--oneui-ok); }
-.feedbackCerca { background: var(--oneui-warning); }
-.feedbackIncorrecta { background: var(--oneui-danger); }
+.beginnerTipsBox {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
 
+.textPre {
+  white-space: pre-wrap;
+  color: #475569;
+  line-height: 1.6;
+}
 
+/* ---------- BOLETINES ---------- */
+.bulletinBox {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
 
-/* ============================================================
-   LISTAS AVANZADAS
-   ============================================================ */
+.bulletinBox ul {
+  padding-left: 20px;
+  margin: 0;
+  color: #9a3412;
+}
 
-.causeList,
+/* ---------- LISTA DE PASOS ---------- */
 .stepList {
-  margin-left: 20px;
-  margin-top: 15px;
-  line-height: 1.55;
-  color: var(--oneui-muted);
+  counter-reset: steps;
+  padding: 0;
+  list-style: none;
 }
 
-/* ============================================================
-   TARJETAS DE REPUESTOS — COMPACT MODE
-   ============================================================ */
+.stepList li {
+  position: relative;
+  padding-left: 40px;
+  margin-bottom: 16px;
+  color: #334155;
+  line-height: 1.5;
+}
 
-/* ============================================================
-   TARJETAS DE REPUESTOS — GRID RESPONSIVE REAL
-   ============================================================ */
+.stepList li::before {
+  counter-increment: steps;
+  content: counter(steps);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  background: #e2e8f0;
+  color: #475569;
+  font-weight: bold;
+  font-size: 0.85rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+/* ---------- REPUESTOS (GRID) ---------- */
 .partsContainer {
   display: grid;
-  gap: 22px;
-  margin-top: 30px;
-  justify-content: center; /* Centra la grilla */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
-
-/* Celular — 1 columna */
-@media (max-width: 600px) {
-  .partsContainer {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Tablet — 2 columnas */
-@media (min-width: 601px) and (max-width: 1020px) {
-  .partsContainer {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Laptop y Desktop — 3 columnas centradas */
-@media (min-width: 1021px) {
-  .partsContainer {
-    grid-template-columns: repeat(3, 300px);
-    justify-content: center; /* Centra las 3 tarjetas */
-  }
-}
-
 
 .partCardCompact {
-  background: #fff;
-  border: 1px solid #e6e6e6;
-  border-radius: var(--oneui-card-radius);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
   padding: 16px;
-  text-align: center;
-  box-shadow: var(--oneui-shadow);
-  transition: .2s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .partCardCompact:hover {
-  box-shadow: var(--oneui-shadow-strong);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
 }
 
-/* Imagen */
-.partCompactImage {
-  width: 100%;
-  height: 130px;
-  object-fit: contain;
-  background: #F3F4F6;
-  border-radius: 10px;
+.partCriticalCompact {
+  border: 1px solid #fca5a5;
+  background: #fff9f9;
 }
 
-.partCompactImagePlaceholder {
-  width: 100%;
-  height: 130px;
-  background: #E7E9EC;
-  border-radius: 10px;
+/* ---------- CONTENIDO DE PARTE (TOGGLE) ---------- */
+.partHeader {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
 
-/* Textos compactos */
-.partCompactName {
-  margin-top: 12px;
+.partName {
   font-weight: 700;
-  font-size: 1.05rem;
-  color: var(--oneui-text);
+  color: #1e293b;
+  font-size: 1rem;
+  line-height: 1.3;
 }
 
-.partCompactNumber {
-  margin-top: 4px;
-  font-size: 0.9rem;
-  color: var(--oneui-muted);
-}
-
-.partCriticalBadge {
-  display: inline-block;
-  background: var(--oneui-danger);
-  color: #fff;
-  padding: 3px 8px;
+.partNumberBadge {
+  background: #f1f5f9;
+  padding: 4px 8px;
   border-radius: 6px;
-  font-size: 0.75rem;
-  margin-top: 6px;
-  font-weight: 700;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-family: monospace;
 }
 
-/* Botón Ver más */
-.partDetailsButton {
-  margin-top: 14px;
-  background: var(--oneui-blue);
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: var(--oneui-radius-sm);
+.partBadgeCritical {
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* Botón Toggle */
+.toggleDetailsButton {
+  background: transparent;
+  border: none;
+  color: #2563eb;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  border: none;
+  padding: 0;
+  margin-top: auto; /* Empuja el botón al final si hay espacio */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toggleDetailsButton:hover {
+  text-decoration: underline;
+}
+
+/* Sección expandible */
+.partDetailsExpanded {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #cbd5e1;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.partImage {
   width: 100%;
-  transition: .2s ease;
+  height: 140px;
+  object-fit: contain;
+  background: #fff;
+  margin-bottom: 12px;
+  border-radius: 8px;
 }
 
-.partDetailsButton:hover {
-  background: var(--oneui-blue-strong);
+.detailRow {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #475569;
 }
 
-/* ============================================================
-   MODAL FULLSCREEN — ONE UI
-   ============================================================ */
+.detailLabel {
+  font-weight: 600;
+  color: #1e293b;
+  display: block;
+  margin-bottom: 2px;
+}
 
-.partModalOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(4px);
+/* ---------- FEEDBACK ---------- */
+.feedbackSection {
+  background: #f0f9ff;
+  border: 1px dashed #bae6fd;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.feedbackButtons {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding-top: 40px;
-  z-index: 9999;
+  gap: 16px;
+  margin-top: 12px;
 }
-
-.partModal {
-  width: 94%;
-  max-width: 520px;
-  background: #fff;
-  border-radius: var(--oneui-card-radius);
-  padding: 22px;
-  box-shadow: var(--oneui-shadow-strong);
-  max-height: 85vh;
-  overflow-y: auto;
-}
-
-.modalCloseButton {
-  background: none;
-  border: none;
-  font-size: 1.6rem;
-  float: right;
-  cursor: pointer;
-  color: var(--oneui-text);
-}
-
-.modalImage {
-  width: 100%;
-  height: 180px;
-  object-fit: contain;
-  background: #F3F4F6;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.modalTitle {
-  text-align: center;
-  font-size: 1.45rem;
-  margin-top: 15px;
-  font-weight: 700;
-}
-
-.modalCriticalBadge {
-  display: inline-block;
-  background: var(--oneui-danger);
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 6px;
-  margin: 10px auto;
-  font-weight: 700;
-}
-
-.modalPartNumber,
-.modalDescription,
-.modalReason {
-  margin-top: 14px;
-  line-height: 1.55;
-  color: var(--oneui-text);
-}
-
-/* ===============================================
-   SPINNER — ANIMACIÓN DE CARGA (One UI)
-   =============================================== */
 
 .spinner {
-  animation: spin 0.9s linear infinite;
-  transform-origin: center;
+  animation: spin 1s linear infinite;
 }
-
-/* Animación One UI estilo Samsung */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+@keyframes spin { 100% { transform: rotate(360deg); } }

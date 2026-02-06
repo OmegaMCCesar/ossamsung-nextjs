@@ -1,12 +1,11 @@
 // pages/api/ods/check.js
-import { db } from '@/lib/firebaseAdmin';
-import { collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
+import { db }from '@/lib/firebaseAdmin';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método no permitido. Solo POST.' });
     }
-    
+
     const { odsNumber } = req.body;
     if (!odsNumber) {
         return res.status(400).json({ error: 'ODS es requerida.' });
@@ -15,31 +14,23 @@ export default async function handler(req, res) {
     const cleanOds = odsNumber.trim().toUpperCase();
 
     try {
-        // Buscamos el último uso registrado para esta ODS
-        const q = query(
-            collection(db, "aiUsage"), 
-            where("odsNumber", "==", cleanOds),
-            orderBy("timestamp", "desc"), // El más reciente primero
-            limit(1) 
-        );
+        const snapshot = await db
+            .collection('aiUsage')
+            .where('odsNumber', '==', cleanOds)
+            .limit(1)
+            .get();
 
-        const snapshot = await getDocs(q);
-        
-        let isRegistered = !snapshot.empty;
+        const isRegistered = !snapshot.empty;
         let latestModel = null;
         let latestProductType = null;
-        
+
         if (isRegistered) {
-            const lastDoc = snapshot.docs[0].data();
-            latestModel = lastDoc.model;
-            latestProductType = lastDoc.productType;
+            const docData = snapshot.docs[0].data();
+            latestModel = docData.model || null;
+            latestProductType = docData.productType || null;
         }
 
-        return res.status(200).json({ 
-            isRegistered, 
-            latestModel, 
-            latestProductType 
-        });
+        return res.status(200).json({ isRegistered, latestModel, latestProductType });
 
     } catch (error) {
         console.error("Error al verificar ODS:", error);
