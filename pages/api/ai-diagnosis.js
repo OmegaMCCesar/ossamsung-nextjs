@@ -182,6 +182,7 @@ export default async function handler(req, res) {
     const instructionContext = {
         'Refrigerador': 'Enfócate en sistemas No-Frost, Inverter, sensores de deshielo y damper.',
         'Aire Acondicionado': 'Enfócate en compresor Inverter, fugas, termistores y códigos de comunicación.',
+        'Pantalla': 'Enfocate en partes remplazables como main, panel(incluye display y leds), bocinas , modulo wifi, las prueban deben de ser solo de verificacion de funcionamiento correcto de estas partes, no repar partes '
     };
     const contextNote = instructionContext[productType] || 'Diagnóstico técnico preciso.';
     

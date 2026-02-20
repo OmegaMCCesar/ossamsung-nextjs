@@ -8,13 +8,11 @@ const TestDevice = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Protección de ruta: si no hay usuario tras cargar, va al login
     if (!loading && !user) {
       router.push("/login");
     }
   }, [loading, user, router]);
 
-  // Pantalla de carga mientras se verifica la sesión
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -23,7 +21,6 @@ const TestDevice = () => {
     );
   }
 
-  // Si no hay usuario (y no está cargando), no renderizamos nada para evitar errores
   if (!user) return null;
 
   return (
@@ -35,9 +32,6 @@ const TestDevice = () => {
 
       <hr className="mb-8 border-t border-gray-200" />
 
-      {/* Pasamos los datos del usuario con valores por defecto (|| "") 
-          para evitar que la app explote si un campo no existe en Firebase 
-      */}
       <ExamScreen 
         user={{
           id: user.uid || user.id || "no-id",

@@ -11,6 +11,11 @@ const PRODUCT_TYPES = [
     'Refrigerador',
     'Horno (Microondas/Eléctrico)',
     'Aire Acondicionado',
+    'Pantalla',
+    'Aspiradora',
+    'Barra de sonido',
+    'Secadora',
+    'Centro de lavado',
 ];
 
 const UNLIMITED_ROLES = ['Admin'];
