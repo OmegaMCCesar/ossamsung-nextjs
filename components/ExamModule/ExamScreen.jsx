@@ -1,349 +1,191 @@
 import React, { useState, useEffect, useRef } from "react";
-import styles from "../../styles/ExamScreen.module.css";
+import { 
+  Zap, 
+  BrainCircuit, 
+  AlertTriangle, 
+  CheckCircle2, 
+  ChevronRight, 
+  Loader2 
+} from "lucide-react";
 
-export default function ExamScreen({ user }) {
-  // ---------------------------------------------
-  // PERFIL
-  // ---------------------------------------------
+export default function ExamScreen({ user, onFinish }) {
   const [bp, setBp] = useState("");
   const [name, setName] = useState("");
   const [asc, setAsc] = useState("");
-  const [level, setLevel] = useState(1);
-
-  // ---------------------------------------------
-  // EXAMEN Y METADATA
-  // ---------------------------------------------
   const [product, setProduct] = useState("");
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [scores, setScores] = useState({});
   const [computedLevel, setComputedLevel] = useState(null);
   const [improvements, setImprovements] = useState([]);
-  
-  // 🔥 Nuevo estado para guardar el ID del examen en curso y su info
   const [testId, setTestId] = useState(null);
   const [examMeta, setExamMeta] = useState(null);
-
-  // ---------------------------------------------
-  // ESTADOS DE CONTROL
-  // ---------------------------------------------
   const [loadingExam, setLoadingExam] = useState(false);
   const [loadingEval, setLoadingEval] = useState(false);
   const [error, setError] = useState("");
-
-  // 🔒 Lock absoluto anti-reintentos rápidos
   const evaluationLock = useRef(false);
 
-  const PRODUCTS = [
-    "Refrigerador",
-    "Lavadora",
-    "Lavasecadora",
-    "Microondas",
-    "Aire Acondicionado",
-  ];
+  const PRODUCTS = ["Refrigerador", "Lavadora", "Lavasecadora", "Microondas", "Aire Acondicionado"];
 
-  // ---------------------------------------------
-  // CARGAR DATOS DE USUARIO
-  // ---------------------------------------------
   useEffect(() => {
     if (user) {
       setBp(user.bp || "");
       setName(user.name || "");
       setAsc(user.asc || "");
-      setLevel(user.testLevel || 1);
     }
   }, [user]);
 
-  // ---------------------------------------------
-  // 1️⃣ GENERAR EXAMEN
-  // ---------------------------------------------
+  const handleAnswerChange = (qid, value) => {
+    setAnswers(prev => ({ ...prev, [qid]: value }));
+  };
+
   async function handleGenerateExam() {
     if (loadingExam || loadingEval) return;
-
     setError("");
-
-    if (!bp || !name || !asc) {
-      return setError("Faltan datos del perfil (BP, Nombre o ASC).");
-    }
-
-    if (!product) {
-      return setError("Selecciona un producto.");
-    }
+    if (!product) return setError("Selecciona un producto.");
 
     setLoadingExam(true);
-
     try {
       const res = await fetch("/api/device-tests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product,
-          userId: user.id,
-        }),
+        body: JSON.stringify({ product, userId: user.id }),
       });
-
       const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error || data.message || "Error generando examen.");
-      }
+      if (!res.ok) throw new Error(data.error || "Error al generar.");
 
-      // Guardamos preguntas y el ID vital para la evaluación
       setQuestions(data.questions || []);
-      setTestId(data.testId); 
-      setExamMeta({
-        diagnostic: data.diagnostic,
-        level: data.difficultyContext?.level,
-        mode: data.difficultyContext?.mode
-      });
-      
-      // Reiniciamos estados de respuesta
+      setTestId(data.testId);
+      setExamMeta({ diagnostic: data.diagnostic, level: data.difficultyContext?.level, mode: data.difficultyContext?.mode });
       setAnswers({});
       setScores({});
       setComputedLevel(null);
-      setImprovements([]);
       evaluationLock.current = false;
-
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoadingExam(false);
-    }
+    } catch (e) { setError(e.message); } finally { setLoadingExam(false); }
   }
 
-  // ---------------------------------------------
-  // RESPONDER
-  // ---------------------------------------------
-  function handleAnswerChange(qid, value) {
-    setAnswers(prev => ({
-      ...prev,
-      [qid]: value,
-    }));
-  }
-
-  // ---------------------------------------------
-  // 2️⃣ EVALUAR EXAMEN
-  // ---------------------------------------------
   async function handleEvaluateExam() {
-    if (loadingEval || evaluationLock.current) return;
-
+    // Forzamos el estado de carga primero
     setError("");
-
-    // Validación estricta en frontend
-    for (const q of questions) {
-      if (!answers[q.id] || answers[q.id].trim().length < 5) {
-        setError("⚠️ Todas las preguntas deben estar respondidas completamente (mínimo 5 caracteres).");
-        return;
-      }
-    }
-
-    if (!testId) {
-      setError("Error interno: Falta el ID del examen en curso.");
+    
+    // Validación de seguridad
+    const unanswered = questions.some(q => !answers[q.id] || answers[q.id].trim().length < 5);
+    if (unanswered) {
+      setError("⚠️ Todas las respuestas requieren al menos 5 caracteres técnicos.");
       return;
     }
 
-    // 🔒 Bloqueamos botón
-    evaluationLock.current = true;
+    if (evaluationLock.current) return;
+
     setLoadingEval(true);
+    evaluationLock.current = true;
 
     try {
       const res = await fetch("/api/evaluate-exam", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.id,
-          product,
-          questions,
-          answers,
-          testId, // 🔥 Enviamos el testId al backend
-        }),
+        body: JSON.stringify({ userId: user.id, product, questions, answers, testId }),
       });
-
+      
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error en la evaluación de IA.");
 
-      if (res.status === 429) {
-        throw new Error("⏳ El sistema está evaluando o la cuota fue alcanzada. Intenta más tarde.");
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || "Error evaluando examen.");
-      }
-
-      // ✔️ Resultados recibidos
       setScores(data.scores || {});
       setComputedLevel(Math.round(data.averageScore || 0));
-
-      // ✔️ Filtrar áreas a mejorar (menor a 70 puntos)
-      const weakAreas = Object.values(data.scores || {}).filter(
-        s => s.score < 70
-      );
-
-      setImprovements(weakAreas);
-
+      setImprovements(Object.values(data.scores || {}).filter(s => s.score < 70));
+      
+      // DISPARADOR AL PADRE
+      if (onFinish) {
+        onFinish(data);
+      }
     } catch (e) {
       setError(e.message);
-      evaluationLock.current = false; // Liberamos para que intente de nuevo si falló la red
+      evaluationLock.current = false;
     } finally {
       setLoadingEval(false);
     }
   }
 
-  // ---------------------------------------------
-  // 3️⃣ REINICIAR (SIN RECARGAR PÁGINA)
-  // ---------------------------------------------
-  const handleReset = () => {
-    setProduct("");
-    setQuestions([]);
-    setAnswers({});
-    setScores({});
-    setComputedLevel(null);
-    setImprovements([]);
-    setExamMeta(null);
-    setTestId(null);
-    setError("");
-    evaluationLock.current = false;
-  };
-
-  // ---------------------------------------------
-  // COMPONENTE: OVERLAY DE CARGA
-  // ---------------------------------------------
-  const LoadingOverlay = () => {
-    if (!loadingEval) return null;
-
-    return (
-      <div className={styles.loadingOverlay}>
-        <div className={styles.spinner}></div>
-        <p className={styles.loadingText}>
-          Evaluando examen técnico…<br />
-          No cierres esta pantalla
-        </p>
-      </div>
-    );
-  };
-
-  // ---------------------------------------------
-  // RENDER
-  // ---------------------------------------------
   return (
-    <div className={styles.container}>
-      <LoadingOverlay />
-      
-      <h1 className={styles.title}>Examen Técnico — ODS-SAMG</h1>
-
-      <div className={styles.row}>
-        <input className={styles.input} value={bp} readOnly title="BP" />
-        <input className={styles.input} value={name} readOnly title="Nombre Técnico" />
-        <input className={styles.input} value={asc} readOnly title="Centro de Servicio (ASC)" />
-      </div>
-
-      <div className={styles.row}>
-        <select
-          className={styles.select}
-          value={product}
-          onChange={e => setProduct(e.target.value)}
-          disabled={loadingExam || loadingEval || questions.length > 0}
-        >
-          <option value="">-- Seleccionar Producto --</option>
-          {PRODUCTS.map(p => (
-            <option key={p} value={p}>{p}</option>
-          ))}
-        </select>
-
-        <button
-          className={styles.button}
-          onClick={handleGenerateExam}
-          disabled={loadingExam || loadingEval || !product || questions.length > 0}
-        >
-          {loadingExam ? "Generando..." : "Generar examen"}
-        </button>
-      </div>
-
-      {error && <div className={styles.error}>{error}</div>}
-
-      {/* Indicador visual de la dificultad del examen */}
-      {examMeta && (
-        <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '0.5rem', color: '#1e40af', fontSize: '0.9rem' }}>
-          {examMeta.diagnostic ? (
-            <strong>📝 Examen Diagnóstico (Nivel Inicial)</strong>
-          ) : (
-            <strong>⚙️ Examen Adaptativo — Nivel {examMeta.level} (Modo: {examMeta.mode})</strong>
-          )}
+    <div className="relative w-full min-h-screen">
+      {/* OVERLAY CORREGIDO */}
+      {loadingEval && (
+        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-xl text-white text-center p-6 animate-in fade-in duration-300">
+          <Loader2 size={64} className="animate-spin text-blue-500 mb-6" />
+          <h2 className="text-3xl font-black uppercase italic tracking-tighter">Procesando con Axiom IA</h2>
+          <p className="text-slate-400 font-bold mt-2">Analizando precisión técnica y asignando módulos...</p>
         </div>
       )}
 
-      {/* RENDERIZADO DE PREGUNTAS */}
-      {questions.map((q, i) => (
-        <div key={q.id} className={styles.questionBlock}>
-          <div className={styles.qHeader}>
-            <strong>Pregunta {i + 1}</strong>
-            <span className={styles.badge}>
-              Dificultad {q.difficulty}/5
-            </span>
+      {/* HEADER DE DATOS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        {[ {l: "BP", v: bp}, {l: "Técnico", v: name}, {l: "ASC", v: asc} ].map((d, i) => (
+          <div key={i} className="bg-white border border-slate-200 p-5 rounded-3xl shadow-sm">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{d.l}</p>
+            <p className="font-bold text-slate-800 text-sm truncate">{d.v}</p>
           </div>
+        ))}
+      </div>
 
-          <p className={styles.prompt}>{q.prompt}</p>
-
-          <textarea
-            className={styles.textarea}
-            value={answers[q.id] || ""}
-            placeholder="Describe tu procedimiento técnico detalladamente..."
-            onChange={e => handleAnswerChange(q.id, e.target.value)}
-            disabled={loadingEval || computedLevel !== null}
-          />
-
-          {/* RENDERIZADO DE RESULTADOS INDIVIDUALES */}
-          {scores[q.id] && (
-            <div
-              className={`${styles.feedback} ${
-                scores[q.id].score >= 70 ? styles.good : styles.bad
-              }`}
-            >
-              <strong>Resultado: {scores[q.id].score}%</strong>
-              <p>{scores[q.id].feedback}</p>
+      {questions.length === 0 && (
+        <div className="bg-white p-10 rounded-[3rem] border-2 border-slate-100 shadow-xl animate-in fade-in slide-in-from-bottom-8">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="bg-blue-600 p-3 rounded-2xl text-white shadow-lg shadow-blue-200">
+              <BrainCircuit size={32} />
             </div>
-          )}
+            <h2 className="text-2xl font-black text-slate-900 uppercase italic">Nueva Evaluación</h2>
+          </div>
+          <div className="flex flex-col md:flex-row gap-5">
+            <select
+              className="flex-1 p-5 rounded-[1.5rem] bg-slate-100 border-none font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-500/20 transition-all"
+              value={product}
+              onChange={e => setProduct(e.target.value)}
+              disabled={loadingExam}
+            >
+              <option value="">-- Seleccionar Producto --</option>
+              {PRODUCTS.map(p => <option key={p} value={p}>{p}</option>)}
+            </select>
+            <button
+              className="px-10 py-5 bg-blue-600 text-white font-black rounded-[1.5rem] uppercase text-xs tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95 disabled:opacity-50"
+              onClick={handleGenerateExam}
+              disabled={!product || loadingExam}
+            >
+              {loadingExam ? "Generando..." : "Generar Examen"}
+            </button>
+          </div>
+          {error && <p className="mt-6 text-sm font-bold text-rose-500 flex items-center gap-2"><AlertTriangle size={18}/> {error}</p>}
         </div>
-      ))}
-
-      {/* BOTÓN DE EVALUACIÓN FINAL */}
-      {questions.length > 0 && computedLevel === null && (
-        <button
-          className={styles.primary}
-          onClick={handleEvaluateExam}
-          disabled={loadingEval}
-        >
-          {loadingEval ? "Evaluando examen..." : "Finalizar y Evaluar Examen"}
-        </button>
       )}
 
-      {/* RESUMEN FINAL Y ÁREAS DE MEJORA */}
-      {computedLevel !== null && (
-        <div className={styles.summary}>
-          <h3>Nivel de Competencia Final: {computedLevel}%</h3>
+      {questions.length > 0 && (
+        <div className="space-y-8 animate-in fade-in duration-500">
+          {questions.map((q, i) => (
+            <div key={q.id} className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm">
+              <div className="flex justify-between items-center mb-6">
+                <span className="bg-slate-900 text-white px-4 py-1 rounded-full text-[10px] font-black italic">P {i + 1}</span>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nivel {q.difficulty}/5</span>
+              </div>
+              <p className="text-slate-800 font-bold text-lg mb-6 leading-tight">{q.prompt}</p>
+              <textarea
+                className="w-full p-6 rounded-[2rem] bg-slate-50 border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all outline-none font-medium text-slate-700 min-h-[160px] resize-none"
+                placeholder="Describe tu procedimiento..."
+                value={answers[q.id] || ""}
+                onChange={e => handleAnswerChange(q.id, e.target.value)}
+                disabled={loadingEval}
+              />
+            </div>
+          ))}
 
-          {improvements.length > 0 ? (
-            <>
-              <p style={{ marginTop: '1rem', fontWeight: 'bold' }}>Áreas técnicas a reforzar:</p>
-              <ul style={{ marginTop: '0.5rem', marginBottom: '1.5rem', paddingLeft: '1.5rem', listStyleType: 'disc' }}>
-                {improvements.map((item, i) => (
-                  <li key={i} style={{ marginBottom: '0.5rem' }}>
-                    <strong>{item.score}%</strong> — {item.feedback}
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            <p style={{ marginTop: '1rem', marginBottom: '1.5rem', color: '#15803d', fontWeight: 'bold' }}>
-              ✅ Excelente desempeño técnico. Demuestras gran dominio del producto.
-            </p>
-          )}
-
-          <button
-            className={styles.button}
-            onClick={handleReset}
-          >
-            Tomar otro examen
-          </button>
+          <div className="sticky bottom-10 flex justify-center pb-10">
+            <button
+              className="group px-16 py-6 bg-slate-900 text-white font-black rounded-full uppercase text-xs tracking-[0.3em] shadow-2xl hover:bg-black transition-all hover:scale-105 active:scale-95 flex items-center gap-4"
+              onClick={handleEvaluateExam}
+              disabled={loadingEval}
+            >
+              {loadingEval ? "Evaluando..." : "Finalizar Evaluación"}
+              <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -2,9 +2,9 @@
 
 import { UserProvider } from '@/context/UserContext';
 // pages/_app.js
-import '../styles/globals.css';
+import '@/styles/globals.css';
 import Layout from '../components/Layout';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/NavBar';
 import '../styles/chaoSamg.module.css';
 
 export default function MyApp({ Component, pageProps }) {

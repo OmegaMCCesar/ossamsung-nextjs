@@ -1,32 +1,16 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 
-const genAI = new GoogleGenAI({
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY no configurada");
+}
+
+const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-const MODEL = "gemini-3-flash-preview";
-
-const evaluationSchema = {
-  type: Type.OBJECT,
-  properties: {
-    results: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          questionId: { type: Type.STRING },
-          score: { type: Type.NUMBER },
-          feedback: { type: Type.STRING }
-        },
-        required: ["questionId", "score", "feedback"]
-      }
-    },
-    averageScore: { type: Type.NUMBER }
-  },
-  required: ["results", "averageScore"]
-};
+const MODEL_NAME = "gemini-3-flash-preview";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -38,142 +22,138 @@ export default async function handler(req, res) {
   try {
     const { userId, product, questions, answers, testId } = req.body || {};
 
-    if (!userId || !product || !Array.isArray(questions) || !answers || !testId) {
-      return res.status(400).json({ error: "Datos incompletos o falta ID del examen" });
+    if (!userId || !product || !testId || !Array.isArray(questions) || typeof answers !== "object") {
+      return res.status(400).json({ error: "Datos incompletos o inválidos" });
     }
 
-    // 1️⃣ LOCK / CACHE DE EVALUACIÓN (SINTAXIS ADMIN SDK)
-    const evalSnap = await db.collection("examEvaluations")
+    // 🔐 LOCK anti doble evaluación
+    const pendingSnap = await db.collection("examEvaluations")
       .where("userId", "==", userId)
-      .where("product", "==", product)
+      .where("testId", "==", testId)
       .where("status", "==", "pending")
       .get();
 
-    if (!evalSnap.empty) {
-      return res.status(429).json({
-        error: "Evaluación en proceso",
-        details: "Evita múltiples envíos",
-      });
+    if (!pendingSnap.empty) {
+      return res.status(429).json({ error: "Evaluación ya en proceso" });
     }
 
     evalRef = await db.collection("examEvaluations").add({
-      userId, product, status: "pending", createdAt: FieldValue.serverTimestamp(),
+      userId, product, testId, status: "pending", createdAt: FieldValue.serverTimestamp(),
     });
 
-    // 2️⃣ PROMPT ULTRA ESTRICTO
+    // 🧠 Construcción del bloque de preguntas con CONTEXTO TÉCNICO INYECTADO
     const questionsBlock = questions.map((q, i) => {
-      const answer = (answers[q.id] || "").trim();
-      const isShort = answer.length < 20;
-
+      const answer = (answers[q.id] || "").toString().trim();
       return `
 Pregunta ${i + 1}
 ID: ${q.id}
-Dificultad: ${q.difficulty}/5
+Componente Relacionado: ${q.subTopic} (PN: ${q.partNumber})
 Enunciado: ${q.prompt}
 Respuesta del técnico: "${answer}"
-${isShort ? "⚠️ Respuesta demasiado corta, penalizar fuerte." : ""}
 `;
     }).join("\n");
 
     const prompt = `
-Eres un EVALUADOR TÉCNICO SENIOR EXTREMADAMENTE ESTRICTO de Samsung.
-NO premies respuestas vagas.
+Eres un EVALUADOR TÉCNICO SENIOR de Samsung. Tu misión es calificar la precisión de un técnico.
 
-CRITERIOS:
-- 90–100: Diagnóstico claro + pruebas reales
-- 70–89: Correcto pero incompleto
-- 40–69: Genérico o sin método
-- 0–39: Vago, incorrecto o sin sustento
+REGLAS DE EVALUACIÓN:
+1. Si la pregunta menciona valores técnicos específicos (Ohms, Voltios, Amperios), la respuesta del técnico DEBE coincidir con esos valores para obtener más de 70 puntos.
+2. Penaliza respuestas vagas como "revisar", "verificar" o "cambiar pieza" si no explican el "cómo" o el "qué valor esperar".
+3. Si el score de una pregunta es menor a 80, identifica el componente en 'suggestedPartKey'.
 
-REGLAS:
-- Respuestas cortas o vagas → máximo 40%
-- Sin método de diagnóstico → no superar 60%
+Responde ESTRICTAMENTE en JSON:
+{
+  "results": [
+    {
+      "questionId": "string",
+      "score": number,
+      "feedback": "string (explicar por qué el valor es correcto o incorrecto)",
+      "suggestedPartKey": "string (nombre del componente fallado)"
+    }
+  ],
+  "averageScore": number,
+  "academyTopics": ["Lista de componentes a reforzar"]
+}
 
-Producto: ${product}
 ${questionsBlock}
 `;
 
-    // 3️⃣ IA
-    const aiResponse = await genAI.models.generateContent({
-      model: MODEL,
-      contents: prompt,
-      config: {
-        temperature: 0.1,
-        responseMimeType: "application/json",
-        responseSchema: evaluationSchema,
-      },
+    // 🤖 Llamada a Gemini
+    const aiResponse = await ai.models.generateContent({
+      model: MODEL_NAME,
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      config: { responseMimeType: "application/json" },
     });
 
-    let parsed;
-    try {
-      parsed = JSON.parse(aiResponse.text);
-    } catch (e) {
-      console.error("Error parseando IA:", aiResponse.text);
-      throw new Error("Error procesando los resultados estructurados de la IA.");
+    const rawText = aiResponse?.text || aiResponse?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const cleanedText = rawText.replace(/```json/gi, "").replace(/```/g, "").trim();
+    let parsed = JSON.parse(cleanedText);
+
+    // 📚 Cruce de datos con la colección de Refacciones (Mejorado)
+    const academySuggestions = [];
+    const topicsToSearch = parsed.academyTopics || [];
+
+    // Obtenemos las refacciones involucradas en el examen para un cruce más rápido
+    const involvedPartNumbers = questions.map(q => q.partNumber);
+    
+    if (topicsToSearch.length > 0) {
+      const partsSnap = await db.collection("partsForDiagnosis")
+        .where("partNumber", "in", involvedPartNumbers)
+        .get();
+
+      const examParts = partsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      for (const topic of topicsToSearch) {
+        const normalizedTopic = topic.toLowerCase();
+        
+        // Buscamos el match primero por las partes que sabemos que venían en el examen
+        const match = examParts.find(p => 
+          p.partName.toLowerCase().includes(normalizedTopic) || 
+          normalizedTopic.includes(p.partName.toLowerCase())
+        );
+
+        if (match && !academySuggestions.some(s => s.partNumber === match.partNumber)) {
+          academySuggestions.push({
+            id: match.id,
+            topic,
+            partName: match.partName,
+            partNumber: match.partNumber,
+            imageUrl: match.imageUrl || null,
+            technicalData: match.technicalData || "Ver especificaciones en Academia",
+          });
+        }
+      }
     }
 
-    // 4️⃣ NORMALIZAR RESULTADOS
-    const scores = {};
-    let total = 0;
-    let count = 0;
-
-    parsed.results.forEach(r => {
-      const score = Math.max(0, Math.min(100, Number(r.score) || 0));
-      scores[r.questionId] = { score, feedback: r.feedback || "" };
-      total += score;
-      count++;
-    });
-
-    const averageScore = parsed.averageScore !== undefined 
-      ? parsed.averageScore 
-      : (count ? Math.round(total / count) : 0);
-
-    // 5️⃣ PROGRESIÓN REAL
-    const currentDifficulty = Math.max(...questions.map(q => q.difficulty || 1)) || 1;
-    let nextDifficulty = currentDifficulty;
-    let mode = "normal";
-
-    if (averageScore >= 80) nextDifficulty = Math.min(currentDifficulty + 1, 5);
-    if (averageScore >= 90) mode = "strict";
-    if (averageScore >= 85 && nextDifficulty >= 4) { nextDifficulty = 5; mode = "expert"; }
-
     const finalResult = {
-      scores, averageScore,
-      progression: { currentDifficulty, nextDifficulty, mode, canAdvance: averageScore >= 80 },
+      results: parsed.results,
+      averageScore: parsed.averageScore,
+      academySuggestions,
     };
 
-    // 6️⃣ CERRAR LOCK EXITOSAMENTE (SINTAXIS ADMIN SDK)
+    // 💾 Guardado y actualización de progreso
     await evalRef.update({
-      status: "done", result: finalResult, completedAt: FieldValue.serverTimestamp(),
-    });
-
-    // 7️⃣ HISTORIAL REAL (SINTAXIS ADMIN SDK)
-    await db.collection("examResults").add({
-      userId, product, averageScore, difficultyReached: nextDifficulty,
-      mode, createdAt: FieldValue.serverTimestamp(),
-    });
-
-    // 8️⃣ MARCAR EXAMEN COMO COMPLETADO (SINTAXIS ADMIN SDK)
-    await db.collection("generatedTests").doc(testId).update({
-      status: "completed",
+      status: "done",
+      result: finalResult,
       completedAt: FieldValue.serverTimestamp(),
+    });
+
+    // Actualizamos el resultado oficial para el Dashboard de la Academia
+    await db.collection("examResults").add({
+      userId,
+      product,
+      testId,
+      averageScore: parsed.averageScore,
+      academySuggestions, // Crucial para el index de la academia
+      difficultyReached: Math.max(...questions.map(q => q.difficulty || 1)),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     return res.status(200).json(finalResult);
 
   } catch (err) {
     console.error("evaluate-exam error:", err);
-
-    if (evalRef) {
-      try {
-        await evalRef.update({
-          status: "failed", error: err.message, completedAt: FieldValue.serverTimestamp(),
-        });
-      } catch (unlockErr) {
-        console.error("No se pudo liberar el candado", unlockErr);
-      }
-    }
-
-    return res.status(500).json({ error: "Error evaluando examen", details: err.message });
+    if (evalRef) await evalRef.update({ status: "failed", error: err.message });
+    return res.status(500).json({ error: "Error en la evaluación", details: err.message });
   }
 }
