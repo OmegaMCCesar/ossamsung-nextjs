@@ -10,7 +10,7 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-const MODEL_NAME = "gemini-3-flash-preview";
+const MODEL_NAME = "gemini-3.1-pro-preview";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {

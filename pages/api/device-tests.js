@@ -4,7 +4,7 @@ import { FieldValue } from "firebase-admin/firestore";
 
 // --- CONFIGURACIÓN ---
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const modelName = "gemini-3-flash-preview"; 
+const modelName = "gemini-3.1-pro-preview"; 
 
 const PRODUCT_PREFIXES = {
     "REFRIGERADOR": ["RF", "RT", "RS", "RH"],

@@ -3,7 +3,7 @@ import { db } from '@/lib/firebaseAdmin'; // Usamos Admin SDK directamente
 
 // --- CONFIGURACIÓN Y CONSTANTES ---
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const modelName = "gemini-3-flash-preview"; 
+const modelName = "gemini-3.1-pro-preview"; 
 
 const UNLIMITED_ROLES = ['Admin'];
 const MAX_QUERIES_PER_DEVICE = 50;

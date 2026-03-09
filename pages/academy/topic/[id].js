@@ -105,7 +105,7 @@ export default function TopicDetail() {
               ) : (
                 <FileText size={80} className="text-slate-200" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </div>
           </div>
         </div>
